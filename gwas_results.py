@@ -30,7 +30,10 @@ class GwasResult:
         self.ref = a
         self.alt = r
         self.b = self.b * -1
-        self.alt_freq = (1 - self.alt_freq)
+        try:
+            self.alt_freq = (1 - self.alt_freq)
+        except TypeError:
+            self.alt_freq = None
 
     # TODO only allow once per input
     # TODO safe guard palindromics
@@ -63,12 +66,13 @@ class GwasResult:
             se_field,
             pval_field,
             n0_field,
-            a2_af_field,
             dbsnp_field=None,
             n1_field=None,
+            a1_af_field=None,
+            a2_af_field=None,
             skip_n_rows=0):
 
-        logging.info("Reading sumamry stats and mapping to FASTA: {}".format(path))
+        logging.info("Reading summary stats and mapping to FASTA: {}".format(path))
 
         results = []
         with open(path, "r") as f:
@@ -79,28 +83,33 @@ class GwasResult:
 
                 s = l.strip().split("\t")
 
-                chrom = str(s[int(chrom_field)])
-                pos = int(s[int(pos_field)])
-                ref = str(s[int(a1_field)])
-                alt = str(s[int(a2_field)])
-                b = float(s[int(effect_field)])
-                se = float(s[int(se_field)])
-                pval = float(s[int(pval_field)])
-                n0 = float(s[int(n0_field)])
+                chrom = s[chrom_field]
+                pos = int(s[pos_field])
+                ref = s[a1_field]
+                alt = s[a2_field]
+                b = float(s[effect_field])
+                se = float(s[se_field])
+                pval = float(s[pval_field])
+                n0 = float(s[n0_field])
 
                 try:
-                    alt_freq = float(s[int(a2_af_field)])
-                except ValueError:
+                    if a2_af_field is not None:
+                        alt_freq = float(s[a2_af_field])
+                    elif a1_af_field is not None:
+                        alt_freq = 1 - float(s[a1_af_field])
+                    else:
+                        alt_freq = None
+                except (IndexError, TypeError, ValueError):
                     alt_freq = None
 
                 try:
-                    dbsnpid = str(s[int(dbsnp_field)])
-                except (IndexError, TypeError):
+                    dbsnpid = s[dbsnp_field]
+                except (IndexError, TypeError, ValueError):
                     dbsnpid = None
 
                 try:
-                    n1 = float(s[int(n1_field)])
-                except (IndexError, TypeError):
+                    n1 = float(s[n1_field])
+                except (IndexError, TypeError, ValueError):
                     n1 = None
 
                 # TODO add builds
