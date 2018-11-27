@@ -1,5 +1,3 @@
-from pyfaidx import Fasta
-import pysam
 from Bio.Seq import Seq
 import logging
 
@@ -8,52 +6,23 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(mess
 
 class GwasResult:
 
-    # TODO check alleles are IUPAC
     # TODO set build from FASTA
-    def __init__(self, chrom, pos, build, ref, alt, dbsnpid=None, b=None, se=None, pval=None,
-                 n0=None, n1=None, alt_freq=None, vcf_filter="PASS"):
-        self.chrom = str(chrom)
-        self.pos = int(pos)
-        self.build = str(build)
-        self.ref = str(ref).upper()
-        self.alt = str(alt).upper()
+    def __init__(self, chrom, pos, build, ref, alt, b, se, pval, n0, alt_freq, n1=None, dbsnpid=None,
+                 vcf_filter="PASS"):
 
-        try:
-            self.dbsnpid = str(dbsnpid)
-        except (TypeError, ValueError):
-            self.dbsnpid = None
-
-        try:
-            self.b = float(b)
-        except (TypeError, ValueError):
-            self.b = None
-
-        try:
-            self.se = float(se)
-        except (TypeError, ValueError):
-            self.se = None
-
-        try:
-            self.pval = float(pval)
-        except (TypeError, ValueError):
-            self.pval = None
-
-        try:
-            self.n0 = float(n0)
-        except (TypeError, ValueError):
-            self.n0 = None
-
-        try:
-            self.n1 = float(n1)
-        except (TypeError, ValueError):
-            self.n1 = None
-
-        try:
-            self.alt_freq = float(alt_freq)
-        except (TypeError, ValueError):
-            self.alt_freq = None
-
-        self.vcf_filter = str(vcf_filter)
+        self.chrom = chrom
+        self.pos = pos
+        self.build = build
+        self.ref = str(ref).strip().upper()
+        self.alt = str(alt).strip().upper()
+        self.b = b
+        self.se = se
+        self.pval = pval
+        self.n0 = n0
+        self.alt_freq = alt_freq
+        self.n1 = n1
+        self.dbsnpid = dbsnpid
+        self.vcf_filter = vcf_filter
 
     def reverse_sign(self):
         r = self.ref
@@ -69,17 +38,16 @@ class GwasResult:
         self.ref = Seq(self.ref).reverse_complement()
         self.alt = Seq(self.alt).reverse_complement()
 
-    # TODO add support for indels
-    def is_ref_allele_match_fasta(self, path):
-        with Fasta(path) as fasta:
-            seq = fasta.get_seq(self.chrom, self.pos, self.pos)
-        return str(seq) == self.ref
+    def are_alleles_iupac(self):
+        for bp in self.alt:
+            if bp != 'A' and bp != 'T' and bp != 'C' and bp != 'G':
+                return False
 
-    def is_ref_allele_match_fasta_htslib(self, path):
-        file = pysam.FastaFile(path)
-        seq = file.fetch(region="{}:{}-{}".format(self.chrom, self.pos, self.pos))
-        file.close()
-        return str(seq) == self.ref
+        for bp in self.ref:
+            if bp != 'A' and bp != 'T' and bp != 'C' and bp != 'G':
+                return False
+
+        return True
 
     def __str__(self):
         return f'{self.chrom}\t{self.pos}\t{self.ref}\t{self.alt}'
@@ -87,17 +55,17 @@ class GwasResult:
     @staticmethod
     def read_from_text_file(
             path,
+            chrom_field,
+            pos_field,
+            a1_field,
+            a2_field,
             effect_field,
             se_field,
             pval_field,
+            n0_field,
+            a2_af_field,
             dbsnp_field=None,
-            chrom_field=None,
-            pos_field=None,
-            a1_field=None,
-            a2_field=None,
-            n0_field=None,
             n1_field=None,
-            a2_af_field=None,
             skip_n_rows=0):
 
         logging.info("Reading sumamry stats and mapping to FASTA: {}".format(path))
@@ -110,77 +78,45 @@ class GwasResult:
                     continue
 
                 s = l.strip().split("\t")
-                print(s)
 
-                try:
-                    chrom = s[int(chrom_field)]
-                except IndexError:
-                    chrom = None
-
-                try:
-                    pos = int(s[int(pos_field)])
-                except Exception:
-                    pos = None
-
-                try:
-                    ref = s[int(a1_field)]
-                except Exception:
-                    ref = None
-
-                try:
-                    alt = s[int(a2_field)]
-                except Exception:
-                    alt = None
-
-                try:
-                    dbsnpid = s[int(dbsnp_field)]
-                except Exception:
-                    dbsnpid = None
-
-                try:
-                    b = s[int(effect_field)]
-                except Exception:
-                    b = None
-
-                try:
-                    se = s[int(se_field)]
-                except Exception:
-                    se = None
-
-                try:
-                    pval = s[int(pval_field)]
-                except Exception:
-                    pval = None
-
-                try:
-                    n1 = float(s[int(n1_field)])
-                except Exception:
-                    n1 = None
-
-                try:
-                    n0 = float(s[int(n0_field)])
-                except Exception:
-                    n0 = None
+                chrom = str(s[int(chrom_field)])
+                pos = int(s[int(pos_field)])
+                ref = str(s[int(a1_field)])
+                alt = str(s[int(a2_field)])
+                b = float(s[int(effect_field)])
+                se = float(s[int(se_field)])
+                pval = float(s[int(pval_field)])
+                n0 = float(s[int(n0_field)])
 
                 try:
                     alt_freq = float(s[int(a2_af_field)])
-                except Exception:
+                except ValueError:
                     alt_freq = None
+
+                try:
+                    dbsnpid = str(s[int(dbsnp_field)])
+                except (IndexError, TypeError):
+                    dbsnpid = None
+
+                try:
+                    n1 = float(s[int(n1_field)])
+                except (IndexError, TypeError):
+                    n1 = None
 
                 # TODO add builds
                 result = GwasResult(
-                    chrom=chrom,
-                    pos=pos,
-                    build="b37",
-                    ref=ref,
-                    alt=alt,
-                    dbsnpid=dbsnpid,
-                    b=b,
-                    se=se,
-                    pval=pval,
+                    chrom,
+                    pos,
+                    "b37",
+                    ref,
+                    alt,
+                    b,
+                    se,
+                    pval,
+                    n0,
+                    alt_freq,
                     n1=n1,
-                    n0=n0,
-                    alt_freq=alt_freq
+                    dbsnpid=dbsnpid
                 )
 
                 results.append(result)

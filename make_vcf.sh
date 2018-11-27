@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-g="test/data/jointGwasMc_LDL.split.n50k.txt"
+g="test/data/jointGwasMc_LDL.clean.txt"
 f="/data/db/human/gatk/2.8/b37/human_g1k_v37.fasta"
 v="test/data/jointGwasMc_LDL.vcf"
 
@@ -11,16 +11,16 @@ v="test/data/jointGwasMc_LDL.vcf"
 -g "$g" \
 -f "$f" \
 -s 1 \
--chrom_field 2 \
--pos_field 3 \
--a1_field 5 \
--a2_field 6 \
--effect_field 7 \
--se_field 8 \
--n1_field 9 \
--pval_field 10 \
--dbsnp_field 4 \
--a2_af_field 11
+-chrom_field 0 \
+-pos_field 1 \
+-dbsnp_field 2 \
+-a1_field 3 \
+-a2_field 4 \
+-effect_field 5 \
+-se_field 6 \
+-n0_field 7 \
+-pval_field 8 \
+-a2_af_field 9
 
 # sort vcf
 /share/apps/bedtools-distros/bedtools-2.26.0/bin/bedtools sort \
