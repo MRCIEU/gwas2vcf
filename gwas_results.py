@@ -61,6 +61,7 @@ class GwasResult:
         self.ref = a
         self.alt = r
         self.b = self.b * -1
+        self.alt_freq = (1 - self.alt_freq)
 
     # TODO only allow once per input
     # TODO safe guard palindromics
@@ -84,7 +85,21 @@ class GwasResult:
         return f'{self.chrom}\t{self.pos}\t{self.ref}\t{self.alt}'
 
     @staticmethod
-    def read_from_text_file(path, skip_n_rows=0):
+    def read_from_text_file(
+            path,
+            effect_field,
+            se_field,
+            pval_field,
+            dbsnp_field=None,
+            chrom_field=None,
+            pos_field=None,
+            a1_field=None,
+            a2_field=None,
+            n0_field=None,
+            n1_field=None,
+            a2_af_field=None,
+            skip_n_rows=0):
+
         logging.info("Reading sumamry stats and mapping to FASTA: {}".format(path))
 
         results = []
@@ -95,18 +110,77 @@ class GwasResult:
                     continue
 
                 s = l.strip().split("\t")
+                print(s)
+
+                try:
+                    chrom = s[int(chrom_field)]
+                except IndexError:
+                    chrom = None
+
+                try:
+                    pos = int(s[int(pos_field)])
+                except Exception:
+                    pos = None
+
+                try:
+                    ref = s[int(a1_field)]
+                except Exception:
+                    ref = None
+
+                try:
+                    alt = s[int(a2_field)]
+                except Exception:
+                    alt = None
+
+                try:
+                    dbsnpid = s[int(dbsnp_field)]
+                except Exception:
+                    dbsnpid = None
+
+                try:
+                    b = s[int(effect_field)]
+                except Exception:
+                    b = None
+
+                try:
+                    se = s[int(se_field)]
+                except Exception:
+                    se = None
+
+                try:
+                    pval = s[int(pval_field)]
+                except Exception:
+                    pval = None
+
+                try:
+                    n1 = float(s[int(n1_field)])
+                except Exception:
+                    n1 = None
+
+                try:
+                    n0 = float(s[int(n0_field)])
+                except Exception:
+                    n0 = None
+
+                try:
+                    alt_freq = float(s[int(a2_af_field)])
+                except Exception:
+                    alt_freq = None
+
+                # TODO add builds
                 result = GwasResult(
-                    chrom=s[1].split(":")[0].replace("chr", ""),
-                    pos=int(s[1].split(":")[1]),
+                    chrom=chrom,
+                    pos=pos,
                     build="b37",
-                    ref=s[3],
-                    alt=s[4],
-                    dbsnpid=s[2],
-                    b=s[5],
-                    se=s[6],
-                    pval=s[8],
-                    n1=int(round(float(s[7]))),
-                    alt_freq=s[9]
+                    ref=ref,
+                    alt=alt,
+                    dbsnpid=dbsnpid,
+                    b=b,
+                    se=se,
+                    pval=pval,
+                    n1=n1,
+                    n0=n0,
+                    alt_freq=alt_freq
                 )
 
                 results.append(result)
