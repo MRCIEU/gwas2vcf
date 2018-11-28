@@ -6,17 +6,8 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(mess
 
 class Vcf:
 
-    # TODO set from fasta
     @staticmethod
-    def get_contig_headers(path):
-        contigs = []
-        with open('test/data/contigs.vcf') as f:
-            for l in f:
-                contigs.append(l.strip())
-            return contigs
-
-    @staticmethod
-    def write_to_file(gwas_results, path):
+    def write_to_file(gwas_results, path, fasta):
         logging.info("Writing to VCF: {}".format(path))
 
         header = pysam.VariantHeader()
@@ -28,9 +19,11 @@ class Vcf:
         header.add_line('##INFO=<ID=N1,Number=A,Type=Float,Description="Number of cases. 0 if continuous trait">')
         header.add_line(
             '##INFO=<ID=N0,Number=A,Type=Float,Description="Number of controls. Total sample size if continuous trait">')
-        contigs = Vcf.get_contig_headers('test/data/contigs.vcf')
-        for contig in contigs:
-            header.add_line(contig)
+
+        # add contig lengths
+        assert len(fasta.references) == len(fasta.lengths)
+        for n, contig in enumerate(fasta.references):
+            header.add_line("##contig=<ID={},length={}>".format(contig, fasta.lengths[n]))
 
         vcf = pysam.VariantFile(path, "w", header=header)
 

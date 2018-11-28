@@ -3,6 +3,7 @@ import logging
 from gwas_results import GwasResult
 from vcf import Vcf
 import pysam
+from harmonise import Harmonise
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 
@@ -33,12 +34,8 @@ def main():
     # load fasta fai
     fasta = pysam.FastaFile(args.fasta)
 
-    # count skipped lines
-    excluded_variants = 0
-
     # read in GWAS and harmonise alleles to reference fasta
-    harmonised = []
-    orig = GwasResult.read_from_text_file(
+    gwas = GwasResult.read_from_text_file(
         args.gwas,
         args.chrom_field,
         args.pos_field,
@@ -54,33 +51,16 @@ def main():
         a2_af_field=args.a2_af_field,
         skip_n_rows=args.skip)
 
-    for r in orig:
-
-        if not r.are_alleles_iupac():
-            logging.warning("Skipping record {}: allele(s) are not standard IUPAC".format(r))
-            excluded_variants += 1
-            continue
-
-        # get expected FASTA REF
-        # TODO add support for indels
-        expected_ref_allele = str(fasta.fetch(region="{}:{}-{}".format(r.chrom, r.pos, r.pos))).upper()
-
-        if r.ref != expected_ref_allele:
-            r.reverse_sign()
-            if r.ref != expected_ref_allele:
-                logging.warning("Skipping record {}: could not match to FASTA {}".format(r, expected_ref_allele))
-                excluded_variants += 1
-                continue
-
-        harmonised.append(r)
+    # harmonise to FASTA
+    harmonised, excluded_variants = Harmonise.align_gwas_to_fasta(gwas, fasta)
 
     # check number of skipped is acceptable
-    logging.info("Skipped {} of {}".format(excluded_variants, len(orig)))
-    if excluded_variants / len(orig) > args.max_missing:
+    logging.info("Skipped {} of {}".format(excluded_variants, len(gwas)))
+    if excluded_variants / len(gwas) > args.max_missing:
         raise RuntimeError("Too many sites skipped.")
 
     # write to vcf
-    Vcf.write_to_file(harmonised, args.out)
+    Vcf.write_to_file(harmonised, args.out, fasta)
 
     fasta.close()
 

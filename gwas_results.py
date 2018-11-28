@@ -6,13 +6,11 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(mess
 
 class GwasResult:
 
-    # TODO set build from FASTA
-    def __init__(self, chrom, pos, build, ref, alt, b, se, pval, n0, alt_freq, n1=None, dbsnpid=None,
+    def __init__(self, chrom, pos, ref, alt, b, se, pval, n0, alt_freq, n1=None, dbsnpid=None,
                  vcf_filter="PASS"):
 
         self.chrom = chrom
         self.pos = pos
-        self.build = build
         self.ref = str(ref).strip().upper()
         self.alt = str(alt).strip().upper()
         self.b = b
@@ -112,11 +110,9 @@ class GwasResult:
                 except (IndexError, TypeError, ValueError):
                     n1 = None
 
-                # TODO add builds
                 result = GwasResult(
                     chrom,
                     pos,
-                    "b37",
                     ref,
                     alt,
                     b,
