@@ -2,11 +2,11 @@
 set -euxo pipefail
 
 # get data
-curl -L http://csg.sph.umich.edu/abecasis/public/lipids2013/jointGwasMc_LDL.txt.gz | \
-gzip -dc | \
-cut -s -f2- | \
-sed 's/^chr//g' | \
-tr ':' '\t' > test/data/jointGwasMc_LDL.txt
+#curl -L http://csg.sph.umich.edu/abecasis/public/lipids2013/jointGwasMc_LDL.txt.gz | \
+#gzip -dc | \
+#cut -s -f2- | \
+#sed 's/^chr//g' | \
+#tr ':' '\t' > test/data/jointGwasMc_LDL.txt
 
 g="test/data/jointGwasMc_LDL.txt"
 f="/data/db/human/gatk/2.8/b37/human_g1k_v37.fasta"
@@ -21,13 +21,13 @@ v="test/data/jointGwasMc_LDL.vcf"
 -chrom_field 0 \
 -pos_field 1 \
 -dbsnp_field 2 \
--a1_field 3 \
--a2_field 4 \
+-ea_field 3 \
+-nea_field 4 \
 -effect_field 5 \
 -se_field 6 \
 -n0_field 7 \
 -pval_field 8 \
--a1_af_field 9
+-ea_af_field 9
 
 # sort vcf
 /share/apps/bedtools-distros/bedtools-2.26.0/bin/bedtools sort \

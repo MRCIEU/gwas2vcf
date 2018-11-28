@@ -77,7 +77,7 @@ class GwasResult:
             for n, l in enumerate(f):
 
                 if n < skip_n_rows:
-                    logging.info("Skipping header {}".format(l.strip()))
+                    logging.info("Skipping header: {}".format(l.strip()))
                     continue
 
                 s = l.strip().split("\t")

@@ -19,8 +19,8 @@ def main():
     parser.add_argument('-chrom_field', dest='chrom_field', type=int, required=True,
                         help='Column number for chromosome')
     parser.add_argument('-pos_field', dest='pos_field', type=int, required=True, help='Column number for chromosome')
-    parser.add_argument('-ea_field', dest='a1_field', type=int, required=True, help='Column number for effect allele')
-    parser.add_argument('-nea_field', dest='a2_field', type=int, required=True,
+    parser.add_argument('-ea_field', dest='ea_field', type=int, required=True, help='Column number for effect allele')
+    parser.add_argument('-nea_field', dest='nea_field', type=int, required=True,
                         help='Column number for non-effect allele')
     parser.add_argument('-effect_field', dest='effect_field', type=int, required=True, help='Effect size field')
     parser.add_argument('-se_field', dest='se_field', type=int, required=True, help='SE field')
@@ -28,9 +28,9 @@ def main():
     parser.add_argument('-n0_field', dest='n0_field', type=int, required=True, help='N0 field')
     parser.add_argument('-dbsnp_field', dest='dbsnp_field', type=int, required=False, help='dbSNP identifier field')
     parser.add_argument('-n1_field', dest='n1_field', type=int, required=False, help='N1 field')
-    parser.add_argument('-ea_af_field', dest='a1_af_field', type=int, required=False,
+    parser.add_argument('-ea_af_field', dest='ea_af_field', type=int, required=False,
                         help='Effect allele frequency field')
-    parser.add_argument('-nea_af_field', dest='a2_af_field', type=int, required=False,
+    parser.add_argument('-nea_af_field', dest='nea_af_field', type=int, required=False,
                         help='None effect allele frequency field')
     args = parser.parse_args()
 
