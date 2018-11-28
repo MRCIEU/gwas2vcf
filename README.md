@@ -12,11 +12,25 @@ pip install -r ./requirements.txt
 
 ## Running the tests
 
+Unit tests:
+
 ```
 python -m unittest discover gwas_harmonisation/test
 ```
 
+End-to-end tests:
+
+```
+# convert GIANT to BCF
+bash test/make_vcf.bmi.sh
+
+# convert GLGC to BCF
+bash test/make_vcf.bmi.sh
+```
+
 ## Usage
+
+Column field numbers are 0-based
 
 ```
 python gwas_harmonisation/main.py \

@@ -8,9 +8,9 @@ set -euxo pipefail
 #sed 's/^chr//g' | \
 #tr ':' '\t' > test/data/jointGwasMc_LDL.txt
 
-g="test/data/jointGwasMc_LDL.txt"
-f="/data/db/human/gatk/2.8/b37/human_g1k_v37.fasta"
-v="test/data/jointGwasMc_LDL.vcf"
+g="data/jointGwasMc_LDL.txt"
+f="data/db/human/gatk/2.8/b37/human_g1k_v37.fasta"
+v="data/jointGwasMc_LDL.vcf"
 
 # make VCF
 /Users/ml/GitLab/gwas_harmonisation/venv/bin/python /Users/ml/GitLab/gwas_harmonisation/main.py \
