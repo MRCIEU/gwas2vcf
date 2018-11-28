@@ -6,8 +6,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(mess
 
 class GwasResult:
 
-    def __init__(self, chrom, pos, ref, alt, b, se, pval, n0, alt_freq, n1=None, dbsnpid=None,
-                 vcf_filter="PASS"):
+    def __init__(self, chrom, pos, ref, alt, b, se, pval, n0, alt_freq, n1, dbsnpid, vcf_filter="PASS"):
 
         self.chrom = chrom
         self.pos = pos
@@ -63,8 +62,8 @@ class GwasResult:
             effect_field,
             se_field,
             pval_field,
-            n0_field,
             dbsnp_field=None,
+            n0_field=None,
             n1_field=None,
             ea_af_field=None,
             nea_af_field=None,
@@ -89,7 +88,6 @@ class GwasResult:
                 b = float(s[effect_field])
                 se = float(s[se_field])
                 pval = float(s[pval_field])
-                n0 = float(s[n0_field])
 
                 try:
                     if nea_af_field is not None:
@@ -107,6 +105,11 @@ class GwasResult:
                     dbsnpid = None
 
                 try:
+                    n0 = float(s[n0_field])
+                except (IndexError, TypeError, ValueError):
+                    n0 = None
+
+                try:
                     n1 = float(s[n1_field])
                 except (IndexError, TypeError, ValueError):
                     n1 = None
@@ -121,8 +124,8 @@ class GwasResult:
                     pval,
                     n0,
                     alt_freq,
-                    n1=n1,
-                    dbsnpid=dbsnpid
+                    n1,
+                    dbsnpid
                 )
 
                 results.append(result)
