@@ -10,6 +10,18 @@ cd gwas_harmonisation
 pip install -r ./requirements.txt
 ```
 
+### Reference FASTA
+
+```
+# GRCh37/hg19/b37
+wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/b37/human_g1k_v37.fasta
+wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/b37/human_g1k_v37.fasta.fai
+
+# GRCh38/hg38/b38
+wget https://storage.googleapis.com/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta
+wget https://storage.googleapis.com/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta.fai
+```
+
 ## Running the tests
 
 Unit tests:

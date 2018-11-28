@@ -2,12 +2,12 @@
 set -euxo pipefail
 
 # get data
-curl -L https://portals.broadinstitute.org/collaboration/giant/images/c/c8/Meta-analysis_Locke_et_al%2BUKBiobank_2018_UPDATED.txt.gz | \
-gzip -dc > data/Meta-analysis_Locke_et_al_UKBiobank_2018_UPDATED.txt
+curl -L http://www.cardiogramplusc4d.org/media/cardiogramplusc4d-consortium/data-downloads/UKBB.GWAS1KG.EXOME.CAD.SOFT.META.PublicRelease.300517.txt.gz | \
+gzip -dc > data/UKBB.GWAS1KG.EXOME.CAD.SOFT.META.PublicRelease.300517.txt
 
-g="data/Meta-analysis_Locke_et_al_UKBiobank_2018_UPDATED.txt"
-f="/data/db/human/gatk/2.8/b37/human_g1k_v37.fasta"
-v="data/Meta-analysis_Locke_et_al_UKBiobank_2018_UPDATED.vcf"
+g="data/UKBB.GWAS1KG.EXOME.CAD.SOFT.META.PublicRelease.300517.txt"
+f="data/db/human/gatk/2.8/b37/human_g1k_v37.fasta"
+v="data/UKBB.GWAS1KG.EXOME.CAD.SOFT.META.PublicRelease.300517.vcf"
 
 # make VCF
 /Users/ml/GitLab/gwas_harmonisation/venv/bin/python /Users/ml/GitLab/gwas_harmonisation/main.py \
@@ -15,16 +15,15 @@ v="data/Meta-analysis_Locke_et_al_UKBiobank_2018_UPDATED.vcf"
 -g "$g" \
 -f "$f" \
 -s 1 \
--chrom_field 0 \
--pos_field 1 \
--dbsnp_field 2 \
--ea_field 3 \
--nea_field 4 \
--ea_af_field 5 \
--effect_field 6 \
--se_field 7 \
--pval_field 8 \
--n0_field 9
+-dbsnp_field 1 \
+-chrom_field 2 \
+-pos_field 3 \
+-ea_field 4 \
+-nea_field 5 \
+-ea_af_field 6 \
+-effect_field 7 \
+-se_field 8 \
+-pval_field 9
 
 # sort vcf
 /share/apps/bedtools-distros/bedtools-2.26.0/bin/bedtools sort \

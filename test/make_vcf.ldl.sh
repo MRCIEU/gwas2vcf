@@ -2,11 +2,11 @@
 set -euxo pipefail
 
 # get data
-#curl -L http://csg.sph.umich.edu/abecasis/public/lipids2013/jointGwasMc_LDL.txt.gz | \
-#gzip -dc | \
-#cut -s -f2- | \
-#sed 's/^chr//g' | \
-#tr ':' '\t' > test/data/jointGwasMc_LDL.txt
+curl -L http://csg.sph.umich.edu/abecasis/public/lipids2013/jointGwasMc_LDL.txt.gz | \
+gzip -dc | \
+cut -s -f2- | \
+sed 's/^chr//g' | \
+tr ':' '\t' > data/jointGwasMc_LDL.txt
 
 g="data/jointGwasMc_LDL.txt"
 f="data/db/human/gatk/2.8/b37/human_g1k_v37.fasta"
