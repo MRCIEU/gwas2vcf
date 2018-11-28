@@ -19,16 +19,19 @@ def main():
     parser.add_argument('-chrom_field', dest='chrom_field', type=int, required=True,
                         help='Column number for chromosome')
     parser.add_argument('-pos_field', dest='pos_field', type=int, required=True, help='Column number for chromosome')
-    parser.add_argument('-a1_field', dest='a1_field', type=int, required=True, help='Column number for allele 1')
-    parser.add_argument('-a2_field', dest='a2_field', type=int, required=True, help='Column number for allele 2')
+    parser.add_argument('-ea_field', dest='a1_field', type=int, required=True, help='Column number for effect allele')
+    parser.add_argument('-nea_field', dest='a2_field', type=int, required=True,
+                        help='Column number for non-effect allele')
     parser.add_argument('-effect_field', dest='effect_field', type=int, required=True, help='Effect size field')
     parser.add_argument('-se_field', dest='se_field', type=int, required=True, help='SE field')
     parser.add_argument('-pval_field', dest='pval_field', type=int, required=True, help='P-Value field')
     parser.add_argument('-n0_field', dest='n0_field', type=int, required=True, help='N0 field')
     parser.add_argument('-dbsnp_field', dest='dbsnp_field', type=int, required=False, help='dbSNP identifier field')
     parser.add_argument('-n1_field', dest='n1_field', type=int, required=False, help='N1 field')
-    parser.add_argument('-a1_af_field', dest='a1_af_field', type=int, required=False, help='Allele 1 frequency field')
-    parser.add_argument('-a2_af_field', dest='a2_af_field', type=int, required=False, help='Allele 2 frequency field')
+    parser.add_argument('-ea_af_field', dest='a1_af_field', type=int, required=False,
+                        help='Effect allele frequency field')
+    parser.add_argument('-nea_af_field', dest='a2_af_field', type=int, required=False,
+                        help='None effect allele frequency field')
     args = parser.parse_args()
 
     # load fasta fai
@@ -39,16 +42,16 @@ def main():
         args.gwas,
         args.chrom_field,
         args.pos_field,
-        args.a1_field,
-        args.a2_field,
+        args.ea_field,
+        args.nea_field,
         args.effect_field,
         args.se_field,
         args.pval_field,
         args.n0_field,
         dbsnp_field=args.dbsnp_field,
         n1_field=args.n1_field,
-        a1_af_field=args.a1_af_field,
-        a2_af_field=args.a2_af_field,
+        ea_af_field=args.ea_af_field,
+        nea_af_field=args.nea_af_field,
         skip_n_rows=args.skip)
 
     # harmonise to FASTA

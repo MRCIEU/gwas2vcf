@@ -58,16 +58,16 @@ class GwasResult:
             path,
             chrom_field,
             pos_field,
-            a1_field,
-            a2_field,
+            ea_field,
+            nea_field,
             effect_field,
             se_field,
             pval_field,
             n0_field,
             dbsnp_field=None,
             n1_field=None,
-            a1_af_field=None,
-            a2_af_field=None,
+            ea_af_field=None,
+            nea_af_field=None,
             skip_n_rows=0):
 
         logging.info("Reading summary stats and mapping to FASTA: {}".format(path))
@@ -77,24 +77,25 @@ class GwasResult:
             for n, l in enumerate(f):
 
                 if n < skip_n_rows:
+                    logging.info("Skipping header {}".format(l.strip()))
                     continue
 
                 s = l.strip().split("\t")
 
                 chrom = s[chrom_field]
                 pos = int(s[pos_field])
-                ref = s[a1_field]
-                alt = s[a2_field]
+                ref = s[ea_field]
+                alt = s[nea_field]
                 b = float(s[effect_field])
                 se = float(s[se_field])
                 pval = float(s[pval_field])
                 n0 = float(s[n0_field])
 
                 try:
-                    if a2_af_field is not None:
-                        alt_freq = float(s[a2_af_field])
-                    elif a1_af_field is not None:
-                        alt_freq = 1 - float(s[a1_af_field])
+                    if nea_af_field is not None:
+                        alt_freq = float(s[nea_af_field])
+                    elif ea_af_field is not None:
+                        alt_freq = 1 - float(s[ea_af_field])
                     else:
                         alt_freq = None
                 except (IndexError, TypeError, ValueError):
