@@ -1,5 +1,7 @@
 import pysam
 import logging
+from datetime import datetime
+import git
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 
@@ -9,6 +11,8 @@ class Vcf:
     @staticmethod
     def write_to_file(gwas_results, path, fasta):
         logging.info("Writing to VCF: {}".format(path))
+        repo = git.Repo(search_parent_directories=True)
+        sha = repo.head.object.hexsha
 
         header = pysam.VariantHeader()
         header.add_line(
@@ -19,6 +23,8 @@ class Vcf:
         header.add_line('##INFO=<ID=N1,Number=A,Type=Float,Description="Number of cases. 0 if continuous trait">')
         header.add_line(
             '##INFO=<ID=N0,Number=A,Type=Float,Description="Number of controls. Total sample size if continuous trait">')
+        header.add_line('##fileDate={}'.format(datetime.now().isoformat()))
+        header.add_line('##sourceVersion={}'.format(sha))
 
         # add contig lengths
         assert len(fasta.references) == len(fasta.lengths)
