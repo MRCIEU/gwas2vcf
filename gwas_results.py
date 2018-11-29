@@ -6,7 +6,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(mess
 
 class GwasResult:
 
-    def __init__(self, chrom, pos, ref, alt, b, se, pval, n0, alt_freq, n1, dbsnpid, vcf_filter="PASS"):
+    def __init__(self, chrom, pos, ref, alt, b, se, pval, n, alt_freq, dbsnpid, vcf_filter="PASS"):
 
         self.chrom = chrom
         self.pos = pos
@@ -15,9 +15,8 @@ class GwasResult:
         self.b = b
         self.se = se
         self.pval = pval
-        self.n0 = n0
         self.alt_freq = alt_freq
-        self.n1 = n1
+        self.n = n
         self.dbsnpid = dbsnpid
         self.vcf_filter = vcf_filter
 
@@ -63,13 +62,13 @@ class GwasResult:
             se_field,
             pval_field,
             dbsnp_field=None,
-            n0_field=None,
-            n1_field=None,
+            n_field=None,
             ea_af_field=None,
             nea_af_field=None,
             skip_n_rows=0):
 
         logging.info("Reading summary stats and mapping to FASTA: {}".format(path))
+        total_variants = 0
 
         results = []
         with open(path, "r") as f:
@@ -78,6 +77,8 @@ class GwasResult:
                 if n < skip_n_rows:
                     logging.info("Skipping header: {}".format(l.strip()))
                     continue
+
+                total_variants += 1
 
                 s = l.strip().split("\t")
 
@@ -111,14 +112,9 @@ class GwasResult:
                     dbsnpid = None
 
                 try:
-                    n0 = float(s[n0_field])
+                    n = float(s[n_field])
                 except (IndexError, TypeError, ValueError):
-                    n0 = None
-
-                try:
-                    n1 = float(s[n1_field])
-                except (IndexError, TypeError, ValueError):
-                    n1 = None
+                    n = None
 
                 result = GwasResult(
                     chrom,
@@ -128,12 +124,11 @@ class GwasResult:
                     b,
                     se,
                     pval,
-                    n0,
+                    n,
                     alt_freq,
-                    n1,
                     dbsnpid
                 )
 
                 results.append(result)
 
-        return results
+        return results, total_variants

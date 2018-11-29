@@ -8,6 +8,7 @@ class Harmonise:
     @staticmethod
     def align_gwas_to_fasta(variants, fasta):
         excluded_variants = 0
+        flipped_variants = 0
         harmonised = []
 
         for variant in variants:
@@ -28,6 +29,7 @@ class Harmonise:
 
             if variant.ref != expected_ref_allele:
                 variant.reverse_sign()
+                flipped_variants += 1
 
                 if len(variant.ref) != len(variant.alt):
                     # get expected FASTA REF
@@ -46,4 +48,4 @@ class Harmonise:
 
             harmonised.append(variant)
 
-        return harmonised, excluded_variants
+        return harmonised, excluded_variants, flipped_variants

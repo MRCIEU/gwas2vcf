@@ -20,16 +20,15 @@ class Vcf:
         header.add_line('##INFO=<ID=SE,Number=A,Type=Float,Description="Standard error of effect size estimate">')
         header.add_line('##INFO=<ID=P,Number=A,Type=Float,Description="P-value for effect estimate">')
         header.add_line('##INFO=<ID=AF,Number=A,Type=Float,Description="Alternate allele frequency">')
-        header.add_line('##INFO=<ID=N1,Number=A,Type=Float,Description="Number of cases. 0 if continuous trait">')
-        header.add_line(
-            '##INFO=<ID=N0,Number=A,Type=Float,Description="Number of controls. Total sample size if continuous trait">')
-        header.add_line('##fileDate={}'.format(datetime.now().isoformat()))
-        header.add_line('##sourceVersion={}'.format(sha))
+        header.add_line('##INFO=<ID=N,Number=A,Type=Float,Description="Total number of samples">')
 
         # add contig lengths
         assert len(fasta.references) == len(fasta.lengths)
         for n, contig in enumerate(fasta.references):
             header.add_line("##contig=<ID={},length={}>".format(contig, fasta.lengths[n]))
+
+        header.add_line('##fileDate={}'.format(datetime.now().isoformat()))
+        header.add_line('##sourceVersion={}'.format(sha))
 
         vcf = pysam.VariantFile(path, "w", header=header)
 
@@ -44,9 +43,7 @@ class Vcf:
             record.info['SE'] = result.se
             record.info['P'] = result.pval
             record.info['AF'] = result.alt_freq
-            record.info['N1'] = result.n1
-            record.info['N0'] = result.n0
-
+            record.info['N'] = result.n
             vcf.write(record)
 
         vcf.close()

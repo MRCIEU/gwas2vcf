@@ -25,9 +25,8 @@ def main():
     parser.add_argument('-effect_field', dest='effect_field', type=int, required=True, help='Effect size field')
     parser.add_argument('-se_field', dest='se_field', type=int, required=True, help='SE field')
     parser.add_argument('-pval_field', dest='pval_field', type=int, required=True, help='P-Value field')
-    parser.add_argument('-n0_field', dest='n0_field', type=int, required=False, help='N0 field')
+    parser.add_argument('-n_field', dest='n_field', type=int, required=False, help='Number of samples field')
     parser.add_argument('-dbsnp_field', dest='dbsnp_field', type=int, required=False, help='dbSNP identifier field')
-    parser.add_argument('-n1_field', dest='n1_field', type=int, required=False, help='N1 field')
     parser.add_argument('-ea_af_field', dest='ea_af_field', type=int, required=False,
                         help='Effect allele frequency field')
     parser.add_argument('-nea_af_field', dest='nea_af_field', type=int, required=False,
@@ -38,7 +37,7 @@ def main():
     fasta = pysam.FastaFile(args.fasta)
 
     # read in GWAS and harmonise alleles to reference fasta
-    gwas = GwasResult.read_from_text_file(
+    gwas, total_variants = GwasResult.read_from_text_file(
         args.gwas,
         args.chrom_field,
         args.pos_field,
@@ -48,17 +47,24 @@ def main():
         args.se_field,
         args.pval_field,
         dbsnp_field=args.dbsnp_field,
-        n0_field=args.n0_field,
-        n1_field=args.n1_field,
+        n_field=args.n_field,
         ea_af_field=args.ea_af_field,
         nea_af_field=args.nea_af_field,
         skip_n_rows=args.skip)
 
+    logging.info("Total variants {}".format(total_variants))
+    logging.info("Variants could not be read {}".format(total_variants - len(gwas)))
+
+    # print first lines for debugging
     for i in range(10):
         logging.info("Mapped line {}: {}".format(i, gwas[i]))
 
     # harmonise to FASTA
-    harmonised, excluded_variants = Harmonise.align_gwas_to_fasta(gwas, fasta)
+    harmonised, excluded_variants, flipped_variants = Harmonise.align_gwas_to_fasta(gwas, fasta)
+
+    logging.info("Variants after harmonisation {}".format(len(harmonised)))
+    logging.info("Variants discarded during harmonisation {}".format(len(gwas) - len(harmonised)))
+    logging.info("Alleles switched {}".format(flipped_variants - (len(gwas) - len(harmonised))))
 
     # check number of skipped is acceptable
     logging.info("Skipped {} of {}".format(excluded_variants, len(gwas)))
