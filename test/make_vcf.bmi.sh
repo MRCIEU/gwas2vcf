@@ -24,7 +24,7 @@ v="data/Meta-analysis_Locke_et_al_UKBiobank_2018_UPDATED.vcf"
 -effect_field 6 \
 -se_field 7 \
 -pval_field 8 \
--n0_field 9
+-n_field 9
 
 # sort vcf
 /share/apps/bedtools-distros/bedtools-2.26.0/bin/bedtools sort \

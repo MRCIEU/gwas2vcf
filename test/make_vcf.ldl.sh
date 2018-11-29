@@ -25,7 +25,7 @@ v="data/jointGwasMc_LDL.vcf"
 -nea_field 4 \
 -effect_field 5 \
 -se_field 6 \
--n0_field 7 \
+-n_field 7 \
 -pval_field 8 \
 -ea_af_field 9
 
