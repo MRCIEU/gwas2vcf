@@ -4,6 +4,8 @@ from gwas_results import GwasResult
 from vcf import Vcf
 import pysam
 from harmonise import Harmonise
+import json
+import os
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 
@@ -73,6 +75,26 @@ def main():
 
     # write to vcf
     Vcf.write_to_file(harmonised, args.out, fasta)
+
+    # write metrics to json
+    metrics = {}
+    name, ext = os.path.splitext(args.out)
+
+    # add args
+    for arg in vars(args):
+        metrics['args'][arg] = getattr(args, arg)
+
+    # add counts
+    metrics['counts']['total_variants'] = total_variants
+    metrics['counts']['variants_not_read'] = total_variants - len(gwas)
+    metrics['counts']['harmonised_variants'] = len(harmonised)
+    metrics['counts']['variants_not_harmonised'] = len(gwas) - len(harmonised)
+    metrics['counts']['switched_alleles'] = flipped_variants - (len(gwas) - len(harmonised))
+    metrics['counts']['total_excluded_variants'] = excluded_variants
+
+    # write to file
+    with open(os.path.join(name, ".json"), 'w') as f:
+        json.dump(metrics, f, ensure_ascii=False)
 
     fasta.close()
 
