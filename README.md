@@ -59,7 +59,7 @@ python gwas_harmonisation/main.py \
 -effect_field <n> \
 -se_field <n> \
 -pval_field <n> \
--n0_field <n>
+-n_field <n>
 ```
 
 ## Full workflow
