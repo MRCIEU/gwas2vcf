@@ -54,6 +54,9 @@ def main():
         nea_af_field=args.nea_af_field,
         skip_n_rows=args.skip)
 
+    for i in range(10):
+        logging.info("Mapped line {}: {}".format(i, gwas[i]))
+
     # harmonise to FASTA
     harmonised, excluded_variants = Harmonise.align_gwas_to_fasta(gwas, fasta)
 

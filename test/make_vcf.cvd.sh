@@ -2,11 +2,14 @@
 set -euxo pipefail
 
 # get data
-curl -L http://www.cardiogramplusc4d.org/media/cardiogramplusc4d-consortium/data-downloads/UKBB.GWAS1KG.EXOME.CAD.SOFT.META.PublicRelease.300517.txt.gz | \
-gzip -dc > data/UKBB.GWAS1KG.EXOME.CAD.SOFT.META.PublicRelease.300517.txt
+#curl -L http://www.cardiogramplusc4d.org/media/cardiogramplusc4d-consortium/data-downloads/UKBB.GWAS1KG.EXOME.CAD.SOFT.META.PublicRelease.300517.txt.gz | \
+#gzip -dc > data/UKBB.GWAS1KG.EXOME.CAD.SOFT.META.PublicRelease.300517.txt
+
+# fix NL
+#dos2unix data/UKBB.GWAS1KG.EXOME.CAD.SOFT.META.PublicRelease.300517.txt
 
 g="data/UKBB.GWAS1KG.EXOME.CAD.SOFT.META.PublicRelease.300517.txt"
-f="data/db/human/gatk/2.8/b37/human_g1k_v37.fasta"
+f="/data/db/human/gatk/2.8/b37/human_g1k_v37.fasta"
 v="data/UKBB.GWAS1KG.EXOME.CAD.SOFT.META.PublicRelease.300517.vcf"
 
 # make VCF

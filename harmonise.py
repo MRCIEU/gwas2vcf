@@ -28,9 +28,19 @@ class Harmonise:
 
             if variant.ref != expected_ref_allele:
                 variant.reverse_sign()
+
+                if len(variant.ref) != len(variant.alt):
+                    # get expected FASTA REF
+                    expected_ref_allele = str(
+                        fasta.fetch(region="{}:{}-{}".format(
+                            variant.chrom,
+                            variant.pos,
+                            variant.pos + (len(variant.ref) - 1)
+                        ))
+                    ).upper()
+
                 if variant.ref != expected_ref_allele:
-                    logging.warning(
-                        "Skipping record {}: could not match to FASTA {}".format(variant, expected_ref_allele))
+                    logging.warning("Skipping record {}: could not match alleles to FASTA".format(variant))
                     excluded_variants += 1
                     continue
 

@@ -50,7 +50,7 @@ class GwasResult:
         return True
 
     def __str__(self):
-        return f'{self.chrom}\t{self.pos}\t{self.ref}\t{self.alt}'
+        return str(self.__dict__)
 
     @staticmethod
     def read_from_text_file(
@@ -82,7 +82,13 @@ class GwasResult:
                 s = l.strip().split("\t")
 
                 chrom = s[chrom_field]
-                pos = int(s[pos_field])
+
+                try:
+                    pos = int(float(s[pos_field]))  # float is for scientific notation
+                except ValueError as e:
+                    logging.warning("Skipping {}: {}".format(s, e))
+                    continue
+
                 ref = s[ea_field]
                 alt = s[nea_field]
                 b = float(s[effect_field])
