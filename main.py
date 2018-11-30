@@ -71,7 +71,7 @@ def main():
     # check number of skipped is acceptable
     logging.info("Skipped {} of {}".format(total_variants - len(harmonised), total_variants))
     if (total_variants - len(harmonised)) / total_variants > args.max_missing:
-        raise RuntimeError("Too many sites skipped.")
+        raise RuntimeError("Too many sites skipped. The alleles must be on the forward strand.")
 
     # write to vcf
     Vcf.write_to_file(harmonised, args.out, fasta)
