@@ -63,7 +63,10 @@ def main():
 
     # print first lines for debugging
     for i in range(10):
-        logging.info("Mapped line {}: {}".format(i, gwas[i]))
+        try:
+            logging.info("Mapped line {}: {}".format(i, gwas[i]))
+        except IndexError:
+            continue
 
     with pysam.FastaFile(args.fasta) as fasta:
 
