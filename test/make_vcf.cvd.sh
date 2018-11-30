@@ -17,6 +17,7 @@ v="data/UKBB.GWAS1KG.EXOME.CAD.SOFT.META.PublicRelease.300517.vcf"
 -o "$v" \
 -g "$g" \
 -f "$f" \
+-b "b37" \
 -s 1 \
 -dbsnp_field 1 \
 -chrom_field 2 \

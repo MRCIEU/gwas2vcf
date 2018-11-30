@@ -14,6 +14,7 @@ v="data/Meta-analysis_Locke_et_al_UKBiobank_2018_UPDATED.vcf"
 -o "$v" \
 -g "$g" \
 -f "$f" \
+-b "b37" \
 -s 1 \
 -chrom_field 0 \
 -pos_field 1 \

@@ -16,6 +16,7 @@ v="data/Mahajan.NatGenet2018b.T2D.European.vcf"
 -o "$v" \
 -g "$g" \
 -f "$f" \
+-b "b37" \
 -s 1 \
 -chrom_field 1 \
 -pos_field 2 \

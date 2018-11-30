@@ -81,7 +81,7 @@ def main():
 
         # write to vcf
         Vcf.write_to_file(harmonised, args.out, fasta, args.build, {
-            'gwas_harmonisation_command': ' '.join(sys.argv[1:]),
+            'gwas_harmonisation_command': ' '.join(sys.argv[1:]) + "; " + sha,
             'file_date': datetime.now().isoformat(),
             'total_variants': total_variants,
             'variants_not_read': total_variants - len(gwas),

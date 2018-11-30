@@ -8,7 +8,7 @@ set -euxo pipefail
 #sed 's/^chr//g' | \
 #tr ':' '\t' > data/jointGwasMc_LDL.txt
 
-g="data/jointGwasMc_LDL.txt"
+g="data/jointGwasMc_LDL.n500.txt"
 f="/data/db/human/gatk/2.8/b37/human_g1k_v37.fasta"
 v="data/jointGwasMc_LDL.vcf"
 
@@ -17,6 +17,7 @@ v="data/jointGwasMc_LDL.vcf"
 -o "$v" \
 -g "$g" \
 -f "$f" \
+-b "b37" \
 -s 1 \
 -chrom_field 0 \
 -pos_field 1 \

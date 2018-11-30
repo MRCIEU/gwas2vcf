@@ -19,6 +19,7 @@ python ~/apps/gwas_harmonisation/main.py \
 -g "$gwas_path" \
 -o "$vcf_path" \
 -f "$fasta_path" \
+-b "b37" \
 -s  \
 -chrom_field  \
 -pos_field  \
