@@ -54,8 +54,8 @@ def main():
         nea_af_field=args.nea_af_field,
         skip_n_rows=args.skip)
 
-    logging.info("Total variants {}".format(total_variants))
-    logging.info("Variants could not be read {}".format(total_variants - len(gwas)))
+    logging.info("Total variants: {}".format(total_variants))
+    logging.info("Variants could not be read: {}".format(total_variants - len(gwas)))
 
     # print first lines for debugging
     for i in range(10):
@@ -64,9 +64,9 @@ def main():
     # harmonise to FASTA
     harmonised, flipped_variants = Harmonise.align_gwas_to_fasta(gwas, fasta)
 
-    logging.info("Variants harmonised {}".format(len(harmonised)))
-    logging.info("Variants discarded during harmonisation {}".format(len(gwas) - len(harmonised)))
-    logging.info("Alleles switched {}".format(flipped_variants - (len(gwas) - len(harmonised))))
+    logging.info("Variants harmonised: {}".format(len(harmonised)))
+    logging.info("Variants discarded during harmonisation: {}".format(len(gwas) - len(harmonised)))
+    logging.info("Alleles switched: {}".format(flipped_variants - (len(gwas) - len(harmonised))))
 
     # check number of skipped is acceptable
     logging.info("Skipped {} of {}".format(total_variants - harmonised, total_variants))
