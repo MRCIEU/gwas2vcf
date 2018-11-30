@@ -7,12 +7,13 @@ from harmonise import Harmonise
 from datetime import datetime
 import git
 import sys
+import os
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 
 
 def main():
-    repo = git.Repo(search_parent_directories=True)
+    repo = git.Repo(os.path.dirname(os.path.realpath(__file__)))
     sha = repo.head.object.hexsha
 
     parser = argparse.ArgumentParser(description='Map GWAS summary statistics to VCF')
