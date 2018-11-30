@@ -62,15 +62,15 @@ def main():
         logging.info("Mapped line {}: {}".format(i, gwas[i]))
 
     # harmonise to FASTA
-    harmonised, excluded_variants, flipped_variants = Harmonise.align_gwas_to_fasta(gwas, fasta)
+    harmonised, flipped_variants = Harmonise.align_gwas_to_fasta(gwas, fasta)
 
-    logging.info("Variants after harmonisation {}".format(len(harmonised)))
+    logging.info("Variants harmonised {}".format(len(harmonised)))
     logging.info("Variants discarded during harmonisation {}".format(len(gwas) - len(harmonised)))
     logging.info("Alleles switched {}".format(flipped_variants - (len(gwas) - len(harmonised))))
 
     # check number of skipped is acceptable
-    logging.info("Skipped {} of {}".format(excluded_variants, len(gwas)))
-    if excluded_variants / len(gwas) > args.max_missing:
+    logging.info("Skipped {} of {}".format(total_variants - harmonised, total_variants))
+    if (total_variants - harmonised) / total_variants > args.max_missing:
         raise RuntimeError("Too many sites skipped.")
 
     # write to vcf
@@ -90,7 +90,6 @@ def main():
     metrics['counts']['harmonised_variants'] = len(harmonised)
     metrics['counts']['variants_not_harmonised'] = len(gwas) - len(harmonised)
     metrics['counts']['switched_alleles'] = flipped_variants - (len(gwas) - len(harmonised))
-    metrics['counts']['total_excluded_variants'] = excluded_variants
 
     # write to file
     with open(os.path.join(name, ".json"), 'w') as f:

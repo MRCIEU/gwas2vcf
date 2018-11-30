@@ -7,7 +7,6 @@ class Harmonise:
 
     @staticmethod
     def align_gwas_to_fasta(variants, fasta):
-        excluded_variants = 0
         flipped_variants = 0
         harmonised = []
 
@@ -15,7 +14,6 @@ class Harmonise:
 
             if not variant.are_alleles_iupac():
                 logging.warning("Skipping record {}: allele(s) are not standard IUPAC".format(variant))
-                excluded_variants += 1
                 continue
 
             # get expected FASTA REF
@@ -43,9 +41,8 @@ class Harmonise:
 
                 if variant.ref != expected_ref_allele:
                     logging.warning("Skipping record {}: could not match alleles to FASTA".format(variant))
-                    excluded_variants += 1
                     continue
 
             harmonised.append(variant)
 
-        return harmonised, excluded_variants, flipped_variants
+        return harmonised, flipped_variants
