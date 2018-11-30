@@ -69,15 +69,18 @@ def main():
     logging.info("Alleles switched: {}".format(flipped_variants - (len(gwas) - len(harmonised))))
 
     # check number of skipped is acceptable
-    logging.info("Skipped {} of {}".format(total_variants - harmonised, total_variants))
-    if (total_variants - harmonised) / total_variants > args.max_missing:
+    logging.info("Skipped {} of {}".format(total_variants - len(harmonised), total_variants))
+    if (total_variants - len(harmonised)) / total_variants > args.max_missing:
         raise RuntimeError("Too many sites skipped.")
 
     # write to vcf
     Vcf.write_to_file(harmonised, args.out, fasta)
 
     # write metrics to json
-    metrics = {}
+    metrics = {
+        'args': dict(),
+        'counts': dict()
+    }
     name, ext = os.path.splitext(args.out)
 
     # add args
@@ -92,7 +95,7 @@ def main():
     metrics['counts']['switched_alleles'] = flipped_variants - (len(gwas) - len(harmonised))
 
     # write to file
-    with open(os.path.join(name, ".json"), 'w') as f:
+    with open(name + ".json", 'w') as f:
         json.dump(metrics, f, ensure_ascii=False)
 
     fasta.close()
