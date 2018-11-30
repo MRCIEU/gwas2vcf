@@ -1,5 +1,11 @@
 import pysam
 import logging
+<<<<<<< HEAD
+=======
+from datetime import datetime
+import git
+import os
+>>>>>>> 75cc735b2a0f408ad59bc39fa2529fdf13c21825
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 
@@ -9,6 +15,11 @@ class Vcf:
     @staticmethod
     def write_to_file(gwas_results, path, fasta, build, params=None):
         logging.info("Writing to VCF: {}".format(path))
+<<<<<<< HEAD
+=======
+        repo = git.Repo(os.path.dirname(os.path.realpath(__file__)))
+        sha = repo.head.object.hexsha
+>>>>>>> 75cc735b2a0f408ad59bc39fa2529fdf13c21825
 
         header = pysam.VariantHeader()
         header.add_line(

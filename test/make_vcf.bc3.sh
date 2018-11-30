@@ -38,8 +38,7 @@ bedtools sort \
 -header > $(echo "$vcf_path" | sed 's/.vcf/.sorted.vcf/g')
 
 # validate vcf
-gatk \
--T ValidateVariants \
+gatk ValidateVariants \
 -R "$fasta_path" \
 -V $(echo "$vcf_path" | sed 's/.vcf/.sorted.vcf/g')
 
