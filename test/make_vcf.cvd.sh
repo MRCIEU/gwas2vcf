@@ -5,9 +5,6 @@ set -euxo pipefail
 #curl -L http://www.cardiogramplusc4d.org/media/cardiogramplusc4d-consortium/data-downloads/UKBB.GWAS1KG.EXOME.CAD.SOFT.META.PublicRelease.300517.txt.gz | \
 #gzip -dc > data/UKBB.GWAS1KG.EXOME.CAD.SOFT.META.PublicRelease.300517.txt
 
-# fix NL
-#dos2unix data/UKBB.GWAS1KG.EXOME.CAD.SOFT.META.PublicRelease.300517.txt
-
 g="data/UKBB.GWAS1KG.EXOME.CAD.SOFT.META.PublicRelease.300517.txt"
 f="/data/db/human/gatk/2.8/b37/human_g1k_v37.fasta"
 v="data/UKBB.GWAS1KG.EXOME.CAD.SOFT.META.PublicRelease.300517.vcf"
@@ -27,7 +24,8 @@ v="data/UKBB.GWAS1KG.EXOME.CAD.SOFT.META.PublicRelease.300517.vcf"
 -ea_af_field 6 \
 -effect_field 7 \
 -se_field 8 \
--pval_field 9
+-pval_field 9 \
+-n_field 10
 
 # sort vcf
 /share/apps/bedtools-distros/bedtools-2.26.0/bin/bedtools sort \
