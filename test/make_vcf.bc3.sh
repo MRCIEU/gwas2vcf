@@ -1,6 +1,6 @@
 #!/bin/bash
 #PBS -l nodes=1:ppn=1
-#PBS -l walltime=01:00:00
+#PBS -l walltime=02:00:00
 set -euo pipefail
 cd $PBS_O_WORKDIR
 
