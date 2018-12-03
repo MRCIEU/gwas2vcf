@@ -17,27 +17,36 @@ class Harmonise:
                 continue
 
             # get expected FASTA REF
-            expected_ref_allele = str(
-                fasta.fetch(region="{}:{}-{}".format(
-                    variant.chrom,
-                    variant.pos,
-                    variant.pos + (len(variant.ref) - 1)
-                ))
-            ).upper()
+            try:
+                expected_ref_allele = str(
+                    fasta.fetch(region="{}:{}-{}".format(
+                        variant.chrom,
+                        variant.pos,
+                        variant.pos + (len(variant.ref) - 1)
+                    ))
+                ).upper()
+            except (TypeError, ValueError):
+                logging.warning("Skipping record {}: problem getting ref allele".format(variant))
+                continue
 
             if variant.ref != expected_ref_allele:
                 variant.reverse_sign()
                 flipped_variants += 1
 
                 if len(variant.ref) != len(variant.alt):
+
                     # get expected FASTA REF
-                    expected_ref_allele = str(
-                        fasta.fetch(region="{}:{}-{}".format(
-                            variant.chrom,
-                            variant.pos,
-                            variant.pos + (len(variant.ref) - 1)
-                        ))
-                    ).upper()
+                    try:
+                        expected_ref_allele = str(
+                            fasta.fetch(region="{}:{}-{}".format(
+                                variant.chrom,
+                                variant.pos,
+                                variant.pos + (len(variant.ref) - 1)
+                            ))
+                        ).upper()
+                    except  (TypeError, ValueError):
+                        logging.warning("Skipping record {}: problem getting ref allele".format(variant))
+                        continue
 
                 if variant.ref != expected_ref_allele:
                     logging.warning("Skipping record {}: could not match alleles to FASTA".format(variant))
