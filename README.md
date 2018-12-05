@@ -7,7 +7,7 @@ Tool to map GWAS summary statistics from tab-delim to VCF with on the fly harmon
 ```
 git clone https://ieugit-scmv-d0.epi.bris.ac.uk/ml18692/gwas_harmonisation.git
 cd gwas_harmonisation
-pip install -r ./requirements.txt
+pip install --user -r ./requirements.txt
 ```
 
 ### Reference FASTA
