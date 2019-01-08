@@ -27,7 +27,8 @@ wget https://storage.googleapis.com/genomics-public-data/resources/broad/hg38/v0
 Unit tests:
 
 ```
-python -m unittest discover gwas_harmonisation/test
+cd gwas_harmonisation
+python -m unittest discover test
 ```
 
 End-to-end tests:
@@ -37,7 +38,13 @@ End-to-end tests:
 bash test/make_vcf.bmi.sh
 
 # convert GLGC to BCF
-bash test/make_vcf.bmi.sh
+bash test/make_vcf.ldl.sh
+
+# convert CVD to BCF
+bash test/make_vcf.cvd.sh
+
+# convert T2DM to BCF
+bash test/make_vcf.t2dm.sh
 ```
 
 ## Usage
@@ -46,8 +53,35 @@ Column field numbers are 0-based
 
 ```
 python gwas_harmonisation/main.py -h
+  -h, --help            show this help message and exit
+  -v, --version         show program's version number and exit
+  -o OUT                Path to output VCF
+  -g GWAS               Path to GWAS tab-sep summary stats
+  -f FASTA              Path to reference FASTA
+  -b BUILD              FASTA build assembly
+  -s SKIP               Number of rows to skip
+  -m MAX_MISSING        Maximum fraction of missing variants permitted
+  -chrom_field CHROM_FIELD
+                        Column number for chromosome
+  -pos_field POS_FIELD  Column number for chromosome
+  -ea_field EA_FIELD    Column number for effect allele
+  -nea_field NEA_FIELD  Column number for non-effect allele
+  -effect_field EFFECT_FIELD
+                        Effect size field
+  -se_field SE_FIELD    SE field
+  -pval_field PVAL_FIELD
+                        P-Value field
+  -n_field N_FIELD      Number of samples field
+  -dbsnp_field DBSNP_FIELD
+                        dbSNP identifier field
+  -ea_af_field EA_AF_FIELD
+                        Effect allele frequency field
+  -nea_af_field NEA_AF_FIELD
+                        None effect allele frequency field
 ```
 
-## Full workflow
+## Full workflow on BC3
 
-```bash make_vcf.ldl.sh```
+```
+# edit as needed #
+bash make_vcf.bc3.sh```
