@@ -4,7 +4,7 @@ Tool to map GWAS summary statistics from tab-delim to VCF with on the fly harmon
 
 ### Bug fixes ##
 
-- 8c9a75b1 fixed an error where reading in GWAS files EA and NEA were incorrect leading wrong betas
+- c33d1c24 fixed an error where reading in GWAS files EA and NEA were incorrect leading wrong betas
 
 ### Installing
 
