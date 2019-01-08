@@ -1,4 +1,3 @@
-from Bio.Seq import Seq
 import logging
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
@@ -25,17 +24,11 @@ class GwasResult:
         a = self.alt
         self.ref = a
         self.alt = r
-        self.b = self.b * -1
+        self.b = (self.b * -1)
         try:
             self.alt_freq = (1 - self.alt_freq)
         except TypeError:
             self.alt_freq = None
-
-    # TODO only allow once per input
-    # TODO safe guard palindromics
-    def flip_strand(self):
-        self.ref = Seq(self.ref).reverse_complement()
-        self.alt = Seq(self.alt).reverse_complement()
 
     def are_alleles_iupac(self):
         for bp in self.alt:
@@ -90,17 +83,17 @@ class GwasResult:
                     logging.warning("Skipping {}: {}".format(s, e))
                     continue
 
-                ref = s[ea_field]
-                alt = s[nea_field]
+                ref = s[nea_field]
+                alt = s[ea_field]
                 b = float(s[effect_field])
                 se = float(s[se_field])
                 pval = float(s[pval_field])
 
                 try:
-                    if nea_af_field is not None:
-                        alt_freq = float(s[nea_af_field])
-                    elif ea_af_field is not None:
-                        alt_freq = 1 - float(s[ea_af_field])
+                    if ea_af_field is not None:
+                        alt_freq = float(s[ea_af_field])
+                    elif nea_af_field is not None:
+                        alt_freq = 1 - float(s[nea_af_field])
                     else:
                         alt_freq = None
                 except (IndexError, TypeError, ValueError):
