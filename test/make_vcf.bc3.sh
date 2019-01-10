@@ -43,6 +43,15 @@ gatk ValidateVariants \
 -R "$fasta_path" \
 -V $(echo "$vcf_path" | sed 's/.vcf/.sorted.vcf/g')
 
+# annotate vcf with 1kg eur af
+gatk VariantAnnotator \
+-R /panfs/panasas01/sscm/ml18692/db/gatk/2.8/b37/human_g1k_v37.fasta \
+-V $(echo "$vcf_path" | sed 's/.vcf/.sorted.vcf/g') \
+-O $(echo "$vcf_path" | sed 's/.vcf/.1kg.vcf/g') \
+--resource 1kg:/panfs/panasas01/sscm/ml18692/db/1kg/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz \
+-E 1kg.EUR_AF \
+--resource-allele-concordance
+
 # combine multi allelics & output bcf
 bcftools norm \
 --check-ref e \
@@ -50,7 +59,7 @@ bcftools norm \
 -m +any \
 -Ob \
 -o $(echo "$vcf_path" | sed 's/.vcf/.bcf/g') \
-$(echo "$vcf_path" | sed 's/.vcf/.sorted.vcf/g')
+$(echo "$vcf_path" | sed 's/.vcf/.1kg.vcf/g')
 
 # index bcf
 bcftools index \
