@@ -8,6 +8,16 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(mess
 class Vcf:
 
     @staticmethod
+    def convert_pval_to_neg_log10(p):
+        # prevent negative 0 output
+        if p == 1:
+            return 0
+        # prevent Inf output
+        if p == 0:
+            return None
+        return -np.log10(p)
+
+    @staticmethod
     def write_to_file(gwas_results, path, fasta, build, params=None):
         logging.info("Writing to VCF: {}".format(path))
 
@@ -40,7 +50,7 @@ class Vcf:
             record.filter.add(result.vcf_filter)
             record.info['BETA'] = result.b
             record.info['SE'] = result.se
-            record.info['L10PVAL'] = -np.log10(result.pval)
+            record.info['L10PVAL'] = Vcf.convert_pval_to_neg_log10(result.pval)
             record.info['AF'] = result.alt_freq
             record.info['N'] = result.n
             vcf.write(record)
