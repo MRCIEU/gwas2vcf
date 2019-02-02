@@ -86,11 +86,11 @@ def main():
         Vcf.write_to_file(harmonised, args.out, fasta, args.build, {
             'gwas_harmonisation_command': ' '.join(sys.argv[1:]) + "; " + sha,
             'file_date': datetime.now().isoformat(),
-            'total_variants': total_variants,
-            'variants_not_read': total_variants - len(gwas),
-            'harmonised_variants': len(harmonised),
-            'variants_not_harmonised': len(gwas) - len(harmonised),
-            'switched_alleles': flipped_variants - (len(gwas) - len(harmonised))
+            'counts.total_variants': total_variants,
+            'counts.variants_not_read': total_variants - len(gwas),
+            'counts.harmonised_variants': len(harmonised),
+            'counts.variants_not_harmonised': len(gwas) - len(harmonised),
+            'counts.switched_alleles': flipped_variants - (len(gwas) - len(harmonised))
         })
 
 
