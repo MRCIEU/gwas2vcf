@@ -52,11 +52,8 @@ gatk VariantAnnotator \
 -E 1kg.EUR_AF \
 --resource-allele-concordance
 
-# combine multi allelics & output bcf
-bcftools norm \
---check-ref e \
--f "$fasta_path" \
--m +any \
+# convertto bcf
+bcftools view \
 -Ob \
 -o $(echo "$vcf_path" | sed 's/.vcf/.bcf/g') \
 $(echo "$vcf_path" | sed 's/.vcf/.1kg.vcf/g')

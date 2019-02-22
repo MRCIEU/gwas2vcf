@@ -39,14 +39,11 @@ java -Xmx2g -jar /share/apps/GATK-distros/GATK_3.7.0/GenomeAnalysisTK.jar \
 -R "$f" \
 -V $(echo "$v" | sed 's/.vcf/.sorted.vcf/g')
 
-# combine multi allelics & output bcf
-/share/apps/bcftools-distros/bcftools-1.3.1/bcftools norm \
---check-ref e \
--f "$f" \
--m +any \
+# convertto bcf
+bcftools view \
 -Ob \
--o $(echo "$v" | sed 's/.vcf/.bcf/g') \
-$(echo "$v" | sed 's/.vcf/.sorted.vcf/g')
+-o $(echo "$vcf_path" | sed 's/.vcf/.bcf/g') \
+$(echo "$vcf_path" | sed 's/.vcf/.1kg.vcf/g')
 
 # index bcf
 /share/apps/bcftools-distros/bcftools-1.3.1/bcftools index $(echo "$v" | sed 's/.vcf/.bcf/g')
