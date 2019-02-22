@@ -22,9 +22,8 @@ def main():
     parser.add_argument('-g', dest='gwas', required=True, help='Path to GWAS tab-sep summary stats')
     parser.add_argument('-f', dest='fasta', required=True, help='Path to reference FASTA')
     parser.add_argument('-b', dest='build', required=True, help='FASTA build assembly')
+    parser.add_argument('-i', dest='id', required=False, help='GWAS study identifier')
     parser.add_argument('-s', dest='skip', default=0, type=int, required=False, help='Number of rows to skip')
-    parser.add_argument('-m', dest='max_missing', default=0.05, type=float, required=False,
-                        help='Maximum fraction of missing variants permitted')
     parser.add_argument('-chrom_field', dest='chrom_field', type=int, required=True,
                         help='Column number for chromosome')
     parser.add_argument('-pos_field', dest='pos_field', type=int, required=True, help='Column number for chromosome')
@@ -40,6 +39,8 @@ def main():
                         help='Effect allele frequency field')
     parser.add_argument('-nea_af_field', dest='nea_af_field', type=int, required=False,
                         help='None effect allele frequency field')
+    parser.add_argument('-prop_cases_field', dest='prop_cases_field', type=int, required=False,
+                        help='Proportion of cases if case/control study')
     args = parser.parse_args()
 
     # read in GWAS and harmonise alleles to reference fasta
@@ -56,6 +57,7 @@ def main():
         n_field=args.n_field,
         ea_af_field=args.ea_af_field,
         nea_af_field=args.nea_af_field,
+        prop_cases_field=args.prop_cases_field,
         skip_n_rows=args.skip)
 
     logging.info("Total variants: {}".format(total_variants))
@@ -77,13 +79,10 @@ def main():
         logging.info("Variants discarded during harmonisation: {}".format(len(gwas) - len(harmonised)))
         logging.info("Alleles switched: {}".format(flipped_variants - (len(gwas) - len(harmonised))))
 
-        # check number of skipped is acceptable
+        # number of skipped records
         logging.info("Skipped {} of {}".format(total_variants - len(harmonised), total_variants))
-        if (total_variants - len(harmonised)) / total_variants > args.max_missing:
-            raise RuntimeError("Too many sites skipped. The alleles must be on the forward strand.")
 
-        # write to vcf
-        Vcf.write_to_file(harmonised, args.out, fasta, args.build, {
+        params = {
             'gwas_harmonisation_command': ' '.join(sys.argv[1:]) + "; " + sha,
             'file_date': datetime.now().isoformat(),
             'counts.total_variants': total_variants,
@@ -91,7 +90,18 @@ def main():
             'counts.harmonised_variants': len(harmonised),
             'counts.variants_not_harmonised': len(gwas) - len(harmonised),
             'counts.switched_alleles': flipped_variants - (len(gwas) - len(harmonised))
-        })
+        }
+
+        if args.id is not None:
+            params['gwas.id'] = args.id
+
+        if args.prop_cases_field is None:
+            params['gwas.type'] = 'continuous'
+        else:
+            params['gwas.type'] = 'case/control'
+
+        # write to vcf
+        Vcf.write_to_file(harmonised, args.out, fasta, args.build, params)
 
 
 if __name__ == "__main__":

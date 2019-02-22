@@ -14,7 +14,7 @@ class Vcf:
             return 0
         # prevent Inf output
         if p == 0:
-            return None
+            return 999
         return -np.log10(p)
 
     @staticmethod
@@ -23,11 +23,17 @@ class Vcf:
 
         header = pysam.VariantHeader()
         header.add_line(
-            '##INFO=<ID=BETA,Number=A,Type=Float,Description="Effect size estimate relative to the alternative allele(s)">')
+            '##INFO=<ID=EFFECT,Number=A,Type=Float,Description="Effect size estimate relative to the alternative allele">')
         header.add_line('##INFO=<ID=SE,Number=A,Type=Float,Description="Standard error of effect size estimate">')
-        header.add_line('##INFO=<ID=L10PVAL,Number=A,Type=Float,Description="P-value (-log10) for effect estimate">')
+        header.add_line('##INFO=<ID=L10PVAL,Number=A,Type=Float,Description="-log10 p-value for effect estimate">')
         header.add_line('##INFO=<ID=AF,Number=A,Type=Float,Description="Alternate allele frequency">')
         header.add_line('##INFO=<ID=N,Number=A,Type=Float,Description="Sample size used to estimate genetic effect">')
+        header.add_line(
+            '##INFO=<ID=ZSCORE,Number=A,Type=Float,Description="Z-score provided if it was used to derive the EFFECT and SE fields">')
+        header.add_line(
+            '##INFO=<ID=SIMPINFO,Number=A,Type=Float,Description="Accuracy score of summary data imputation">')
+        header.add_line(
+            '##INFO=<ID=PROPCASES,Number=A,Type=Float,Description="Proportion of sample size that were cases in the GWAS">')
 
         # add contig lengths
         assert len(fasta.references) == len(fasta.lengths)
@@ -48,7 +54,7 @@ class Vcf:
             record.id = result.dbsnpid
             record.alleles = (result.ref, result.alt)
             record.filter.add(result.vcf_filter)
-            record.info['BETA'] = result.b
+            record.info['EFFECT'] = result.b
             record.info['SE'] = result.se
             record.info['L10PVAL'] = Vcf.convert_pval_to_neg_log10(result.pval)
             record.info['AF'] = result.alt_freq

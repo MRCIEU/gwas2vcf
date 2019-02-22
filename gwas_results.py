@@ -5,7 +5,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(mess
 
 class GwasResult:
 
-    def __init__(self, chrom, pos, ref, alt, b, se, pval, n, alt_freq, dbsnpid, vcf_filter="PASS"):
+    def __init__(self, chrom, pos, ref, alt, b, se, pval, n, alt_freq, dbsnpid, prop_cases, vcf_filter="PASS"):
 
         self.chrom = chrom
         self.pos = pos
@@ -17,6 +17,7 @@ class GwasResult:
         self.alt_freq = alt_freq
         self.n = n
         self.dbsnpid = dbsnpid
+        self.prop_cases = prop_cases
         self.vcf_filter = vcf_filter
 
     def reverse_sign(self):
@@ -58,6 +59,7 @@ class GwasResult:
             n_field=None,
             ea_af_field=None,
             nea_af_field=None,
+            prop_cases_field=None,
             skip_n_rows=0):
 
         logging.info("Reading summary stats and mapping to FASTA: {}".format(path))
@@ -109,6 +111,11 @@ class GwasResult:
                 except (IndexError, TypeError, ValueError):
                     n = None
 
+                try:
+                    prop_cases = float(s[prop_cases_field])
+                except (IndexError, TypeError, ValueError):
+                    prop_cases = None
+
                 result = GwasResult(
                     chrom,
                     pos,
@@ -119,7 +126,8 @@ class GwasResult:
                     pval,
                     n,
                     alt_freq,
-                    dbsnpid
+                    dbsnpid,
+                    prop_cases
                 )
 
                 results.append(result)
