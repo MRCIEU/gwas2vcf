@@ -77,10 +77,12 @@ class GwasResult:
         total_variants = 0
         filename, file_extension = os.path.splitext(path)
 
-        if file_extension is '.gz':
-            f = gzip.open(path, 'rt', encoding='utf-8')
+        if file_extension == '.gz':
+            logging.info("Reading gzip file")
+            f = gzip.open(path, 'rt')
         else:
-            f = open(path, 'r', encoding='utf-8')
+            logging.info("Reading plain text file")
+            f = open(path, 'r')
 
         results = []
         for n, l in enumerate(f):
