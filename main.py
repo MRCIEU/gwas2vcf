@@ -39,6 +39,10 @@ def main():
                         help='Effect allele frequency field')
     parser.add_argument('-nea_af_field', dest='nea_af_field', type=int, required=False,
                         help='None effect allele frequency field')
+    parser.add_argument('-imp_z_field', dest='imp_z_field', type=int, required=False,
+                        help='Field for Z score from imputed summary statistics only')
+    parser.add_argument('-imp_info_field', dest='imp_info_field', type=int, required=False,
+                        help='Field for INFO score from imputed summary statistics only')
     parser.add_argument('-prop_cases_field', dest='prop_cases_field', type=int, required=False,
                         help='Proportion of cases if case/control study')
     args = parser.parse_args()
@@ -53,10 +57,12 @@ def main():
         args.effect_field,
         args.se_field,
         args.pval_field,
-        dbsnp_field=args.dbsnp_field,
         n_field=args.n_field,
+        dbsnp_field=args.dbsnp_field,
         ea_af_field=args.ea_af_field,
         nea_af_field=args.nea_af_field,
+        imp_z_field=args.imp_z_field,
+        imp_info_field=args.imp_info_field,
         prop_cases_field=args.prop_cases_field,
         skip_n_rows=args.skip)
 

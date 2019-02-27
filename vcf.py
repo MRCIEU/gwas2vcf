@@ -59,6 +59,9 @@ class Vcf:
             record.info['L10PVAL'] = Vcf.convert_pval_to_neg_log10(result.pval)
             record.info['AF'] = result.alt_freq
             record.info['N'] = result.n
+            record.info['ZSCORE'] = result.zscore
+            record.info['SIMPINFO'] = result.simp_info
+            record.info['PROPCASES'] = result.prop_cases
             vcf.write(record)
 
         vcf.close()

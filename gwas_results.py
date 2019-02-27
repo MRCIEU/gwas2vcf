@@ -5,7 +5,8 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(mess
 
 class GwasResult:
 
-    def __init__(self, chrom, pos, ref, alt, b, se, pval, n, alt_freq, dbsnpid, prop_cases, vcf_filter="PASS"):
+    def __init__(self, chrom, pos, ref, alt, b, se, pval, n, alt_freq, dbsnpid, prop_cases, imp_info, imp_z,
+                 vcf_filter="PASS"):
 
         self.chrom = chrom
         self.pos = pos
@@ -18,6 +19,8 @@ class GwasResult:
         self.n = n
         self.dbsnpid = dbsnpid
         self.prop_cases = prop_cases
+        self.imp_info = imp_info
+        self.imp_z = imp_z
         self.vcf_filter = vcf_filter
 
     def reverse_sign(self):
@@ -26,6 +29,10 @@ class GwasResult:
         self.ref = a
         self.alt = r
         self.b = (self.b * -1)
+
+        if self.imp_z is not None:
+            self.imp_z = (self.imp_z * -1)
+
         try:
             self.alt_freq = (1 - self.alt_freq)
         except TypeError:
@@ -59,6 +66,8 @@ class GwasResult:
             n_field=None,
             ea_af_field=None,
             nea_af_field=None,
+            imp_z_field=None,
+            imp_info_field=None,
             prop_cases_field=None,
             skip_n_rows=0):
 
@@ -116,6 +125,16 @@ class GwasResult:
                 except (IndexError, TypeError, ValueError):
                     prop_cases = None
 
+                try:
+                    imp_info = float(s[imp_info_field])
+                except (IndexError, TypeError, ValueError):
+                    imp_info = None
+
+                try:
+                    imp_z = float(s[imp_z_field])
+                except (IndexError, TypeError, ValueError):
+                    imp_z = None
+
                 result = GwasResult(
                     chrom,
                     pos,
@@ -127,7 +146,9 @@ class GwasResult:
                     n,
                     alt_freq,
                     dbsnpid,
-                    prop_cases
+                    prop_cases,
+                    imp_info,
+                    imp_z
                 )
 
                 results.append(result)
