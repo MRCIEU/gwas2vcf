@@ -8,4 +8,4 @@ services:
     volumes:
       - .:/app
       - /data/bgc:/data
-      - /data/ref:/data/ref
+      - /data/bgc/ref:/data/ref
