@@ -1,5 +1,6 @@
 import argparse
 import logging
+import marshmallow
 from gwas_results import GwasResult
 from vcf import Vcf
 import pysam
@@ -31,12 +32,15 @@ def main():
     # load parameters from json
     logging.info("Reading JSON parameters")
     try:
-        schema = Param()
+        schema = Param(strict=True)
         with open(args.json) as f:
             j = schema.load(json.load(f)).data
-        logging.info("Parameters: {}".format(j))
+            logging.info("Parameters: {}".format(j))
     except json.decoder.JSONDecodeError as e:
         logging.error("Could not read json parameter file: {}".format(e))
+        sys.exit()
+    except marshmallow.exceptions.ValidationError as e:
+        logging.error("Could not validate json parameter file: {}".format(e))
         sys.exit()
 
     # read in GWAS and harmonise alleles to reference fasta

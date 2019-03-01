@@ -11,6 +11,6 @@
   "eaf_col": 9,
   "delimiter": "\t",
   "header": true,
-  "id": 300,
+  "id": "300",
   "build": "GRCh37"
 }
