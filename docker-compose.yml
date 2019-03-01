@@ -1,0 +1,11 @@
+version: "2"
+services:
+  gwas_harmonisation:
+    container_name: gwas_harmonisation
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - /data/bgc:/data
+      - /data/ref:/data/ref
