@@ -64,14 +64,16 @@ class GwasResult:
             effect_field,
             se_field,
             pval_field,
+            delimiter,
+            header,
+            ncase_field=None,
             dbsnp_field=None,
-            n_field=None,
             ea_af_field=None,
             nea_af_field=None,
             imp_z_field=None,
             imp_info_field=None,
-            prop_cases_field=None,
-            skip_n_rows=0):
+            ncontrol_field=None
+    ):
 
         logging.info("Reading summary stats and mapping to FASTA: {}".format(path))
         total_variants = 0
@@ -87,13 +89,13 @@ class GwasResult:
         results = []
         for n, l in enumerate(f):
 
-            if n < skip_n_rows:
+            if header:
                 logging.info("Skipping header: {}".format(l.strip()))
                 continue
 
             total_variants += 1
 
-            s = l.strip().split("\t")
+            s = l.strip().split(delimiter)
 
             chrom = s[chrom_field]
 
@@ -125,12 +127,22 @@ class GwasResult:
                 dbsnpid = None
 
             try:
-                n = float(s[n_field])
+                ncase = float(s[ncase_field])
             except (IndexError, TypeError, ValueError):
-                n = None
+                ncase = None
 
             try:
-                prop_cases = float(s[prop_cases_field])
+                ncontrol = float(s[ncontrol_field])
+            except (IndexError, TypeError, ValueError):
+                ncontrol = None
+
+            try:
+                n = ncase + ncontrol
+            except (IndexError, TypeError, ValueError):
+                n = ncontrol
+
+            try:
+                prop_cases = ncase / ncase + ncontrol
             except (IndexError, TypeError, ValueError):
                 prop_cases = None
 

@@ -8,6 +8,7 @@ from datetime import datetime
 import git
 import sys
 import os
+import json
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 
@@ -16,55 +17,38 @@ def main():
     repo = git.Repo(os.path.dirname(os.path.realpath(__file__)))
     sha = repo.head.object.hexsha
 
-    parser = argparse.ArgumentParser(description='Map GWAS summary statistics to VCF')
+    parser = argparse.ArgumentParser(description='Map GWAS summary statistics to VCF/BCF')
     parser.add_argument('-v', '--version', action='version', version='%(prog)s {}'.format(sha))
-    parser.add_argument('-o', dest='out', required=True, help='Path to output VCF')
-    parser.add_argument('-g', dest='gwas', required=True, help='Path to GWAS tab-sep summary stats')
-    parser.add_argument('-f', dest='fasta', required=True, help='Path to reference FASTA')
-    parser.add_argument('-b', dest='build', required=True, help='FASTA build assembly')
-    parser.add_argument('-i', dest='id', required=False, help='GWAS study identifier')
-    parser.add_argument('-s', dest='skip', default=0, type=int, required=False, help='Number of rows to skip')
-    parser.add_argument('-chrom_field', dest='chrom_field', type=int, required=True,
-                        help='Column number for chromosome')
-    parser.add_argument('-pos_field', dest='pos_field', type=int, required=True, help='Column number for chromosome')
-    parser.add_argument('-ea_field', dest='ea_field', type=int, required=True, help='Column number for effect allele')
-    parser.add_argument('-nea_field', dest='nea_field', type=int, required=True,
-                        help='Column number for non-effect allele')
-    parser.add_argument('-effect_field', dest='effect_field', type=int, required=True, help='Effect size field')
-    parser.add_argument('-se_field', dest='se_field', type=int, required=True, help='SE field')
-    parser.add_argument('-pval_field', dest='pval_field', type=int, required=True, help='P-Value field')
-    parser.add_argument('-n_field', dest='n_field', type=int, required=False, help='Number of samples field')
-    parser.add_argument('-dbsnp_field', dest='dbsnp_field', type=int, required=False, help='dbSNP identifier field')
-    parser.add_argument('-ea_af_field', dest='ea_af_field', type=int, required=False,
-                        help='Effect allele frequency field')
-    parser.add_argument('-nea_af_field', dest='nea_af_field', type=int, required=False,
-                        help='None effect allele frequency field')
-    parser.add_argument('-imp_z_field', dest='imp_z_field', type=int, required=False,
-                        help='Field for Z score from imputed summary statistics only')
-    parser.add_argument('-imp_info_field', dest='imp_info_field', type=int, required=False,
-                        help='Field for INFO score from imputed summary statistics only')
-    parser.add_argument('-prop_cases_field', dest='prop_cases_field', type=int, required=False,
-                        help='Proportion of cases if case/control study')
+    parser.add_argument('--out', dest='out', required=True, help='Path to output VCF/BCF')
+    parser.add_argument('--data', dest='gwas', required=True, help='Path to GWAS summary stats')
+    parser.add_argument('--ref', dest='fasta', required=True, help='Path to reference FASTA')
+    parser.add_argument('--json', dest='json', required=True, help='Path to parameters JSON')
     args = parser.parse_args()
+
+    # load parameters from json
+    with open(args.json) as f:
+        j = json.load(f)
 
     # read in GWAS and harmonise alleles to reference fasta
     gwas, total_variants = GwasResult.read_from_text_file(
         args.gwas,
-        args.chrom_field,
-        args.pos_field,
-        args.ea_field,
-        args.nea_field,
-        args.effect_field,
-        args.se_field,
-        args.pval_field,
-        n_field=args.n_field,
-        dbsnp_field=args.dbsnp_field,
-        ea_af_field=args.ea_af_field,
-        nea_af_field=args.nea_af_field,
-        imp_z_field=args.imp_z_field,
-        imp_info_field=args.imp_info_field,
-        prop_cases_field=args.prop_cases_field,
-        skip_n_rows=args.skip)
+        j['chr_col'],
+        j['pos_col'],
+        j['ea_col'],
+        j['oa_col'],
+        j['beta_col'],
+        j['se_col'],
+        j['pval_col'],
+        j['delimiter'],
+        j['header'],
+        ncase_field=j.get('ncase_col'),
+        dbsnp_field=j.get('snp_col'),
+        ea_af_field=j.get('eaf_col'),
+        nea_af_field=j.get('oaf_col'),
+        imp_z_field=j.get('imp_z_col'),
+        imp_info_field=j.get('imp_info_col'),
+        ncontrol_field=j.get('ncontrol_col')
+    )
 
     logging.info("Total variants: {}".format(total_variants))
     logging.info("Variants could not be read: {}".format(total_variants - len(gwas)))
@@ -98,16 +82,16 @@ def main():
             'counts.switched_alleles': flipped_variants - (len(gwas) - len(harmonised))
         }
 
-        if args.id is not None:
-            params['gwas.id'] = args.id
+        if 'id' in j:
+            params['gwas.id'] = j['id']
 
-        if args.prop_cases_field is None:
-            params['gwas.type'] = 'continuous'
-        else:
+        if 'ncase_col' in j:
             params['gwas.type'] = 'case/control'
+        else:
+            params['gwas.type'] = 'continuous'
 
         # write to vcf
-        Vcf.write_to_file(harmonised, args.out, fasta, args.build, params)
+        Vcf.write_to_file(harmonised, args.out, fasta, j['build'], params)
 
 
 if __name__ == "__main__":

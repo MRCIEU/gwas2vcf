@@ -19,7 +19,7 @@ class Vcf:
 
     @staticmethod
     def write_to_file(gwas_results, path, fasta, build, params=None):
-        logging.info("Writing to VCF: {}".format(path))
+        logging.info("Writing to BCF/VCF: {}".format(path))
 
         header = pysam.VariantHeader()
         header.add_line(
@@ -47,6 +47,7 @@ class Vcf:
 
         vcf = pysam.VariantFile(path, "w", header=header)
 
+        records = dict()
         for result in gwas_results:
             record = vcf.new_record()
             record.chrom = result.chrom
@@ -62,6 +63,20 @@ class Vcf:
             record.info['ZSCORE'] = result.imp_z
             record.info['SIMPINFO'] = result.imp_info
             record.info['PROPCASES'] = result.prop_cases
-            vcf.write(record)
+
+            # bank variants by chromosome
+            if result.chrom not in records:
+                records[result.chrom] = []
+
+            records[result.chrom].append(record)
+
+        # sort records & write records to VCF/BCF
+        for contig in fasta.references:
+            records[contig].sort(key=lambda x: x.pos)
+            for record in records[contig]:
+                vcf.write(record)
 
         vcf.close()
+
+        # index output file
+        pysam.tabix_index(path, preset="vcf", force=True, csi=True)
