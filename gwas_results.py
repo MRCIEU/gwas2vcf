@@ -86,13 +86,12 @@ class GwasResult:
             logging.info("Reading plain text file")
             f = open(path, 'r')
 
+        # skip header line (if present)
+        if header:
+            logging.info("Skipping header: {}".format(f.readline().strip()))
+
         results = []
         for n, l in enumerate(f):
-
-            if header:
-                logging.info("Skipping header: {}".format(l.strip()))
-                continue
-
             total_variants += 1
 
             s = l.strip().split(delimiter)

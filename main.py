@@ -6,9 +6,10 @@ import pysam
 from harmonise import Harmonise
 from datetime import datetime
 import git
-import sys
 import os
 import json
+from param import Param
+import sys
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 
@@ -16,6 +17,8 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(mess
 def main():
     repo = git.Repo(os.path.dirname(os.path.realpath(__file__)))
     sha = repo.head.object.hexsha
+
+    logging.info("GWAS Harmonisation v{}".format(sha))
 
     parser = argparse.ArgumentParser(description='Map GWAS summary statistics to VCF/BCF')
     parser.add_argument('-v', '--version', action='version', version='%(prog)s {}'.format(sha))
@@ -26,8 +29,15 @@ def main():
     args = parser.parse_args()
 
     # load parameters from json
-    with open(args.json) as f:
-        j = json.load(f)
+    logging.info("Reading JSON parameters")
+    try:
+        schema = Param()
+        with open(args.json) as f:
+            j = schema.load(json.load(f)).data
+        logging.info("Parameters: {}".format(j))
+    except json.decoder.JSONDecodeError as e:
+        logging.error("Could not read json parameter file: {}".format(e))
+        sys.exit()
 
     # read in GWAS and harmonise alleles to reference fasta
     gwas, total_variants = GwasResult.read_from_text_file(
@@ -56,7 +66,7 @@ def main():
     # print first lines for debugging
     for i in range(10):
         try:
-            logging.info("Mapped line {}: {}".format(i, gwas[i]))
+            logging.debug("Mapped line {}: {}".format(i, gwas[i]))
         except IndexError:
             continue
 
@@ -79,11 +89,9 @@ def main():
             'counts.variants_not_read': total_variants - len(gwas),
             'counts.harmonised_variants': len(harmonised),
             'counts.variants_not_harmonised': len(gwas) - len(harmonised),
-            'counts.switched_alleles': flipped_variants - (len(gwas) - len(harmonised))
+            'counts.switched_alleles': flipped_variants - (len(gwas) - len(harmonised)),
+            'gwas.id': j.get('id')
         }
-
-        if 'id' in j:
-            params['gwas.id'] = j['id']
 
         if 'ncase_col' in j:
             params['gwas.type'] = 'case/control'
