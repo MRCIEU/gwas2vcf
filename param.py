@@ -1,4 +1,4 @@
-from marshmallow import fields, Schema
+from marshmallow import fields, Schema, validates_schema, ValidationError
 
 
 class Param(Schema):
@@ -25,3 +25,9 @@ class Param(Schema):
                               description="Column number for number of controls (if case/control) or total sample size if continuous")
     id = fields.Str(required=False, description="Identifier for GWAS study")
     build = fields.Str(required=True, description="Name of the genome build i.e. GRCh36, GRCh37, GRCh38")
+
+    @validates_schema(pass_original=True)
+    def check_unknown_fields(self, data, original_data):
+        unknown = set(original_data) - set(self.fields)
+        if unknown:
+            raise ValidationError('Unknown field', unknown)
