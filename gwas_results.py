@@ -2,8 +2,6 @@ import logging
 import gzip
 import os
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
-
 
 class GwasResult:
 
@@ -117,42 +115,50 @@ class GwasResult:
                     alt_freq = 1 - float(s[nea_af_field])
                 else:
                     alt_freq = None
-            except (IndexError, TypeError, ValueError):
+            except (IndexError, TypeError, ValueError) as e:
+                logging.debug("Could not parse allele frequency: {}".format(e))
                 alt_freq = None
 
             try:
                 dbsnpid = s[dbsnp_field]
-            except (IndexError, TypeError, ValueError):
+            except (IndexError, TypeError, ValueError) as e:
+                logging.debug("Could not parse dbsnp identifier: {}".format(e))
                 dbsnpid = None
 
             try:
                 ncase = float(s[ncase_field])
-            except (IndexError, TypeError, ValueError):
+            except (IndexError, TypeError, ValueError) as e:
+                logging.debug("Could not parse number of cases: {}".format(e))
                 ncase = None
 
             try:
                 ncontrol = float(s[ncontrol_field])
-            except (IndexError, TypeError, ValueError):
+            except (IndexError, TypeError, ValueError) as e:
+                logging.debug("Could not parse number of controls: {}".format(e))
                 ncontrol = None
 
             try:
                 n = ncase + ncontrol
-            except (IndexError, TypeError, ValueError):
+            except (IndexError, TypeError, ValueError) as e:
+                logging.debug("Could not sum cases and controls: {}".format(e))
                 n = ncontrol
 
             try:
                 prop_cases = ncase / ncase + ncontrol
-            except (IndexError, TypeError, ValueError):
+            except (IndexError, TypeError, ValueError) as e:
+                logging.debug("Could not determine proportion of cases: {}".format(e))
                 prop_cases = None
 
             try:
                 imp_info = float(s[imp_info_field])
-            except (IndexError, TypeError, ValueError):
+            except (IndexError, TypeError, ValueError) as e:
+                logging.debug("Could not parse imputation INFO: {}".format(e))
                 imp_info = None
 
             try:
                 imp_z = float(s[imp_z_field])
-            except (IndexError, TypeError, ValueError):
+            except (IndexError, TypeError, ValueError) as e:
+                logging.debug("Could not parse imputation Z score: {}".format(e))
                 imp_z = None
 
             result = GwasResult(
@@ -170,6 +176,8 @@ class GwasResult:
                 imp_info,
                 imp_z
             )
+
+            logging.debug("Extracted row: {}".format(result))
 
             results.append(result)
 

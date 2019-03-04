@@ -12,14 +12,10 @@ import json
 from param import Param
 import sys
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
-
 
 def main():
     repo = git.Repo(os.path.dirname(os.path.realpath(__file__)))
     sha = repo.head.object.hexsha
-
-    logging.info("GWAS Harmonisation v{}".format(sha))
 
     parser = argparse.ArgumentParser(description='Map GWAS summary statistics to VCF/BCF')
     parser.add_argument('-v', '--version', action='version', version='%(prog)s {}'.format(sha))
@@ -27,7 +23,16 @@ def main():
     parser.add_argument('--data', dest='gwas', required=True, help='Path to GWAS summary stats')
     parser.add_argument('--ref', dest='fasta', required=True, help='Path to reference FASTA')
     parser.add_argument('--json', dest='json', required=True, help='Path to parameters JSON')
+    parser.add_argument("--log", dest="log", required=False, default='INFO',
+                        choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
+                        help="Set the logging level")
     args = parser.parse_args()
+
+    # set logging level
+    if args.log:
+        logging.basicConfig(level=getattr(logging, args.log), format='%(asctime)s %(levelname)s %(message)s')
+
+    logging.info("GWAS Harmonisation {}".format(sha))
 
     # load parameters from json
     logging.info("Reading JSON parameters")
