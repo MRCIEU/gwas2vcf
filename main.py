@@ -49,7 +49,7 @@ def main():
         sys.exit()
 
     # read in GWAS and harmonise alleles to reference fasta
-    gwas, total_variants = GwasResult.read_from_text_file(
+    gwas, total_variants = GwasResult.read_from_file(
         args.gwas,
         j['chr_col'],
         j['pos_col'],
@@ -71,13 +71,6 @@ def main():
 
     logging.info("Total variants: {}".format(total_variants))
     logging.info("Variants could not be read: {}".format(total_variants - len(gwas)))
-
-    # print first lines for debugging
-    for i in range(10):
-        try:
-            logging.debug("Mapped line {}: {}".format(i, gwas[i]))
-        except IndexError:
-            continue
 
     with pysam.FastaFile(args.fasta) as fasta:
 

@@ -53,7 +53,7 @@ class GwasResult:
         return str(self.__dict__)
 
     @staticmethod
-    def read_from_text_file(
+    def read_from_file(
             path,
             chrom_field,
             pos_field,
@@ -74,6 +74,24 @@ class GwasResult:
     ):
 
         logging.info("Reading summary stats and mapping to FASTA: {}".format(path))
+        logging.debug("File path: {}".format(path))
+        logging.debug("CHR field: {}".format(chrom_field))
+        logging.debug("POS field: {}".format(pos_field))
+        logging.debug("EA field: {}".format(ea_field))
+        logging.debug("NEA field: {}".format(nea_field))
+        logging.debug("Effect field: {}".format(effect_field))
+        logging.debug("SE field: {}".format(se_field))
+        logging.debug("P fields: {}".format(pval_field))
+        logging.debug("Delimiter: {}".format(delimiter))
+        logging.debug("Header: {}".format(header))
+        logging.debug("ncase Field: {}".format(ncase_field))
+        logging.debug("dbsnp Field: {}".format(dbsnp_field))
+        logging.debug("EA AF Field: {}".format(ea_af_field))
+        logging.debug("NEA AF Field: {}".format(nea_af_field))
+        logging.debug("IMP Z Score Field: {}".format(imp_z_field))
+        logging.debug("IMP INFO Field: {}".format(imp_info_field))
+        logging.debug("N Control Field: {}".format(ncontrol_field))
+
         total_variants = 0
         filename, file_extension = os.path.splitext(path)
 
