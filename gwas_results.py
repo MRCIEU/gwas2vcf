@@ -94,6 +94,8 @@ class GwasResult:
 
             s = l.strip().split(delimiter)
 
+            logging.debug("Input row: {}".format(s))
+
             chrom = s[chrom_field]
 
             try:
