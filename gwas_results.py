@@ -164,7 +164,7 @@ class GwasResult:
                 n = ncontrol
 
             try:
-                prop_cases = ncase / ncase + ncontrol
+                prop_cases = ncase / (ncase + ncontrol)
             except (IndexError, TypeError, ValueError) as e:
                 logging.debug("Could not determine proportion of cases: {}".format(e))
                 prop_cases = None
