@@ -124,9 +124,24 @@ class GwasResult:
 
             ref = s[nea_field]
             alt = s[ea_field]
-            b = float(s[effect_field])
-            se = float(s[se_field])
-            pval = float(s[pval_field])
+
+            try:
+                b = float(s[effect_field])
+            except ValueError as e:
+                logging.warning("Skipping {}: {}".format(s, e))
+                continue
+
+            try:
+                se = float(s[se_field])
+            except ValueError as e:
+                logging.warning("Skipping {}: {}".format(s, e))
+                continue
+
+            try:
+                pval = float(s[pval_field])
+            except ValueError as e:
+                logging.warning("Skipping {}: {}".format(s, e))
+                continue
 
             try:
                 if ea_af_field is not None:
