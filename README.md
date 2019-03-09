@@ -62,3 +62,17 @@ optional arguments:
 ```
 
 See param.py for JSON specification
+
+## Dealing with missing variant frequency
+
+Add variant frequency from 1000 genomes (or similar)
+
+```
+gatk VariantAnnotator \
+-R ref.fasta \
+-V harmonised.bcf \
+-O harmonised_af.bcf \
+--resource 1kg:1kg.vcf.gz \
+-E 1kg.EUR_AF \
+--resource-allele-concordance
+``` 
