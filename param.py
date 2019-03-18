@@ -23,7 +23,6 @@ class Param(Schema):
                               description="Column number for summary statistics imputation INFO score")
     ncontrol_col = fields.Int(required=False,
                               description="Column number for number of controls (if case/control) or total sample size if continuous")
-    id = fields.Str(required=False, description="Identifier for GWAS study")
     build = fields.Str(required=True, description="Name of the genome build i.e. GRCh36, GRCh37, GRCh38")
 
     @validates_schema(pass_original=True)

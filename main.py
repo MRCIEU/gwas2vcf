@@ -23,6 +23,7 @@ def main():
     parser.add_argument('--data', dest='gwas', required=True, help='Path to GWAS summary stats')
     parser.add_argument('--ref', dest='fasta', required=True, help='Path to reference FASTA')
     parser.add_argument('--json', dest='json', required=True, help='Path to parameters JSON')
+    parser.add_argument('--id', dest='id', default=None, required=False, help='GWAS identifier')
     parser.add_argument("--log", dest="log", required=False, default='INFO',
                         choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
                         help="Set the logging level")
@@ -92,7 +93,7 @@ def main():
             'counts.harmonised_variants': len(harmonised),
             'counts.variants_not_harmonised': len(gwas) - len(harmonised),
             'counts.switched_alleles': flipped_variants - (len(gwas) - len(harmonised)),
-            'gwas.id': j.get('id')
+            'gwas.id': args.id
         }
 
         if 'ncase_col' in j:
