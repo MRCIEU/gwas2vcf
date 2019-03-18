@@ -13,4 +13,5 @@ python main.py \
 --out example.vcf \
 --data example.txt \
 --ref human_g1k_v37.fasta \
+--id '300' \
 --json example.json
