@@ -24,6 +24,10 @@ def main():
     parser.add_argument('--ref', dest='fasta', required=True, help='Path to reference FASTA')
     parser.add_argument('--json', dest='json', required=True, help='Path to parameters JSON')
     parser.add_argument('--id', dest='id', default=None, required=False, help='GWAS identifier')
+    parser.add_argument('--cohort_sample_size', type=int, dest='cohort_sample_size', required=False, default=None,
+                        help='Total sample size of cohort')
+    parser.add_argument('--cohort_frac_cases', type=float, dest='cohort_frac_cases', required=False, default=None,
+                        help='Total fraction of cases in cohort')
     parser.add_argument("--log", dest="log", required=False, default='INFO',
                         choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
                         help="Set the logging level")
@@ -67,7 +71,9 @@ def main():
         nea_af_field=j.get('oaf_col'),
         imp_z_field=j.get('imp_z_col'),
         imp_info_field=j.get('imp_info_col'),
-        ncontrol_field=j.get('ncontrol_col')
+        ncontrol_field=j.get('ncontrol_col'),
+        cohort_sample_size=args.cohort_sample_size,
+        cohort_frac_cases=args.cohort_frac_cases
     )
 
     logging.info("Total variants: {}".format(total_variants))
@@ -93,6 +99,8 @@ def main():
             'counts.harmonised_variants': len(harmonised),
             'counts.variants_not_harmonised': len(gwas) - len(harmonised),
             'counts.switched_alleles': flipped_variants - (len(gwas) - len(harmonised)),
+            'cohort_sample_size': args.cohort_sample_size,
+            'cohort_frac_cases': args.cohort_frac_cases,
             'gwas.id': args.id
         }
 

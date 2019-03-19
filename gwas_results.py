@@ -70,7 +70,9 @@ class GwasResult:
             nea_af_field=None,
             imp_z_field=None,
             imp_info_field=None,
-            ncontrol_field=None
+            ncontrol_field=None,
+            cohort_sample_size=None,
+            cohort_frac_cases=None
     ):
 
         logging.info("Reading summary stats and mapping to FASTA: {}".format(path))
@@ -91,6 +93,8 @@ class GwasResult:
         logging.debug("IMP Z Score Field: {}".format(imp_z_field))
         logging.debug("IMP INFO Field: {}".format(imp_info_field))
         logging.debug("N Control Field: {}".format(ncontrol_field))
+        logging.debug("Cohort sample size: {}".format(cohort_sample_size))
+        logging.debug("Cohort fraction cases: {}".format(cohort_frac_cases))
 
         total_variants = 0
         filename, file_extension = os.path.splitext(path)
@@ -195,6 +199,14 @@ class GwasResult:
             except (IndexError, TypeError, ValueError) as e:
                 logging.debug("Could not parse imputation Z score: {}".format(e))
                 imp_z = None
+
+            # set if not provided in file
+            if n is None:
+                n = cohort_sample_size
+
+            # set if not provided in file
+            if prop_cases is None:
+                prop_cases = cohort_frac_cases
 
             result = GwasResult(
                 chrom,
