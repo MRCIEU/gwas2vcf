@@ -47,6 +47,49 @@ class Vcf:
 
         records = dict()
         for result in gwas_results:
+            lpval = Vcf.convert_pval_to_neg_log10(result.pval)
+
+            # check floats
+            if result.b is not None and result.b > 0 and result.b < 1e-06:
+                logging.warning(
+                    "Effect field smaller than VCF specification. Expect loss of precision for: {}".format(result.b)
+                )
+            if result.se is not None and result.se > 0 and result.se < 1e-06:
+                logging.warning(
+                    "Standard error field smaller than VCF specification. Expect loss of precision for: {}".format(
+                        result.se)
+                )
+            if lpval is not None and lpval > 0 and lpval < 1e-06:
+                logging.warning(
+                    "-log10(pval) field smaller than VCF specification. Expect loss of precision for: {}".format(
+                        lpval)
+                )
+            if result.alt_freq is not None and result.alt_freq > 0 and result.alt_freq < 1e-06:
+                logging.warning(
+                    "Allele frequency field smaller than VCF specification. Expect loss of precision for: {}".format(
+                        result.alt_freq)
+                )
+            if result.n is not None and result.n > 0 and result.n < 1e-06:
+                logging.warning(
+                    "Sample size field smaller than VCF specification. Expect loss of precision for: {}".format(
+                        result.n)
+                )
+            if result.imp_z is not None and result.imp_z > 0 and result.imp_z < 1e-06:
+                logging.warning(
+                    "Imputation Z score field smaller than VCF specification. Expect loss of precision for: {}".format(
+                        result.imp_z)
+                )
+            if result.imp_info is not None and result.imp_info > 0 and result.imp_info < 1e-06:
+                logging.warning(
+                    "Imputation INFO field smaller than VCF specification. Expect loss of precision for: {}".format(
+                        result.imp_info)
+                )
+            if result.prop_cases is not None and result.prop_cases > 0 and result.prop_cases < 1e-06:
+                logging.warning(
+                    "Proportion of cases field smaller than VCF specification. Expect loss of precision for: {}".format(
+                        result.prop_cases)
+                )
+
             record = vcf.new_record()
             record.chrom = result.chrom
             record.pos = result.pos
@@ -55,7 +98,7 @@ class Vcf:
             record.filter.add(result.vcf_filter)
             record.info['EFFECT'] = result.b
             record.info['SE'] = result.se
-            record.info['L10PVAL'] = Vcf.convert_pval_to_neg_log10(result.pval)
+            record.info['L10PVAL'] = lpval
             record.info['AF'] = result.alt_freq
             record.info['N'] = result.n
             record.info['ZSCORE'] = result.imp_z
