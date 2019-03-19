@@ -39,6 +39,20 @@ def main():
 
     logging.info("GWAS Harmonisation {}".format(sha))
 
+    # check values are valid
+    if args.cohort_frac_cases is not None:
+        if args.cohort_frac_cases == 0:
+            logging.error("Proportion of cases in the study must be greater than 0.")
+            sys.exit()
+        if args.cohort_frac_cases == 1:
+            logging.error("Proportion of cases in the study must be less than 1.")
+            sys.exit()
+
+    if args.cohort_sample_size is not None:
+        if args.cohort_sample_size == 0:
+            logging.error("Total sample size must be greater than 0.")
+            sys.exit()
+
     # load parameters from json
     logging.info("Reading JSON parameters")
     try:
