@@ -11,6 +11,7 @@ RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 # add watcher script
+RUN mkdir /home/bin
 ADD watcher.py /home/bin
 RUN chmod 775 /home/bin/watcher.py
 
