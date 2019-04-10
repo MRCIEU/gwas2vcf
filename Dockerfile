@@ -10,7 +10,8 @@ WORKDIR /app
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-RUN wget -O /bin/watcher.py https://raw.githubusercontent.com/MRCIEU/bgc-upload-orchestrator/master/watcher.py?token=AB1fTMa-e8fsZrhTfgrH2VEnYtpvjtCBks5cgZIdwA%3D%3D && chmod 775 /bin/watcher.py
+ADD watcher.py /home/bin
+RUN chmod 775 /home/bin/watcher.py
 
 # Path
 ENV PATH /app:$PATH
