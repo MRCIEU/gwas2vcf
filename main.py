@@ -6,19 +6,16 @@ from vcf import Vcf
 import pysam
 from harmonise import Harmonise
 from datetime import datetime
-import git
-import os
 import json
 from param import Param
 import sys
 
 
 def main():
-    repo = git.Repo(os.path.dirname(os.path.realpath(__file__)))
-    sha = repo.head.object.hexsha
+    version = "1.0.0"
 
     parser = argparse.ArgumentParser(description='Map GWAS summary statistics to VCF/BCF')
-    parser.add_argument('-v', '--version', action='version', version='%(prog)s {}'.format(sha))
+    parser.add_argument('-v', '--version', action='version', version='%(prog)s {}'.format(version))
     parser.add_argument('--out', dest='out', required=True, help='Path to output VCF/BCF')
     parser.add_argument('--data', dest='gwas', required=True, help='Path to GWAS summary stats')
     parser.add_argument('--ref', dest='fasta', required=True, help='Path to reference FASTA')
@@ -37,7 +34,7 @@ def main():
     if args.log:
         logging.basicConfig(level=getattr(logging, args.log), format='%(asctime)s %(levelname)s %(message)s')
 
-    logging.info("GWAS Harmonisation {}".format(sha))
+    logging.info("GWAS Harmonisation {}".format(version))
 
     # check values are valid
     if args.cohort_frac_cases is not None:
@@ -106,7 +103,7 @@ def main():
         logging.info("Skipped {} of {}".format(total_variants - len(harmonised), total_variants))
 
         params = {
-            'gwas_harmonisation_command': ' '.join(sys.argv[1:]) + "; " + sha,
+            'gwas_harmonisation_command': ' '.join(sys.argv[1:]) + "; " + version,
             'file_date': datetime.now().isoformat(),
             'counts.total_variants': total_variants,
             'counts.variants_not_read': total_variants - len(gwas),

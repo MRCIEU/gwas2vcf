@@ -1,4 +1,3 @@
 biopython==1.72
-GitPython==2.1.11
 pysam==0.15.2
 marshmallow==2.18.1
