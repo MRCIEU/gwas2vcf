@@ -6,6 +6,5 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - .:/app
       - /data/bgc:/data
       - /data/bgc/ref:/data/ref
