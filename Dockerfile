@@ -3,7 +3,7 @@ FROM python:3.6.4
 MAINTAINER "Matt Lyon" matt.lyon@bristol.ac.uk
 
 # copy flask app to container
-COPY ./requirements.txt /app/
+COPY . /app/
 WORKDIR /app
 
 # install python dependencies
