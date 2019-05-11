@@ -72,7 +72,8 @@ class GwasResult:
             imp_info_field=None,
             ncontrol_field=None,
             cohort_sample_size=None,
-            cohort_frac_cases=None
+            cohort_frac_cases=None,
+            rm_chr_prefix=False
     ):
 
         logging.info("Reading summary stats and mapping to FASTA: {}".format(path))
@@ -118,7 +119,10 @@ class GwasResult:
 
             logging.debug("Input row: {}".format(s))
 
-            chrom = s[chrom_field]
+            if rm_chr_prefix:
+                chrom = s[chrom_field].replace("chr", "")
+            else:
+                chrom = s[chrom_field]
 
             try:
                 pos = int(float(s[pos_field]))  # float is for scientific notation
