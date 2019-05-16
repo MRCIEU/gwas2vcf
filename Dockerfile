@@ -10,14 +10,5 @@ WORKDIR /app
 RUN pip install --upgrade pip
 RUN pip install -r ./requirements.txt
 
-# add watcher script
-RUN mkdir /home/bin
-ADD ./watcher.py /home/bin
-RUN chmod 775 /home/bin/watcher.py
-
-# Path
-ENV PATH /app:$PATH
-
-CMD tail -f /dev/null
 # launch app
-# CMD ["python", "main.py"]
+CMD ["python", "main.py"]

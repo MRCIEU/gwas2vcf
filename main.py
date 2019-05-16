@@ -25,6 +25,8 @@ def main():
                         help='Total sample size of cohort')
     parser.add_argument('--cohort_frac_cases', type=float, dest='cohort_frac_cases', required=False, default=None,
                         help='Total fraction of cases in cohort')
+    parser.add_argument('--rm_chr_prefix', dest='rm_chr_prefix', action='store_true', default=False, required=False,
+                        help='Remove chr prefix from GWAS chromosome')
     parser.add_argument("--log", dest="log", required=False, default='INFO',
                         choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
                         help="Set the logging level")
@@ -84,7 +86,8 @@ def main():
         imp_info_field=j.get('imp_info_col'),
         ncontrol_field=j.get('ncontrol_col'),
         cohort_sample_size=args.cohort_sample_size,
-        cohort_frac_cases=args.cohort_frac_cases
+        cohort_frac_cases=args.cohort_frac_cases,
+        rm_chr_prefix=args.rm_chr_prefix
     )
 
     logging.info("Total variants: {}".format(total_variants))

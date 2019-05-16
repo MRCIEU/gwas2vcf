@@ -16,7 +16,7 @@ pip install --user -r ./requirements.txt
 
 # Docker
 docker build -t gwas_harmonisation .
-docker-compose up -d
+docker create -v /data/bgc:/data/bgc -name gwas_harmonisation gwas_harmonisation
 ```
 
 ### Reference FASTA
