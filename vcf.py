@@ -21,7 +21,7 @@ class Vcf:
 
         header = pysam.VariantHeader()
         header.add_line(
-            '##INFO=<ID=EFFECT,Number=A,Type=String,Description="Effect size estimate relative to the alternative allele">')
+            '##INFO=<ID=EFFECT,Number=A,Type=Float,Description="Effect size estimate relative to the alternative allele">')
         header.add_line('##INFO=<ID=SE,Number=A,Type=Float,Description="Standard error of effect size estimate">')
         header.add_line('##INFO=<ID=L10PVAL,Number=A,Type=Float,Description="-log10 p-value for effect estimate">')
         header.add_line('##INFO=<ID=AF,Number=A,Type=Float,Description="Alternate allele frequency">')
@@ -50,7 +50,14 @@ class Vcf:
             lpval = Vcf.convert_pval_to_neg_log10(result.pval)
 
             # check floats
+            if result.b is not None and result.b > 0 and result.b < 1e-06:
+                logging.warning(
+                    "Effect field smaller than VCF specification. Expect loss of precision for: {}".format(
+                        result.b)
+                )
             if result.se is not None and result.se > 0 and result.se < 1e-06:
+                # set SE to lowest possible value
+                result.se = 1e-06
                 logging.warning(
                     "Standard error field smaller than VCF specification. Expect loss of precision for: {}".format(
                         result.se)
@@ -92,7 +99,7 @@ class Vcf:
             record.id = result.dbsnpid
             record.alleles = (result.ref, result.alt)
             record.filter.add(result.vcf_filter)
-            record.info['EFFECT'] = str(result.b)
+            record.info['EFFECT'] = result.b
             record.info['SE'] = result.se
             record.info['L10PVAL'] = lpval
             record.info['AF'] = result.alt_freq
