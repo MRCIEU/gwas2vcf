@@ -118,7 +118,7 @@ def main():
             'gwas.id': args.id
         }
 
-        if 'ncase_col' in j:
+        if 'ncase_col' in j or args.cohort_frac_cases is not None:
             params['gwas.type'] = 'case/control'
         else:
             params['gwas.type'] = 'continuous'
