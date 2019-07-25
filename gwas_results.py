@@ -126,7 +126,8 @@ class GwasResult:
 
             try:
                 pos = int(float(s[pos_field]))  # float is for scientific notation
-            except ValueError as e:
+                assert pos > 0
+            except (ValueError, AssertionError) as e:
                 logging.warning("Skipping {}: {}".format(s, e))
                 continue
 
