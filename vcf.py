@@ -32,6 +32,9 @@ class Vcf:
 
         header = pysam.VariantHeader()
 
+        # INFO
+        header.add_line('##INFO=<ID=TH,Number=0,Type=Flag,Description="Association top hit">')
+
         # FORMAT
         header.add_line(
             '##FORMAT=<ID=ES,Number=A,Type=Float,Description="Effect size estimate relative to the alternative allele">')
