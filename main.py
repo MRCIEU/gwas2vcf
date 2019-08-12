@@ -20,11 +20,11 @@ def main():
     parser.add_argument('--data', dest='gwas', required=True, help='Path to GWAS summary stats')
     parser.add_argument('--ref', dest='fasta', required=True, help='Path to reference FASTA')
     parser.add_argument('--json', dest='json', required=True, help='Path to parameters JSON')
-    parser.add_argument('--id', dest='id', required=True, help='GWAS identifier')
-    parser.add_argument('--cohort_sample_size', type=int, dest='cohort_sample_size', required=False, default=None,
-                        help='Total sample size of cohort')
-    parser.add_argument('--cohort_frac_cases', type=float, dest='cohort_frac_cases', required=False, default=None,
-                        help='Total fraction of cases in cohort')
+    parser.add_argument('--id', dest='id', required=True, help='Study identifier')
+    parser.add_argument('--cohort_controls', type=int, dest='cohort_controls', required=False, default=None,
+                        help='Total study number of controls (if case/control) or total sample size if continuous')
+    parser.add_argument('--cohort_cases', type=int, dest='cohort_cases', required=False, default=None,
+                        help='Total study number of cases')
     parser.add_argument('--rm_chr_prefix', dest='rm_chr_prefix', action='store_true', default=False, required=False,
                         help='Remove chr prefix from GWAS chromosome')
     parser.add_argument("--log", dest="log", required=False, default='INFO',
@@ -39,17 +39,14 @@ def main():
     logging.info("GWAS Harmonisation {}".format(version))
 
     # check values are valid
-    if args.cohort_frac_cases is not None:
-        if args.cohort_frac_cases == 0:
-            logging.error("Proportion of cases in the study must be greater than 0.")
-            sys.exit()
-        if args.cohort_frac_cases == 1:
-            logging.error("Proportion of cases in the study must be less than 1.")
+    if args.cohort_cases is not None:
+        if args.cohort_cases < 1:
+            logging.error("Total study number of cases must be a positive number")
             sys.exit()
 
-    if args.cohort_sample_size is not None:
-        if args.cohort_sample_size == 0:
-            logging.error("Total sample size must be greater than 0.")
+    if args.cohort_controls is not None:
+        if args.cohort_controls < 1:
+            logging.error("Total study number of controls must be a positive number")
             sys.exit()
 
     # load parameters from json
@@ -85,8 +82,6 @@ def main():
         imp_z_field=j.get('imp_z_col'),
         imp_info_field=j.get('imp_info_col'),
         ncontrol_field=j.get('ncontrol_col'),
-        cohort_sample_size=args.cohort_sample_size,
-        cohort_frac_cases=args.cohort_frac_cases,
         rm_chr_prefix=args.rm_chr_prefix
     )
 
@@ -105,26 +100,32 @@ def main():
         # number of skipped records
         logging.info("Skipped {} of {}".format(total_variants - len(harmonised), total_variants))
 
-        params = {
+        file_metadata = {
             'gwas_harmonisation_command': ' '.join(sys.argv[1:]) + "; " + version,
-            'file_date': datetime.now().isoformat(),
-            'counts.total_variants': total_variants,
-            'counts.variants_not_read': total_variants - len(gwas),
-            'counts.harmonised_variants': len(harmonised),
-            'counts.variants_not_harmonised': len(gwas) - len(harmonised),
-            'counts.switched_alleles': flipped_variants - (len(gwas) - len(harmonised)),
-            'cohort_sample_size': args.cohort_sample_size,
-            'cohort_frac_cases': args.cohort_frac_cases,
-            'gwas.id': args.id
+            'file_date': datetime.now().isoformat()
         }
 
-        if 'ncase_col' in j or args.cohort_frac_cases is not None:
-            params['gwas.type'] = 'case/control'
+        sample_metadata = {
+            'TotalVariants': total_variants,
+            'VariantsNotRead': total_variants - len(gwas),
+            'HarmonisedVariants': len(harmonised),
+            'VariantsNotHarmonised': len(gwas) - len(harmonised),
+            'SwitchedAlleles': flipped_variants - (len(gwas) - len(harmonised))
+        }
+
+        if args.cohort_controls is not None:
+            sample_metadata['TotalControls'] = args.cohort_controls
+
+        if args.cohort_cases is not None:
+            sample_metadata['TotalCases'] = args.cohort_cases
+
+        if 'ncase_col' in j or args.cohort_cases is not None:
+            sample_metadata['StudyType'] = '"CaseControl"'
         else:
-            params['gwas.type'] = 'continuous'
+            sample_metadata['StudyType'] = '"Continuous"'
 
         # write to vcf
-        Vcf.write_to_file(harmonised, args.out, fasta, j['build'], args.id, params)
+        Vcf.write_to_file(harmonised, args.out, fasta, j['build'], args.id, sample_metadata, file_metadata)
 
 
 if __name__ == "__main__":

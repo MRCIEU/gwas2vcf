@@ -5,6 +5,7 @@ import numpy as np
 
 class Vcf:
 
+    # TODO set P=0 to missing
     @staticmethod
     def convert_pval_to_neg_log10(p):
         # prevent negative 0 output
@@ -16,34 +17,61 @@ class Vcf:
         return -np.log10(p)
 
     @staticmethod
-    def write_to_file(gwas_results, path, fasta, build, trait_id, params=None):
+    def write_to_file(gwas_results, path, fasta, build, trait_id, sample_metadata=None, file_metadata=None):
         logging.info("Writing headers to BCF/VCF: {}".format(path))
 
         header = pysam.VariantHeader()
+
+        # FORMAT
         header.add_line(
-            '##FORMAT=<ID=EFFECT,Number=A,Type=Float,Description="Effect size estimate relative to the alternative allele">')
+            '##FORMAT=<ID=ES,Number=A,Type=Float,Description="Effect size estimate relative to the alternative allele">')
         header.add_line('##FORMAT=<ID=SE,Number=A,Type=Float,Description="Standard error of effect size estimate">')
-        header.add_line('##FORMAT=<ID=L10PVAL,Number=A,Type=Float,Description="-log10 p-value for effect estimate">')
+        header.add_line('##FORMAT=<ID=LP,Number=A,Type=Float,Description="-log10 p-value for effect estimate">')
         header.add_line(
             '##FORMAT=<ID=AF,Number=A,Type=Float,Description="Alternate allele frequency in the association study">')
-        header.add_line('##FORMAT=<ID=N,Number=A,Type=Float,Description="Sample size used to estimate genetic effect">')
         header.add_line(
-            '##FORMAT=<ID=ZSCORE,Number=A,Type=Float,Description="Z-score provided if it was used to derive the EFFECT and SE fields">')
+            '##FORMAT=<ID=SS,Number=A,Type=Float,Description="Sample size used to estimate genetic effect">')
         header.add_line(
-            '##FORMAT=<ID=SIMPINFO,Number=A,Type=Float,Description="Accuracy score of summary data imputation">')
+            '##FORMAT=<ID=EZ,Number=A,Type=Float,Description="Z-score provided if it was used to derive the EFFECT and SE fields">')
+        header.add_line('##FORMAT=<ID=SI,Number=A,Type=Float,Description="Accuracy score of summary data imputation">')
         header.add_line(
-            '##FORMAT=<ID=PROPCASES,Number=A,Type=Float,Description="Proportion of sample size that were cases in the GWAS">')
-        header.samples.add(trait_id)
+            '##FORMAT=<ID=NC,Number=A,Type=Float,Description="Number of cases used to estimate genetic effect">')
 
-        # add contig lengths
+        # META
+        header.add_line(
+            '##META=<ID=TotalVariants,Number=1,Type=Integer,Description="Total number of variants in input">')
+        header.add_line(
+            '##META=<ID=VariantsNotRead,Number=1,Type=Integer,Description="Number of variants that could not be read">')
+        header.add_line(
+            '##META=<ID=HarmonisedVariants,Number=1,Type=Integer,Description="Total number of harmonised variants">')
+        header.add_line(
+            '##META=<ID=VariantsNotHarmonised,Number=1,Type=Integer,Description="Total number of variants that could not be harmonised">')
+        header.add_line(
+            '##META=<ID=SwitchedAlleles,Number=1,Type=Integer,Description="Total number of variants strand switched">')
+        header.add_line(
+            '##META=<ID=TotalControls,Number=1,Type=Integer,Description="Total number of controls in the association study">')
+        header.add_line(
+            '##META=<ID=TotalCases,Number=1,Type=Integer,Description="Total number of cases in the association study">')
+        header.add_line(
+            '##META=<ID=StudyType,Number=1,Type=String,Description="Type of GWAS study [Continuous or CaseControl]">')
+
+        # SAMPLES
+        header.samples.add(trait_id)
+        if file_metadata is not None:
+            s = ""
+            for k in sample_metadata:
+                s += ",{}={}".format(k, sample_metadata[k])
+            header.add_line('##SAMPLE=<ID={}{}>'.format(trait_id, s))
+
+        # CONTIG
         assert len(fasta.references) == len(fasta.lengths)
         for n, contig in enumerate(fasta.references):
             header.add_line("##contig=<ID={},length={}, assembly={}>".format(contig, fasta.lengths[n], build))
 
         # add metadata
-        if params is not None:
-            for k in params:
-                header.add_line('##{}={}'.format(k, params[k]))
+        if file_metadata is not None:
+            for k in file_metadata:
+                header.add_line('##{}={}'.format(k, file_metadata[k]))
 
         vcf = pysam.VariantFile(path, "w", header=header)
 
@@ -52,6 +80,7 @@ class Vcf:
             lpval = Vcf.convert_pval_to_neg_log10(result.pval)
 
             # check floats
+            # TODO check this is the lowest val
             if result.b is not None and result.b > 0 and result.b < 1e-06:
                 logging.warning(
                     "Effect field smaller than VCF specification. Expect loss of precision for: {}".format(
@@ -59,6 +88,7 @@ class Vcf:
                 )
             if result.se is not None and result.se > 0 and result.se < 1e-06:
                 # set SE to lowest possible value
+                # TODO set as null
                 result.se = 1e-06
                 logging.warning(
                     "Standard error field smaller than VCF specification. Expect loss of precision for: {}".format(
@@ -89,11 +119,6 @@ class Vcf:
                     "Imputation INFO field smaller than VCF specification. Expect loss of precision for: {}".format(
                         result.imp_info)
                 )
-            if result.prop_cases is not None and result.prop_cases > 0 and result.prop_cases < 1e-06:
-                logging.warning(
-                    "Proportion of cases field smaller than VCF specification. Expect loss of precision for: {}".format(
-                        result.prop_cases)
-                )
 
             record = vcf.new_record()
             record.chrom = result.chrom
@@ -102,14 +127,22 @@ class Vcf:
             record.alleles = (result.ref, result.alt)
             record.filter.add(result.vcf_filter)
 
-            record.samples[trait_id]['EFFECT'] = result.b
-            record.samples[trait_id]['SE'] = result.se
-            record.samples[trait_id]['L10PVAL'] = lpval
-            record.samples[trait_id]['AF'] = result.alt_freq
-            record.samples[trait_id]['N'] = result.n
-            record.samples[trait_id]['ZSCORE'] = result.imp_z
-            record.samples[trait_id]['SIMPINFO'] = result.imp_info
-            record.samples[trait_id]['PROPCASES'] = result.prop_cases
+            if result.b is not None:
+                record.samples[trait_id]['ES'] = result.b
+            if result.se is not None:
+                record.samples[trait_id]['SE'] = result.se
+            if lpval is not None:
+                record.samples[trait_id]['LP'] = lpval
+            if result.alt_freq is not None:
+                record.samples[trait_id]['AF'] = result.alt_freq
+            if result.n is not None:
+                record.samples[trait_id]['SS'] = result.n
+            if result.imp_z is not None:
+                record.samples[trait_id]['EZ'] = result.imp_z
+            if result.imp_info is not None:
+                record.samples[trait_id]['SI'] = result.imp_info
+            if result.ncase is not None:
+                record.samples[trait_id]['NC'] = result.ncase
 
             # bank variants by chromosome
             if result.chrom not in records:
