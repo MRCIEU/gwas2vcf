@@ -16,22 +16,24 @@ class Vcf:
         return -np.log10(p)
 
     @staticmethod
-    def write_to_file(gwas_results, path, fasta, build, params=None):
+    def write_to_file(gwas_results, path, fasta, build, trait_id, params=None):
         logging.info("Writing headers to BCF/VCF: {}".format(path))
 
         header = pysam.VariantHeader()
         header.add_line(
-            '##INFO=<ID=EFFECT,Number=A,Type=Float,Description="Effect size estimate relative to the alternative allele">')
-        header.add_line('##INFO=<ID=SE,Number=A,Type=Float,Description="Standard error of effect size estimate">')
-        header.add_line('##INFO=<ID=L10PVAL,Number=A,Type=Float,Description="-log10 p-value for effect estimate">')
-        header.add_line('##INFO=<ID=AF,Number=A,Type=Float,Description="Alternate allele frequency">')
-        header.add_line('##INFO=<ID=N,Number=A,Type=Float,Description="Sample size used to estimate genetic effect">')
+            '##FORMAT=<ID=EFFECT,Number=A,Type=Float,Description="Effect size estimate relative to the alternative allele">')
+        header.add_line('##FORMAT=<ID=SE,Number=A,Type=Float,Description="Standard error of effect size estimate">')
+        header.add_line('##FORMAT=<ID=L10PVAL,Number=A,Type=Float,Description="-log10 p-value for effect estimate">')
         header.add_line(
-            '##INFO=<ID=ZSCORE,Number=A,Type=Float,Description="Z-score provided if it was used to derive the EFFECT and SE fields">')
+            '##FORMAT=<ID=AF,Number=A,Type=Float,Description="Alternate allele frequency in the association study">')
+        header.add_line('##FORMAT=<ID=N,Number=A,Type=Float,Description="Sample size used to estimate genetic effect">')
         header.add_line(
-            '##INFO=<ID=SIMPINFO,Number=A,Type=Float,Description="Accuracy score of summary data imputation">')
+            '##FORMAT=<ID=ZSCORE,Number=A,Type=Float,Description="Z-score provided if it was used to derive the EFFECT and SE fields">')
         header.add_line(
-            '##INFO=<ID=PROPCASES,Number=A,Type=Float,Description="Proportion of sample size that were cases in the GWAS">')
+            '##FORMAT=<ID=SIMPINFO,Number=A,Type=Float,Description="Accuracy score of summary data imputation">')
+        header.add_line(
+            '##FORMAT=<ID=PROPCASES,Number=A,Type=Float,Description="Proportion of sample size that were cases in the GWAS">')
+        header.samples.add(trait_id)
 
         # add contig lengths
         assert len(fasta.references) == len(fasta.lengths)
@@ -99,14 +101,15 @@ class Vcf:
             record.id = result.dbsnpid
             record.alleles = (result.ref, result.alt)
             record.filter.add(result.vcf_filter)
-            record.info['EFFECT'] = result.b
-            record.info['SE'] = result.se
-            record.info['L10PVAL'] = lpval
-            record.info['AF'] = result.alt_freq
-            record.info['N'] = result.n
-            record.info['ZSCORE'] = result.imp_z
-            record.info['SIMPINFO'] = result.imp_info
-            record.info['PROPCASES'] = result.prop_cases
+
+            record.samples[trait_id]['EFFECT'] = result.b
+            record.samples[trait_id]['SE'] = result.se
+            record.samples[trait_id]['L10PVAL'] = lpval
+            record.samples[trait_id]['AF'] = result.alt_freq
+            record.samples[trait_id]['N'] = result.n
+            record.samples[trait_id]['ZSCORE'] = result.imp_z
+            record.samples[trait_id]['SIMPINFO'] = result.imp_info
+            record.samples[trait_id]['PROPCASES'] = result.prop_cases
 
             # bank variants by chromosome
             if result.chrom not in records:

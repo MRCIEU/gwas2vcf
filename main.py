@@ -20,7 +20,7 @@ def main():
     parser.add_argument('--data', dest='gwas', required=True, help='Path to GWAS summary stats')
     parser.add_argument('--ref', dest='fasta', required=True, help='Path to reference FASTA')
     parser.add_argument('--json', dest='json', required=True, help='Path to parameters JSON')
-    parser.add_argument('--id', dest='id', default=None, required=False, help='GWAS identifier')
+    parser.add_argument('--id', dest='id', required=True, help='GWAS identifier')
     parser.add_argument('--cohort_sample_size', type=int, dest='cohort_sample_size', required=False, default=None,
                         help='Total sample size of cohort')
     parser.add_argument('--cohort_frac_cases', type=float, dest='cohort_frac_cases', required=False, default=None,
@@ -124,7 +124,7 @@ def main():
             params['gwas.type'] = 'continuous'
 
         # write to vcf
-        Vcf.write_to_file(harmonised, args.out, fasta, j['build'], params)
+        Vcf.write_to_file(harmonised, args.out, fasta, j['build'], args.id, params)
 
 
 if __name__ == "__main__":
