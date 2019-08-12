@@ -81,3 +81,10 @@ gatk VariantAnnotator \
 -E 1kg.EUR_AF \
 --resource-allele-concordance
 ``` 
+
+## Known issues
+
+VCF v4.2 cannot accommodate double precision floats. Therefore the smallest effect size and SE etc is:
+```
+1.1754944e-38
+```
