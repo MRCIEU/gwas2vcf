@@ -5,7 +5,7 @@ import numpy as np
 
 class Vcf:
 
-    # TODO set P=0 to missing
+    # TODO set P=0 to missing @Gib
     @staticmethod
     def convert_pval_to_neg_log10(p):
         # prevent negative 0 output
@@ -15,6 +15,16 @@ class Vcf:
         if p == 0:
             return 999
         return -np.log10(p)
+
+    @staticmethod
+    def is_float32_lossy(f):
+        if f == 0 or f == -0 or f is None or f == np.inf or f == -np.inf:
+            return False
+
+        # convert val to float32
+        v = np.float32(f)
+
+        return v == 0 or v == np.inf or v == -0 or v == -np.inf
 
     @staticmethod
     def write_to_file(gwas_results, path, fasta, build, trait_id, sample_metadata=None, file_metadata=None):
@@ -80,43 +90,40 @@ class Vcf:
             lpval = Vcf.convert_pval_to_neg_log10(result.pval)
 
             # check floats
-            # TODO check this is the lowest val
-            if result.b is not None and result.b > 0 and result.b < 1e-06:
+            if Vcf.is_float32_lossy(result.b):
                 logging.warning(
-                    "Effect field smaller than VCF specification. Expect loss of precision for: {}".format(
+                    "Effect field cannot fit into float32. Expect loss of precision for: {}".format(
                         result.b)
                 )
-            if result.se is not None and result.se > 0 and result.se < 1e-06:
-                # set SE to lowest possible value
-                # TODO set as null
-                result.se = 1e-06
+            if Vcf.is_float32_lossy(result.se):
+                result.se = np.float64(np.finfo(np.float32).tiny).item()
                 logging.warning(
-                    "Standard error field smaller than VCF specification. Expect loss of precision for: {}".format(
+                    "Standard error field cannot fit into float32. Expect loss of precision for: {}".format(
                         result.se)
                 )
-            if lpval is not None and lpval > 0 and lpval < 1e-06:
+            if Vcf.is_float32_lossy(lpval):
                 logging.warning(
-                    "-log10(pval) field smaller than VCF specification. Expect loss of precision for: {}".format(
+                    "-log10(pval) field cannot fit into float32. Expect loss of precision for: {}".format(
                         lpval)
                 )
-            if result.alt_freq is not None and result.alt_freq > 0 and result.alt_freq < 1e-06:
+            if Vcf.is_float32_lossy(result.alt_freq):
                 logging.warning(
-                    "Allele frequency field smaller than VCF specification. Expect loss of precision for: {}".format(
+                    "Allele frequency field cannot fit into float32. Expect loss of precision for: {}".format(
                         result.alt_freq)
                 )
-            if result.n is not None and result.n > 0 and result.n < 1e-06:
+            if Vcf.is_float32_lossy(result.n):
                 logging.warning(
-                    "Sample size field smaller than VCF specification. Expect loss of precision for: {}".format(
+                    "Sample size field cannot fit into float32. Expect loss of precision for: {}".format(
                         result.n)
                 )
-            if result.imp_z is not None and result.imp_z > 0 and result.imp_z < 1e-06:
+            if Vcf.is_float32_lossy(result.imp_z):
                 logging.warning(
-                    "Imputation Z score field smaller than VCF specification. Expect loss of precision for: {}".format(
+                    "Imputation Z score field cannot fit into float32. Expect loss of precision for: {}".format(
                         result.imp_z)
                 )
-            if result.imp_info is not None and result.imp_info > 0 and result.imp_info < 1e-06:
+            if Vcf.is_float32_lossy(result.imp_info):
                 logging.warning(
-                    "Imputation INFO field smaller than VCF specification. Expect loss of precision for: {}".format(
+                    "Imputation INFO field cannot fit into float32. Expect loss of precision for: {}".format(
                         result.imp_info)
                 )
 
