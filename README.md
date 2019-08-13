@@ -99,7 +99,4 @@ gatk VariantAnnotator \
 
 ## Known issues
 
-VCF v4.2 cannot accommodate double precision floats. Therefore the smallest effect size and SE etc is:
-```
-1.1754944e-38
-```
+VCF v4.2 cannot accommodate double precision floats. Decimals smaller than 1.1754944e-38 are rounded to 0. P values are encoded as -log10.
