@@ -80,7 +80,7 @@ Check the file format is valid but ignore genotypes since these are missing
 
 ```
 gatk ValidateVariants \
--V harmonised.bcf \
+-V harmonised.vcf \
 -R ref.fasta \
 --dbsnp dbsnp.vcf \
 --validation-type-to-exclude ALLELES
