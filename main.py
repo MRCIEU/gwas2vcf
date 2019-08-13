@@ -120,9 +120,9 @@ def main():
             sample_metadata['TotalCases'] = args.cohort_cases
 
         if 'ncase_col' in j or args.cohort_cases is not None:
-            sample_metadata['StudyType'] = '"CaseControl"'
+            sample_metadata['StudyType'] = 'CaseControl'
         else:
-            sample_metadata['StudyType'] = '"Continuous"'
+            sample_metadata['StudyType'] = 'Continuous'
 
         # write to vcf
         Vcf.write_to_file(harmonised, args.out, fasta, j['build'], args.id, sample_metadata, file_metadata)

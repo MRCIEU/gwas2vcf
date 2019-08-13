@@ -5,7 +5,6 @@ import numpy as np
 
 class Vcf:
 
-    # TODO set P=0 to missing @Gib
     @staticmethod
     def convert_pval_to_neg_log10(p):
         # prevent negative 0 output
@@ -90,7 +89,7 @@ class Vcf:
 
         records = dict()
         for result in gwas_results:
-            lpval = Vcf.convert_pval_to_neg_log10(result.pval)
+            lpval = -np.log10(result.pval)
 
             # check floats
             if Vcf.is_float32_lossy(result.b):
