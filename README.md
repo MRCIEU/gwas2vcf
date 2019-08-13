@@ -16,7 +16,7 @@ pip install --user -r ./requirements.txt
 
 # Docker
 docker build -t gwas_harmonisation .
-docker create -v /data/bgc:/data/bgc -name gwas_harmonisation gwas_harmonisation
+docker create -v /data:/data -name gwas_harmonisation gwas_harmonisation
 ```
 
 ### Reference FASTA
@@ -52,18 +52,24 @@ bash test/example.sh
 
 ## Usage
 
-Column field numbers are 0-based
-
 ```
 Map GWAS summary statistics to VCF/BCF
 
-optional arguments:
-  -h, --help     show this help message and exit
-  -v, --version  show program's version number and exit
-  --out OUT      Path to output VCF/BCF
-  --data GWAS    Path to GWAS summary stats
-  --ref FASTA    Path to reference FASTA
-  --json JSON    Path to parameters JSON
+-h, --help            show this help message and exit
+-v, --version         show program's version number and exit
+--out OUT             Path to output VCF/BCF
+--data GWAS           Path to GWAS summary stats
+--ref FASTA           Path to reference FASTA
+--json JSON           Path to parameters JSON
+--id ID               Study identifier
+--cohort_controls COHORT_CONTROLS
+                      Total study number of controls (if case/control) or
+                      total sample size if continuous
+--cohort_cases COHORT_CASES
+                      Total study number of cases
+--rm_chr_prefix       Remove chr prefix from GWAS chromosome
+--log {DEBUG,INFO,WARNING,ERROR,CRITICAL}
+                      Set the logging level
 ```
 
 See param.py for JSON specification
@@ -77,7 +83,7 @@ gatk ValidateVariants \
 --validation-type-to-exclude ALLELES
 ```
 
-## Dealing with missing variant frequency
+## Add variant frequency
 
 Add variant frequency from 1000 genomes (or similar)
 
