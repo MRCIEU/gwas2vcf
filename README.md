@@ -101,6 +101,8 @@ harmonised.bcf
 
 ## Merge multiple GWAS summary stats into a single file
 
+Note: Merged GWAS BCFs are significantly slower to query; for best performance do not do this.
+
 ```
 bcftools merge \
 -O b \
@@ -108,13 +110,13 @@ bcftools merge \
 *.bcf
 ```
 
-## Extact tophits for a single GWAS trait
+## Extract genome-wide significant variants to text file
 
 ```
-bcftools view \
--O b \
---samples <gwas_identifier> \
---include 'FORMAT/LP > 7.3'
+bcftools query \
+-i 'FORMAT/LP > 7.3' \
+-f '%CHROM\t%POS\t%ID\t%REF\t%ALT[\t%ES\t%SE\t%LP]\n' \
+-o data.txt \
 file.bcf
 ```
 
