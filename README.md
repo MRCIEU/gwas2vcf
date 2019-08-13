@@ -5,18 +5,20 @@ Tool to map GWAS summary statistics to VCF/BCF with on the fly harmonisation to 
 ### Install
 
 ```
-# Src
-git clone https://github.com/MRCIEU/gwas_harmonisation
+# src
+git clone git@github.com:MRCIEU/gwas_harmonisation.git
 cd gwas_harmonisation
-```
 
-```
-# Native
-pip install --user -r ./requirements.txt
+# VirtualEnv
+virtualenv venv
+source ./venv/bin/activate
+./venv/bin/pip install -r requirements.txt
+./venv/bin/python main.py -h
 
 # Docker
 docker build -t gwas_harmonisation .
 docker create -v /data:/data -name gwas_harmonisation gwas_harmonisation
+docker run -it gwas_harmonisation:latest python main.py -h
 ```
 
 ### Reference FASTA
