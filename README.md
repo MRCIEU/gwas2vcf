@@ -76,25 +76,27 @@ See param.py for JSON specification
 
 ## Validate VCF file
 
+Check the file format is valid but ignore genotypes since these are missing
+
 ```
 gatk ValidateVariants \
 -V harmonised.bcf \
 -R ref.fasta \
+--dbsnp dbsnp.vcf \
 --validation-type-to-exclude ALLELES
 ```
 
-## Add variant frequency
+## Add variant frequency and dbSNP identifiers
 
 Add variant frequency from 1000 genomes (or similar)
 
 ```
-gatk VariantAnnotator \
--R ref.fasta \
--V harmonised.vcf \
--O harmonised_af.vcf \
---resource 1kg:1kg.vcf.gz \
--E 1kg.EUR_AF \
---resource-allele-concordance
+bcftools annotate \
+-a 1kg.vcf.gz \
+-c ID,AF \
+-O b \
+-o annotated.bcf \
+harmonised.bcf
 ``` 
 
 ## Merge multiple GWAS summary stats into a single file
