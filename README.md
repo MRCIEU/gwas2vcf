@@ -97,6 +97,15 @@ gatk VariantAnnotator \
 --resource-allele-concordance
 ``` 
 
+## Merge multiple GWAS summary stats into a single file
+
+```
+bcftools merge \
+-O b \
+-o merged.bcf \
+*.bcf
+```
+
 ## Known issues
 
 VCF v4.2 cannot accommodate double precision floats. Decimals smaller than 1.1754944e-38 are rounded to 0. P values are encoded as -log10.
