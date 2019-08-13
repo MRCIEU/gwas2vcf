@@ -108,6 +108,16 @@ bcftools merge \
 *.bcf
 ```
 
+## Extact tophits for a single GWAS trait
+
+```
+bcftools view \
+-O b \
+--samples <gwas_identifier> \
+--include 'FORMAT/LP > 7.3'
+file.bcf
+```
+
 ## Known issues
 
 VCF v4.2 cannot accommodate double precision floats. Decimals smaller than 1.1754944e-38 are rounded to 0. P values are encoded as -log10.
