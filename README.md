@@ -76,6 +76,18 @@ Map GWAS summary statistics to VCF/BCF
 
 See param.py for JSON specification
 
+## Combine multiallelics
+
+Merge variants at single genetic position on to a single row
+
+```
+bcftools norm \
+-f ref.fasta \
+-m +any \
+-O b \
+-o norm.bcf
+```
+
 ## Validate VCF file
 
 Check the file format is valid but ignore genotypes since these are missing
