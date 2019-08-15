@@ -5,18 +5,20 @@ Tool to map GWAS summary statistics to VCF/BCF with on the fly harmonisation to 
 ### Install
 
 ```
-# Src
-git clone https://github.com/MRCIEU/gwas_harmonisation
+# src
+git clone git@github.com:MRCIEU/gwas_harmonisation.git
 cd gwas_harmonisation
-```
 
-```
-# Native
-pip install --user -r ./requirements.txt
+# VirtualEnv
+virtualenv venv
+source ./venv/bin/activate
+./venv/bin/pip install -r requirements.txt
+./venv/bin/python main.py -h
 
 # Docker
 docker build -t gwas_harmonisation .
-docker create -v /data/bgc:/data/bgc -name gwas_harmonisation gwas_harmonisation
+docker create -v /data:/data -name gwas_harmonisation gwas_harmonisation
+docker run -it gwas_harmonisation:latest python main.py -h
 ```
 
 ### Reference FASTA
@@ -52,32 +54,86 @@ bash test/example.sh
 
 ## Usage
 
-Column field numbers are 0-based
-
 ```
 Map GWAS summary statistics to VCF/BCF
 
-optional arguments:
-  -h, --help     show this help message and exit
-  -v, --version  show program's version number and exit
-  --out OUT      Path to output VCF/BCF
-  --data GWAS    Path to GWAS summary stats
-  --ref FASTA    Path to reference FASTA
-  --json JSON    Path to parameters JSON
+-h, --help            show this help message and exit
+-v, --version         show program's version number and exit
+--out OUT             Path to output VCF/BCF
+--data GWAS           Path to GWAS summary stats
+--ref FASTA           Path to reference FASTA
+--json JSON           Path to parameters JSON
+--id ID               Study identifier
+--cohort_controls COHORT_CONTROLS
+                      Total study number of controls (if case/control) or
+                      total sample size if continuous
+--cohort_cases COHORT_CASES
+                      Total study number of cases
+--rm_chr_prefix       Remove chr prefix from GWAS chromosome
+--log {DEBUG,INFO,WARNING,ERROR,CRITICAL}
+                      Set the logging level
 ```
 
 See param.py for JSON specification
 
-## Dealing with missing variant frequency
+## Combine multiallelics
+
+Merge variants at single genetic position on to a single row
+
+```
+bcftools norm \
+-f ref.fasta \
+-m +any \
+-O b \
+-o norm.bcf
+```
+
+## Validate VCF file
+
+Check the file format is valid but ignore genotypes since these are missing
+
+```
+gatk ValidateVariants \
+-V harmonised.vcf \
+-R ref.fasta \
+--dbsnp dbsnp.vcf \
+--validation-type-to-exclude ALLELES
+```
+
+## Add variant frequency and dbSNP identifiers
 
 Add variant frequency from 1000 genomes (or similar)
 
 ```
-gatk VariantAnnotator \
--R ref.fasta \
--V harmonised.bcf \
--O harmonised_af.bcf \
---resource 1kg:1kg.vcf.gz \
--E 1kg.EUR_AF \
---resource-allele-concordance
+bcftools annotate \
+-a 1kg.vcf.gz \
+-c ID,AF \
+-O b \
+-o annotated.bcf \
+harmonised.bcf
 ``` 
+
+## Extract genome-wide significant variants to text file
+
+```
+bcftools query \
+-i 'FORMAT/LP > 7.3' \
+-f '%CHROM\t%POS\t%ID\t%REF\t%ALT[\t%ES\t%SE\t%LP]\n' \
+-o data.txt \
+file.bcf
+```
+
+## Merge multiple GWAS summary stats into a single file
+
+Note: Merged GWAS BCFs are significantly slower to query; for best performance do not do this.
+
+```
+bcftools merge \
+-O b \
+-o merged.bcf \
+*.bcf
+```
+
+## Known issues
+
+VCF v4.2 cannot accommodate double precision floats. Decimals smaller than 1.1754944e-38 are rounded to 0. P values are encoded as -log10.

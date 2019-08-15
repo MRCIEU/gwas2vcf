@@ -2,10 +2,12 @@ import logging
 import gzip
 import os
 
+""" Class to store single GWAS result i.e. single SNP or row"""
+
 
 class GwasResult:
 
-    def __init__(self, chrom, pos, ref, alt, b, se, pval, n, alt_freq, dbsnpid, prop_cases, imp_info, imp_z,
+    def __init__(self, chrom, pos, ref, alt, b, se, pval, n, alt_freq, dbsnpid, ncase, imp_info, imp_z,
                  vcf_filter="PASS"):
 
         self.chrom = chrom
@@ -18,7 +20,7 @@ class GwasResult:
         self.alt_freq = alt_freq
         self.n = n
         self.dbsnpid = dbsnpid
-        self.prop_cases = prop_cases
+        self.ncase = ncase
         self.imp_info = imp_info
         self.imp_z = imp_z
         self.vcf_filter = vcf_filter
@@ -52,6 +54,8 @@ class GwasResult:
     def __str__(self):
         return str(self.__dict__)
 
+    """ Function to read in GWAS data from plain text file """
+
     @staticmethod
     def read_from_file(
             path,
@@ -71,8 +75,6 @@ class GwasResult:
             imp_z_field=None,
             imp_info_field=None,
             ncontrol_field=None,
-            cohort_sample_size=None,
-            cohort_frac_cases=None,
             rm_chr_prefix=False
     ):
 
@@ -94,8 +96,6 @@ class GwasResult:
         logging.debug("IMP Z Score Field: {}".format(imp_z_field))
         logging.debug("IMP INFO Field: {}".format(imp_info_field))
         logging.debug("N Control Field: {}".format(ncontrol_field))
-        logging.debug("Cohort sample size: {}".format(cohort_sample_size))
-        logging.debug("Cohort fraction cases: {}".format(cohort_frac_cases))
 
         total_variants = 0
         filename, file_extension = os.path.splitext(path)
@@ -131,8 +131,8 @@ class GwasResult:
                 logging.warning("Skipping {}: {}".format(s, e))
                 continue
 
-            ref = s[nea_field]
-            alt = s[ea_field]
+            ref = s[nea_field].upper()
+            alt = s[ea_field].upper()
 
             try:
                 b = float(s[effect_field])
@@ -188,12 +188,6 @@ class GwasResult:
                 n = ncontrol
 
             try:
-                prop_cases = ncase / (ncase + ncontrol)
-            except (IndexError, TypeError, ValueError) as e:
-                logging.debug("Could not determine proportion of cases: {}".format(e))
-                prop_cases = None
-
-            try:
                 imp_info = float(s[imp_info_field])
             except (IndexError, TypeError, ValueError) as e:
                 logging.debug("Could not parse imputation INFO: {}".format(e))
@@ -204,14 +198,6 @@ class GwasResult:
             except (IndexError, TypeError, ValueError) as e:
                 logging.debug("Could not parse imputation Z score: {}".format(e))
                 imp_z = None
-
-            # set if not provided in file
-            if n is None:
-                n = cohort_sample_size
-
-            # set if not provided in file
-            if prop_cases is None:
-                prop_cases = cohort_frac_cases
 
             result = GwasResult(
                 chrom,
@@ -224,7 +210,7 @@ class GwasResult:
                 n,
                 alt_freq,
                 dbsnpid,
-                prop_cases,
+                ncase,
                 imp_info,
                 imp_z
             )
