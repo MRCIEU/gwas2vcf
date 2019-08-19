@@ -27,6 +27,8 @@ def main():
                         help='Total study number of cases')
     parser.add_argument('--rm_chr_prefix', dest='rm_chr_prefix', action='store_true', default=False, required=False,
                         help='Remove chr prefix from GWAS chromosome')
+    parser.add_argument('--csi', dest='csi', action='store_true', default=False, required=False,
+                        help='Default is to index tbi but use this flag to index csi')
     parser.add_argument("--log", dest="log", required=False, default='INFO',
                         choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
                         help="Set the logging level")
@@ -125,7 +127,7 @@ def main():
             sample_metadata['StudyType'] = 'Continuous'
 
         # write to vcf
-        Vcf.write_to_file(harmonised, args.out, fasta, j['build'], args.id, sample_metadata, file_metadata)
+        Vcf.write_to_file(harmonised, args.out, fasta, j['build'], args.id, sample_metadata, file_metadata, args.csi)
 
 
 if __name__ == "__main__":

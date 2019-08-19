@@ -26,7 +26,7 @@ class Vcf:
         return v == 0 or v == np.inf or v == -0 or v == -np.inf
 
     @staticmethod
-    def write_to_file(gwas_results, path, fasta, build, trait_id, sample_metadata=None, file_metadata=None):
+    def write_to_file(gwas_results, path, fasta, build, trait_id, sample_metadata=None, file_metadata=None, csi=False):
         logging.info("Writing headers to BCF/VCF: {}".format(path))
 
         header = pysam.VariantHeader()
@@ -168,4 +168,4 @@ class Vcf:
 
         # index output file
         logging.info("Indexing output file")
-        pysam.tabix_index(path, preset="vcf", force=True, csi=True)
+        pysam.tabix_index(path, preset="vcf", force=True, csi=csi)
