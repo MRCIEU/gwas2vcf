@@ -31,6 +31,9 @@ class Vcf:
 
         header = pysam.VariantHeader()
 
+        # INFO
+        header.add_line('##INFO=<ID=AF,Number=A,Type=Float,Description="Allele Frequency">')
+
         # FORMAT
         header.add_line(
             '##FORMAT=<ID=ES,Number=A,Type=Float,Description="Effect size estimate relative to the alternative allele">')
@@ -134,6 +137,9 @@ class Vcf:
             record.id = result.dbsnpid
             record.alleles = (result.ref, result.alt)
             record.filter.add(result.vcf_filter)
+
+            if result.alt_freq is not None:
+                record.info['AF'] = result.alt_freq
 
             if result.b is not None:
                 record.samples[trait_id]['ES'] = result.b
