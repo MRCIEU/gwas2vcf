@@ -45,6 +45,8 @@ class Vcf:
         header.add_line('##FORMAT=<ID=SI,Number=A,Type=Float,Description="Accuracy score of summary data imputation">')
         header.add_line(
             '##FORMAT=<ID=NC,Number=A,Type=Float,Description="Number of cases used to estimate genetic effect">')
+        header.add_line(
+            '##FORMAT=<ID=ID,Number=1,Type=String,Description="Study variant identifier">')
 
         # META
         header.add_line(
@@ -149,6 +151,8 @@ class Vcf:
                 record.samples[trait_id]['SI'] = result.imp_info
             if result.ncase is not None:
                 record.samples[trait_id]['NC'] = result.ncase
+            if result.dbsnpid is not None:
+                record.samples[trait_id]['ID'] = result.dbsnpid
 
             # bank variants by chromosome
             if result.chrom not in records:
