@@ -26,6 +26,16 @@ class Vcf:
         return v == 0 or v == np.inf or v == -0 or v == -np.inf
 
     @staticmethod
+    def remove_illegal_chars(s):
+        r = s.strip()
+        r = r.replace(" ", "_")
+        r = r.replace(";", "_")
+        r = r.replace(":", "_")
+        r = r.replace("=", "_")
+        r = r.replace(",", "_")
+        return r
+
+    @staticmethod
     def write_to_file(gwas_results, path, fasta, build, trait_id, sample_metadata=None, file_metadata=None, csi=False):
         logging.info("Writing headers to BCF/VCF: {}".format(path))
 
@@ -133,8 +143,10 @@ class Vcf:
 
             record = vcf.new_record()
             record.chrom = result.chrom
+            assert " " not in record.chrom
             record.pos = result.pos
-            record.id = result.dbsnpid
+            assert record.pos > 0
+            record.id = Vcf.remove_illegal_chars(result.dbsnpid)
             record.alleles = (result.ref, result.alt)
             record.filter.add(result.vcf_filter)
 
@@ -158,7 +170,7 @@ class Vcf:
             if result.ncase is not None:
                 record.samples[trait_id]['NC'] = result.ncase
             if result.dbsnpid is not None:
-                record.samples[trait_id]['ID'] = result.dbsnpid
+                record.samples[trait_id]['ID'] = record.id
 
             # bank variants by chromosome
             if result.chrom not in records:
