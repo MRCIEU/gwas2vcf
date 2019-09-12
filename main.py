@@ -12,7 +12,7 @@ import sys
 
 
 def main():
-    version = "1.1.0"
+    version = "1.1.1"
 
     parser = argparse.ArgumentParser(description='Map GWAS summary statistics to VCF/BCF')
     parser.add_argument('-v', '--version', action='version', version='%(prog)s {}'.format(version))
