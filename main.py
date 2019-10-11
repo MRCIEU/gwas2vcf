@@ -38,7 +38,7 @@ def main():
     if args.log:
         logging.basicConfig(level=getattr(logging, args.log), format='%(asctime)s %(levelname)s %(message)s')
 
-    logging.info("GWAS Harmonisation {}".format(version))
+    logging.info("GWAS2VCF {}".format(version))
 
     # check values are valid
     if args.cohort_cases is not None:
