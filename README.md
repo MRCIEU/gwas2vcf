@@ -1,4 +1,4 @@
-# GWAS Harmonisation
+# GWAS to VCF harmonisation tool
 
 Tool to map GWAS summary statistics to VCF/BCF with on the fly harmonisation to a supplied reference FASTA.
 
