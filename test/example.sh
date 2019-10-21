@@ -9,7 +9,9 @@ tr ':' '\t' | \
 sed $'s/^SNP_hg19/chr\tpos/g' > example.txt
 
 # harmonise against reference FASTA
-python main.py \
+
+source ./venv/bin/activate
+./venv/bin/python main.py \
 --out example.vcf \
 --data example.txt \
 --ref human_g1k_v37.fasta \

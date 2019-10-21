@@ -9,22 +9,22 @@ from datetime import datetime
 import json
 from param import Param
 import sys
-
+import os
 
 def main():
     version = "1.1.1"
 
     parser = argparse.ArgumentParser(description='Map GWAS summary statistics to VCF/BCF')
     parser.add_argument('-v', '--version', action='version', version='%(prog)s {}'.format(version))
-    parser.add_argument('--out', dest='out', required=True, help='Path to output VCF/BCF')
-    parser.add_argument('--data', dest='gwas', required=True, help='Path to GWAS summary stats')
-    parser.add_argument('--ref', dest='fasta', required=True, help='Path to reference FASTA')
+    parser.add_argument('--out', dest='out', required=False, help='Path to output VCF/BCF. If not present then must be specified as \'out\' in json file')
+    parser.add_argument('--data', dest='data', required=False, help='Path to GWAS summary stats. If not present then must be specified as \'data\' in json file')
+    parser.add_argument('--ref', dest='ref', required=True, help='Path to reference FASTA')
     parser.add_argument('--json', dest='json', required=True, help='Path to parameters JSON')
-    parser.add_argument('--id', dest='id', required=True, help='Study identifier')
+    parser.add_argument('--id', dest='id', required=False, help='Study identifier. If not present then must be specified as \'id\' in json file')
     parser.add_argument('--cohort_controls', type=int, dest='cohort_controls', required=False, default=None,
-                        help='Total study number of controls (if case/control) or total sample size if continuous')
+                        help='Total study number of controls (if case/control) or total sample size if continuous. Overwrites value if present in json file.')
     parser.add_argument('--cohort_cases', type=int, dest='cohort_cases', required=False, default=None,
-                        help='Total study number of cases')
+                        help='Total study number of cases. Overwrites value if present in json file.')
     parser.add_argument('--rm_chr_prefix', dest='rm_chr_prefix', action='store_true', default=False, required=False,
                         help='Remove chr prefix from GWAS chromosome')
     parser.add_argument('--csi', dest='csi', action='store_true', default=False, required=False,
@@ -39,19 +39,7 @@ def main():
         logging.basicConfig(level=getattr(logging, args.log), format='%(asctime)s %(levelname)s %(message)s')
 
     logging.info("GWAS2VCF {}".format(version))
-
-    # check values are valid
-    if args.cohort_cases is not None:
-        if args.cohort_cases < 1:
-            logging.error("Total study number of cases must be a positive number")
-            sys.exit()
-
-    if args.cohort_controls is not None:
-        if args.cohort_controls < 1:
-            logging.error("Total study number of controls must be a positive number")
-            sys.exit()
-
-    # load parameters from json
+    logging.info("Arguments: {}".format(vars(args)))
     logging.info("Reading JSON parameters")
     try:
         schema = Param(strict=True)
@@ -65,9 +53,62 @@ def main():
         logging.error("Could not validate json parameter file: {}".format(e))
         sys.exit()
 
-    # read in GWAS and harmonise alleles to reference fasta
+    logging.info("Checking input arguments")
+    if args.data is None:
+        if 'data' in j.keys():
+            vars(args)['data'] = j['data']
+        else:
+            logging.error("'data' filename not provided in arguments or json file")
+            sys.exit()
+
+    if args.out is None:
+        if 'out' in j.keys():
+            vars(args)['out'] = j['out']
+        else:
+            logging.error("out filename not provided in arguments or json file")
+            sys.exit()
+
+    if args.id is None:
+        if 'id' in j.keys():
+            vars(args)['id'] = j['id']
+        else:
+            logging.error("id not provided in arguments or json file")
+            sys.exit()
+
+    if args.cohort_cases is None and 'cohort_cases' in j.keys():
+        vars(args)['cohort_cases'] = j['cohort_cases']
+
+    if args.cohort_controls is None and 'cohort_controls' in j.keys():
+        vars(args)['cohort_controls'] = j['cohort_controls']
+
+    # check values are valid
+    if args.cohort_cases is not None:
+        if args.cohort_cases < 1:
+            logging.error("Total study number of cases must be a positive number")
+            sys.exit()
+
+    if args.cohort_controls is not None:
+        if args.cohort_controls < 1:
+            logging.error("Total study number of controls must be a positive number")
+            sys.exit()
+
+    if not os.path.isfile(args.data):
+        logging.error("{} file does not exist".format(args.data))
+        sys.exit()
+
+
+    if not os.path.isfile(args.ref):
+        logging.error("{} file does not exist".format(args.ref))
+        sys.exit()
+
+    if not os.path.exists(os.path.dirname(args.out)):
+        logging.error("{} output directory does not exist".format(args.out))
+        sys.exit()
+
+
+    # read in GWAS and harmonise alleles to reference fasta (ref)
     gwas, total_variants = GwasResult.read_from_file(
-        args.gwas,
+        args.data,
         j['chr_col'],
         j['pos_col'],
         j['ea_col'],
@@ -90,7 +131,7 @@ def main():
     logging.info("Total variants: {}".format(total_variants))
     logging.info("Variants could not be read: {}".format(total_variants - len(gwas)))
 
-    with pysam.FastaFile(args.fasta) as fasta:
+    with pysam.FastaFile(args.ref) as fasta:
 
         # harmonise to FASTA
         harmonised, flipped_variants = Harmonise.align_gwas_to_fasta(gwas, fasta)

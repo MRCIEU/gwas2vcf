@@ -57,24 +57,38 @@ bash test/example.sh
 ```
 Map GWAS summary statistics to VCF/BCF
 
--h, --help            show this help message and exit
--v, --version         show program's version number and exit
---out OUT             Path to output VCF/BCF
---data GWAS           Path to GWAS summary stats
---ref FASTA           Path to reference FASTA
---json JSON           Path to parameters JSON
---id ID               Study identifier
---cohort_controls COHORT_CONTROLS
-                      Total study number of controls (if case/control) or
-                      total sample size if continuous
---cohort_cases COHORT_CASES
-                      Total study number of cases
---rm_chr_prefix       Remove chr prefix from GWAS chromosome
---log {DEBUG,INFO,WARNING,ERROR,CRITICAL}
-                      Set the logging level
+usage: main.py [-h] [-v] [--out OUT] [--data DATA] --ref REF --json JSON
+               [--id ID] [--cohort_controls COHORT_CONTROLS]
+               [--cohort_cases COHORT_CASES] [--rm_chr_prefix] [--csi]
+               [--log {DEBUG,INFO,WARNING,ERROR,CRITICAL}]
+
+Map GWAS summary statistics to VCF/BCF
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -v, --version         show program's version number and exit
+  --out OUT             Path to output VCF/BCF. If not present then must be
+                        specified as 'out' in json file
+  --data DATA           Path to GWAS summary stats. If not present then must
+                        be specified as 'data' in json file
+  --ref REF             Path to reference FASTA
+  --json JSON           Path to parameters JSON
+  --id ID               Study identifier. If not present then must be
+                        specified as 'id' in json file
+  --cohort_controls COHORT_CONTROLS
+                        Total study number of controls (if case/control) or
+                        total sample size if continuous. Overwrites value if
+                        present in json file.
+  --cohort_cases COHORT_CASES
+                        Total study number of cases. Overwrites value if
+                        present in json file.
+  --rm_chr_prefix       Remove chr prefix from GWAS chromosome
+  --csi                 Default is to index tbi but use this flag to index csi
+  --log {DEBUG,INFO,WARNING,ERROR,CRITICAL}
+                        Set the logging level
 ```
 
-See param.py for JSON specification
+See `param.py` for JSON specification
 
 ## Combine multiallelics
 
@@ -111,7 +125,7 @@ bcftools annotate \
 -O z \
 -o annotated.vcf.gz \
 harmonised.vcf.gz
-``` 
+```
 
 ## Extract genome-wide significant variants to text file
 
