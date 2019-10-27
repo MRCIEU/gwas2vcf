@@ -23,7 +23,7 @@ class Harmonise:
                         variant.pos + (len(variant.ref) - 1)
                     ))
                 ).upper()
-            except (TypeError, ValueError):
+            except:
                 logging.warning("Skipping record {}: problem getting ref allele".format(variant))
                 continue
 
@@ -42,7 +42,7 @@ class Harmonise:
                                 variant.pos + (len(variant.ref) - 1)
                             ))
                         ).upper()
-                    except  (TypeError, ValueError):
+                    except:
                         logging.warning("Skipping record {}: problem getting ref allele".format(variant))
                         continue
 
