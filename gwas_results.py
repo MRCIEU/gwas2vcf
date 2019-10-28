@@ -119,10 +119,14 @@ class GwasResult:
 
             logging.debug("Input row: {}".format(s))
 
-            if rm_chr_prefix:
-                chrom = s[chrom_field].replace("chr", "")
-            else:
-                chrom = s[chrom_field]
+            try:
+                if rm_chr_prefix:
+                    chrom = s[chrom_field].replace("chr", "")
+                else:
+                    chrom = s[chrom_field]
+            except:
+                logging.warning("Skipping {}".format(s))
+                exit
 
             try:
                 pos = int(float(s[pos_field]))  # float is for scientific notation
