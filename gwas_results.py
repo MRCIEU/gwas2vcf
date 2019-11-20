@@ -112,9 +112,11 @@ class GwasResult:
             logging.info("Skipping header: {}".format(f.readline().strip()))
 
         results = []
+        i = 0
         for n, l in enumerate(f):
             total_variants += 1
-
+            i+=1
+            print(i)
             s = l.strip().split(delimiter)
 
             logging.debug("Input row: {}".format(s))
@@ -131,7 +133,7 @@ class GwasResult:
             try:
                 pos = int(float(s[pos_field]))  # float is for scientific notation
                 assert pos > 0
-            except (ValueError, AssertionError) as e:
+            except Exception as e:
                 logging.warning("Skipping {}: {}".format(s, e))
                 continue
 
@@ -140,20 +142,20 @@ class GwasResult:
 
             try:
                 b = float(s[effect_field])
-            except ValueError as e:
+            except Exception as e:
                 logging.warning("Skipping {}: {}".format(s, e))
                 continue
 
             try:
                 se = float(s[se_field])
-            except ValueError as e:
+            except Exception as e:
                 logging.warning("Skipping {}: {}".format(s, e))
                 continue
 
             try:
                 pval = float(s[pval_field])
-            except ValueError as e:
-                logging.warning("Skipping {}: {}".format(s, e))
+            except Exception as e:
+                logging.warning("Skipping line {}, {}".format(s, e))
                 continue
 
             try:
