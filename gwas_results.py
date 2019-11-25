@@ -116,7 +116,6 @@ class GwasResult:
         for n, l in enumerate(f):
             total_variants += 1
             i+=1
-            print(i)
             s = l.strip().split(delimiter)
 
             logging.debug("Input row: {}".format(s))
