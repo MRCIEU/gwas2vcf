@@ -27,6 +27,8 @@ class Vcf:
 
     @staticmethod
     def remove_illegal_chars(s):
+        if s is None:
+            return None
         r = s.strip()
         r = r.replace(" ", "_")
         r = r.replace(";", "_")
