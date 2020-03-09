@@ -1,11 +1,12 @@
 import logging
 import gzip
 import os
+import tempfile
+import pickle
+import re
 
-""" Class to store single GWAS result i.e. single SNP or row"""
 
-
-class GwasResult:
+class Gwas:
 
     def __init__(self, chrom, pos, ref, alt, b, se, pval, n, alt_freq, dbsnpid, ncase, imp_info, imp_z,
                  vcf_filter="PASS"):
@@ -40,16 +41,20 @@ class GwasResult:
         except TypeError:
             self.alt_freq = None
 
-    def are_alleles_iupac(self):
+    def check_reference_allele(self, fasta):
+        assert self.ref == str(
+            fasta.fetch(region="{}:{}-{}".format(
+                self.chrom,
+                self.pos,
+                self.pos + len(self.ref) - 1
+            ))
+        ).upper()
+
+    def check_alleles_iupac(self):
         for bp in self.alt:
-            if bp != 'A' and bp != 'T' and bp != 'C' and bp != 'G':
-                return False
-
+            assert bp in {"A", "T", "G", "C"}
         for bp in self.ref:
-            if bp != 'A' and bp != 'T' and bp != 'C' and bp != 'G':
-                return False
-
-        return True
+            assert bp in {"A", "T", "G", "C"}
 
     def __str__(self):
         return str(self.__dict__)
@@ -59,6 +64,7 @@ class GwasResult:
     @staticmethod
     def read_from_file(
             path,
+            fasta,
             chrom_field,
             pos_field,
             ea_field,
@@ -69,7 +75,7 @@ class GwasResult:
             delimiter,
             header,
             ncase_field=None,
-            dbsnp_field=None,
+            rsid_field=None,
             ea_af_field=None,
             nea_af_field=None,
             imp_z_field=None,
@@ -77,6 +83,8 @@ class GwasResult:
             ncontrol_field=None,
             rm_chr_prefix=False
     ):
+
+        rsid_pattern = re.compile("^rs[0-9]*")
 
         logging.info("Reading summary stats and mapping to FASTA: {}".format(path))
         logging.debug("File path: {}".format(path))
@@ -90,14 +98,21 @@ class GwasResult:
         logging.debug("Delimiter: {}".format(delimiter))
         logging.debug("Header: {}".format(header))
         logging.debug("ncase Field: {}".format(ncase_field))
-        logging.debug("dbsnp Field: {}".format(dbsnp_field))
+        logging.debug("dbsnp Field: {}".format(rsid_field))
         logging.debug("EA AF Field: {}".format(ea_af_field))
         logging.debug("NEA AF Field: {}".format(nea_af_field))
         logging.debug("IMP Z Score Field: {}".format(imp_z_field))
         logging.debug("IMP INFO Field: {}".format(imp_info_field))
         logging.debug("N Control Field: {}".format(ncontrol_field))
 
-        total_variants = 0
+        metadata = {
+            'TotalVariants': 0,
+            'VariantsNotRead': 0,
+            'HarmonisedVariants': 0,
+            'VariantsNotHarmonised': 0,
+            'SwitchedAlleles': 0
+        }
+        file_idx = dict()
         filename, file_extension = os.path.splitext(path)
 
         if file_extension == '.gz':
@@ -111,11 +126,11 @@ class GwasResult:
         if header:
             logging.info("Skipping header: {}".format(f.readline().strip()))
 
-        results = []
-        i = 0
-        for n, l in enumerate(f):
-            total_variants += 1
-            i+=1
+        # store results in a serialised temp file to reduce memory usage
+        results = tempfile.TemporaryFile()
+
+        for l in f:
+            metadata['TotalVariants'] += 1
             s = l.strip().split(delimiter)
 
             logging.debug("Input row: {}".format(s))
@@ -125,15 +140,17 @@ class GwasResult:
                     chrom = s[chrom_field].replace("chr", "")
                 else:
                     chrom = s[chrom_field]
-            except:
-                logging.warning("Skipping {}".format(s))
-                exit
+            except Exception as e:
+                logging.warning("Skipping {}: {}".format(s, e))
+                metadata['VariantsNotRead'] += 1
+                continue
 
             try:
                 pos = int(float(s[pos_field]))  # float is for scientific notation
                 assert pos > 0
             except Exception as e:
                 logging.warning("Skipping {}: {}".format(s, e))
+                metadata['VariantsNotRead'] += 1
                 continue
 
             ref = s[nea_field].upper()
@@ -143,18 +160,21 @@ class GwasResult:
                 b = float(s[effect_field])
             except Exception as e:
                 logging.warning("Skipping {}: {}".format(s, e))
+                metadata['VariantsNotRead'] += 1
                 continue
 
             try:
                 se = float(s[se_field])
             except Exception as e:
                 logging.warning("Skipping {}: {}".format(s, e))
+                metadata['VariantsNotRead'] += 1
                 continue
 
             try:
                 pval = float(s[pval_field])
             except Exception as e:
                 logging.warning("Skipping line {}, {}".format(s, e))
+                metadata['VariantsNotRead'] += 1
                 continue
 
             try:
@@ -169,10 +189,11 @@ class GwasResult:
                 alt_freq = None
 
             try:
-                dbsnpid = s[dbsnp_field]
-            except (IndexError, TypeError, ValueError) as e:
+                rsid = s[rsid_field]
+                assert rsid_pattern.match(rsid)
+            except (IndexError, TypeError, ValueError, AssertionError) as e:
                 logging.debug("Could not parse dbsnp identifier: {}".format(e))
-                dbsnpid = None
+                rsid = None
 
             try:
                 ncase = float(s[ncase_field])
@@ -204,7 +225,7 @@ class GwasResult:
                 logging.debug("Could not parse imputation Z score: {}".format(e))
                 imp_z = None
 
-            result = GwasResult(
+            result = Gwas(
                 chrom,
                 pos,
                 ref,
@@ -214,7 +235,7 @@ class GwasResult:
                 pval,
                 n,
                 alt_freq,
-                dbsnpid,
+                rsid,
                 ncase,
                 imp_info,
                 imp_z
@@ -222,8 +243,43 @@ class GwasResult:
 
             logging.debug("Extracted row: {}".format(result))
 
-            results.append(result)
+            # check alleles
+            try:
+                result.check_alleles_iupac()
+            except AssertionError as e:
+                logging.warning("Skipping {}: {}".format(s, e))
+                metadata['VariantsNotRead'] += 1
+                continue
+
+            # harmonise alleles
+            try:
+                result.check_reference_allele(fasta)
+            except AssertionError:
+                try:
+                    result.reverse_sign()
+                    result.check_reference_allele(fasta)
+                    metadata['SwitchedAlleles'] += 1
+                except AssertionError as e:
+                    logging.warning("Could not harmonise {}: {}".format(s, e))
+                    metadata['VariantsNotHarmonised'] += 1
+                    continue
+            metadata['HarmonisedVariants'] += 1
+
+            # keep file position for sorted recall later
+            if result.chrom not in file_idx:
+                file_idx[result.chrom] = []
+            file_idx[result.chrom].append((result.pos, results.tell()))
+            pickle.dump(result, results)
 
         f.close()
 
-        return results, total_variants
+        logging.info("Total variants: {}".format(metadata['TotalVariants']))
+        logging.info("Variants could not be read: {}".format(metadata['VariantsNotRead']))
+        logging.info("Variants harmonised: {}".format(metadata['HarmonisedVariants']))
+        logging.info("Variants discarded during harmonisation: {}".format(metadata['VariantsNotHarmonised']))
+        logging.info("Alleles switched: {}".format(metadata['SwitchedAlleles']))
+        logging.info("Skipped {} of {}".format(
+            metadata['VariantsNotRead'] + metadata['VariantsNotHarmonised'], metadata['TotalVariants'])
+        )
+
+        return results, file_idx, metadata

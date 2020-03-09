@@ -1,6 +1,7 @@
 import pysam
 import logging
 import numpy as np
+import pickle
 
 
 class Vcf:
@@ -37,8 +38,14 @@ class Vcf:
         r = r.replace(",", "_")
         return r
 
+    """ 
+    Write GWAS file to VCF
+    Expects an open file handle to a Picle file of GWAS results & file index dict(chromosome[(position, offset)]) 
+    """
+
     @staticmethod
-    def write_to_file(gwas_results, path, fasta, build, trait_id, sample_metadata=None, file_metadata=None, csi=False):
+    def write_to_file(gwas_file, gwas_idx, path, fasta, build, trait_id, sample_metadata=None, file_metadata=None,
+                      csi=False):
         logging.info("Writing headers to BCF/VCF: {}".format(path))
 
         header = pysam.VariantHeader()
@@ -101,92 +108,93 @@ class Vcf:
 
         vcf = pysam.VariantFile(path, "w", header=header)
 
-        records = dict()
-        for result in gwas_results:
-            lpval = -np.log10(result.pval)
-
-            # check floats
-            if Vcf.is_float32_lossy(result.b):
-                logging.warning(
-                    "Effect field cannot fit into float32. Expect loss of precision for: {}".format(
-                        result.b)
-                )
-            if Vcf.is_float32_lossy(result.se):
-                result.se = np.float64(np.finfo(np.float32).tiny).item()
-                logging.warning(
-                    "Standard error field cannot fit into float32. Expect loss of precision for: {}".format(
-                        result.se)
-                )
-            if Vcf.is_float32_lossy(lpval):
-                logging.warning(
-                    "-log10(pval) field cannot fit into float32. Expect loss of precision for: {}".format(
-                        lpval)
-                )
-            if Vcf.is_float32_lossy(result.alt_freq):
-                logging.warning(
-                    "Allele frequency field cannot fit into float32. Expect loss of precision for: {}".format(
-                        result.alt_freq)
-                )
-            if Vcf.is_float32_lossy(result.n):
-                logging.warning(
-                    "Sample size field cannot fit into float32. Expect loss of precision for: {}".format(
-                        result.n)
-                )
-            if Vcf.is_float32_lossy(result.imp_z):
-                logging.warning(
-                    "Imputation Z score field cannot fit into float32. Expect loss of precision for: {}".format(
-                        result.imp_z)
-                )
-            if Vcf.is_float32_lossy(result.imp_info):
-                logging.warning(
-                    "Imputation INFO field cannot fit into float32. Expect loss of precision for: {}".format(
-                        result.imp_info)
-                )
-
-            record = vcf.new_record()
-            record.chrom = result.chrom
-            assert " " not in record.chrom
-            record.pos = result.pos
-            assert record.pos > 0
-            record.id = Vcf.remove_illegal_chars(result.dbsnpid)
-            record.alleles = (result.ref, result.alt)
-            record.filter.add(result.vcf_filter)
-
-            if result.alt_freq is not None:
-                record.info['AF'] = result.alt_freq
-
-            if result.b is not None:
-                record.samples[trait_id]['ES'] = result.b
-            if result.se is not None:
-                record.samples[trait_id]['SE'] = result.se
-            if lpval is not None:
-                record.samples[trait_id]['LP'] = lpval
-            if result.alt_freq is not None:
-                record.samples[trait_id]['AF'] = result.alt_freq
-            if result.n is not None:
-                record.samples[trait_id]['SS'] = result.n
-            if result.imp_z is not None:
-                record.samples[trait_id]['EZ'] = result.imp_z
-            if result.imp_info is not None:
-                record.samples[trait_id]['SI'] = result.imp_info
-            if result.ncase is not None:
-                record.samples[trait_id]['NC'] = result.ncase
-            if result.dbsnpid is not None:
-                record.samples[trait_id]['ID'] = record.id
-
-            # bank variants by chromosome
-            if result.chrom not in records:
-                records[result.chrom] = []
-
-            records[result.chrom].append(record)
-
-        # sort records & write records to VCF/BCF
-        logging.info("Sorting records by chromosome and position")
+        # recall variant objects in chromosome position order
         for contig in fasta.references:
-            if contig in records:
-                records[contig].sort(key=lambda x: x.pos)
-                for record in records[contig]:
-                    vcf.write(record)
+            if contig not in gwas_idx:
+                continue
+
+            # sort by chromosome position
+            gwas_idx[contig].sort()
+
+            for chr_pos in gwas_idx[contig]:
+
+                # load GWAS result
+                gwas_file.seek(chr_pos[1])
+                result = pickle.load(gwas_file)
+
+                lpval = -np.log10(result.pval)
+
+                # check floats
+                if Vcf.is_float32_lossy(result.b):
+                    logging.warning(
+                        "Effect field cannot fit into float32. Expect loss of precision for: {}".format(
+                            result.b)
+                    )
+                if Vcf.is_float32_lossy(result.se):
+                    result.se = np.float64(np.finfo(np.float32).tiny).item()
+                    logging.warning(
+                        "Standard error field cannot fit into float32. Expect loss of precision for: {}".format(
+                            result.se)
+                    )
+                if Vcf.is_float32_lossy(lpval):
+                    logging.warning(
+                        "-log10(pval) field cannot fit into float32. Expect loss of precision for: {}".format(
+                            lpval)
+                    )
+                if Vcf.is_float32_lossy(result.alt_freq):
+                    logging.warning(
+                        "Allele frequency field cannot fit into float32. Expect loss of precision for: {}".format(
+                            result.alt_freq)
+                    )
+                if Vcf.is_float32_lossy(result.n):
+                    logging.warning(
+                        "Sample size field cannot fit into float32. Expect loss of precision for: {}".format(
+                            result.n)
+                    )
+                if Vcf.is_float32_lossy(result.imp_z):
+                    logging.warning(
+                        "Imputation Z score field cannot fit into float32. Expect loss of precision for: {}".format(
+                            result.imp_z)
+                    )
+                if Vcf.is_float32_lossy(result.imp_info):
+                    logging.warning(
+                        "Imputation INFO field cannot fit into float32. Expect loss of precision for: {}".format(
+                            result.imp_info)
+                    )
+
+                record = vcf.new_record()
+                record.chrom = result.chrom
+                assert " " not in record.chrom
+                record.pos = result.pos
+                assert record.pos > 0
+                record.id = Vcf.remove_illegal_chars(result.dbsnpid)
+                record.alleles = (result.ref, result.alt)
+                record.filter.add(result.vcf_filter)
+
+                if result.alt_freq is not None:
+                    record.info['AF'] = result.alt_freq
+
+                if result.b is not None:
+                    record.samples[trait_id]['ES'] = result.b
+                if result.se is not None:
+                    record.samples[trait_id]['SE'] = result.se
+                if lpval is not None:
+                    record.samples[trait_id]['LP'] = lpval
+                if result.alt_freq is not None:
+                    record.samples[trait_id]['AF'] = result.alt_freq
+                if result.n is not None:
+                    record.samples[trait_id]['SS'] = result.n
+                if result.imp_z is not None:
+                    record.samples[trait_id]['EZ'] = result.imp_z
+                if result.imp_info is not None:
+                    record.samples[trait_id]['SI'] = result.imp_info
+                if result.ncase is not None:
+                    record.samples[trait_id]['NC'] = result.ncase
+                if result.dbsnpid is not None:
+                    record.samples[trait_id]['ID'] = record.id
+
+                # write to file
+                vcf.write(record)
 
         vcf.close()
 
