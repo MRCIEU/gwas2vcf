@@ -266,7 +266,7 @@ class Gwas:
                     continue
             metadata['HarmonisedVariants'] += 1
 
-            # keep file position for sorted recall later
+            # keep file position sorted by chromosome position for recall later
             if result.chrom not in file_idx:
                 file_idx[result.chrom] = []
             heappush(file_idx[result.chrom], (result.pos, results.tell()))
