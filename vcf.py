@@ -2,6 +2,7 @@ import pysam
 import logging
 import numpy as np
 import pickle
+from heapq import heappop
 
 
 class Vcf:
@@ -113,10 +114,8 @@ class Vcf:
             if contig not in gwas_idx:
                 continue
 
-            # sort by chromosome position
-            gwas_idx[contig].sort()
-
-            for chr_pos in gwas_idx[contig]:
+            while gwas_idx[contig]:
+                chr_pos = heappop(gwas_idx[contig])
 
                 # load GWAS result
                 gwas_file.seek(chr_pos[1])

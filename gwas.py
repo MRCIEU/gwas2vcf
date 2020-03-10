@@ -4,6 +4,7 @@ import os
 import tempfile
 import pickle
 import re
+from heapq import heappush
 
 
 class Gwas:
@@ -84,7 +85,7 @@ class Gwas:
             rm_chr_prefix=False
     ):
 
-        rsid_pattern = re.compile("^rs[0-9]*")
+        rsid_pattern = re.compile("^rs[0-9]*$")
 
         logging.info("Reading summary stats and mapping to FASTA: {}".format(path))
         logging.debug("File path: {}".format(path))
@@ -268,7 +269,7 @@ class Gwas:
             # keep file position for sorted recall later
             if result.chrom not in file_idx:
                 file_idx[result.chrom] = []
-            file_idx[result.chrom].append((result.pos, results.tell()))
+            heappush(file_idx[result.chrom], (result.pos, results.tell()))
             pickle.dump(result, results)
 
         f.close()
