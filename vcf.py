@@ -110,6 +110,7 @@ class Vcf:
         vcf = pysam.VariantFile(path, "w", header=header)
 
         # recall variant objects in chromosome position order
+        logging.info("Writing variants to BCF/VCF: {}".format(path))
         for contig in fasta.references:
             if contig not in gwas_idx:
                 continue
