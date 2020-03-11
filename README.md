@@ -46,12 +46,6 @@ cd gwas2vcf
 python -m pytest -v test
 ```
 
-End-to-end tests:
-
-```
-bash test/example.sh
-```
-
 ## Usage
 
 ```
@@ -80,6 +74,10 @@ optional arguments:
 ```
 
 See `param.py` for JSON specification
+
+## Example
+
+See [gwas-vcf-performance](https://github.com/MRCIEU/gwas-vcf-performance/blob/master/workflow.Rmd) for a full implementation 
 
 ## Combine multiallelics
 
