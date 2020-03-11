@@ -1,4 +1,4 @@
-pytest
+pytest==5.3.5
 biopython==1.72
 pysam==0.15.2
 marshmallow==2.18.1
