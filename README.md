@@ -43,45 +43,30 @@ Unit tests:
 
 ```
 cd gwas2vcf
-python -m unittest discover test
-```
-
-End-to-end tests:
-
-```
-bash test/example.sh
+python -m pytest -v test
 ```
 
 ## Usage
 
 ```
-Map GWAS summary statistics to VCF/BCF
-
-usage: main.py [-h] [-v] [--out OUT] [--data DATA] --ref REF --json JSON
-               [--id ID] [--cohort_controls COHORT_CONTROLS]
-               [--cohort_cases COHORT_CASES] [--rm_chr_prefix] [--csi]
-               [--log {DEBUG,INFO,WARNING,ERROR,CRITICAL}]
+usage: main.py [-h] [-v] [--out OUT] [--data DATA] --ref REF --json JSON [--id ID] [--cohort_controls COHORT_CONTROLS]
+               [--cohort_cases COHORT_CASES] [--rm_chr_prefix] [--csi] [--log {DEBUG,INFO,WARNING,ERROR,CRITICAL}]
 
 Map GWAS summary statistics to VCF/BCF
 
 optional arguments:
   -h, --help            show this help message and exit
   -v, --version         show program's version number and exit
-  --out OUT             Path to output VCF/BCF. If not present then must be
-                        specified as 'out' in json file
-  --data DATA           Path to GWAS summary stats. If not present then must
-                        be specified as 'data' in json file
+  --out OUT             Path to output VCF/BCF. If not present then must be specified as 'out' in json file
+  --data DATA           Path to GWAS summary stats. If not present then must be specified as 'data' in json file
   --ref REF             Path to reference FASTA
   --json JSON           Path to parameters JSON
-  --id ID               Study identifier. If not present then must be
-                        specified as 'id' in json file
+  --id ID               Study identifier. If not present then must be specified as 'id' in json file
   --cohort_controls COHORT_CONTROLS
-                        Total study number of controls (if case/control) or
-                        total sample size if continuous. Overwrites value if
+                        Total study number of controls (if case/control) or total sample size if continuous. Overwrites value if
                         present in json file.
   --cohort_cases COHORT_CASES
-                        Total study number of cases. Overwrites value if
-                        present in json file.
+                        Total study number of cases. Overwrites value if present in json file.
   --rm_chr_prefix       Remove chr prefix from GWAS chromosome
   --csi                 Default is to index tbi but use this flag to index csi
   --log {DEBUG,INFO,WARNING,ERROR,CRITICAL}
@@ -90,9 +75,13 @@ optional arguments:
 
 See `param.py` for JSON specification
 
+## Example
+
+See [gwas-vcf-performance](https://github.com/MRCIEU/gwas-vcf-performance/blob/master/workflow.Rmd) for a full implementation 
+
 ## Combine multiallelics
 
-Merge variants at single genetic position on to a single row
+Merge variants at single genetic position on to a single row. This step is **highly** recommended to avoid duplicate RSIDs. 
 
 ```
 bcftools norm \
@@ -138,8 +127,6 @@ file.vcf.gz
 ```
 
 ## Merge multiple GWAS summary stats into a single file
-
-Note: Merged GWAS BCFs are significantly slower to query; for best performance do not do this.
 
 ```
 bcftools merge \

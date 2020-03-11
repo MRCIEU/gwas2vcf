@@ -24,14 +24,18 @@ class Param(Schema):
     ncontrol_col = fields.Int(required=False,
                               description="Column number for number of controls (if case/control) or total sample size if continuous")
     build = fields.Str(required=True, description="Name of the genome build i.e. GRCh36, GRCh37, GRCh38")
-    data = fields.Str(required=False, description="Path to input file, required if not passed in main command line parameters")
-    out = fields.Str(required=False, description="Path to output vcf file, required if not passed in main command line parameters")
-    id = fields.Str(required=False, description="Unique identified or name of GWAS study, required if not passed in main command line parameters")
+    data = fields.Str(required=False,
+                      description="Path to input file, required if not passed in main command line parameters")
+    out = fields.Str(required=False,
+                     description="Path to output vcf file, required if not passed in main command line parameters")
+    id = fields.Str(required=False,
+                    description="Unique identified or name of GWAS study, required if not passed in main command line parameters")
     cohort_cases = fields.Float(required=False,
-                              description="Total study number of cases")
+                                description="Total study number of cases")
     cohort_controls = fields.Float(required=False,
-                              description="Total study number of controls (if case/control) or total sample size if continuous")
+                                   description="Total study number of controls (if case/control) or total sample size if continuous")
     jsonmeta = fields.Str(required=False, description="Path to input metadata file file")
+
     @validates_schema(pass_original=True)
     def check_unknown_fields(self, data, original_data):
         unknown = set(original_data) - set(self.fields)
