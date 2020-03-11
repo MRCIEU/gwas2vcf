@@ -41,7 +41,7 @@ class Vcf:
 
     """ 
     Write GWAS file to VCF
-    Expects an open file handle to a Picle file of GWAS results & file index dict(chromosome[(position, offset)]) 
+    Expects an open file handle to a Pickle file of GWAS results & file index dict(chromosome[(position, offset)]) 
     """
 
     @staticmethod

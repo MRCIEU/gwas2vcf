@@ -142,7 +142,7 @@ class Gwas:
                 else:
                     chrom = s[chrom_field]
             except Exception as e:
-                logging.warning("Skipping {}: {}".format(s, e))
+                logging.debug("Skipping {}: {}".format(s, e))
                 metadata['VariantsNotRead'] += 1
                 continue
 
@@ -150,7 +150,7 @@ class Gwas:
                 pos = int(float(s[pos_field]))  # float is for scientific notation
                 assert pos > 0
             except Exception as e:
-                logging.warning("Skipping {}: {}".format(s, e))
+                logging.debug("Skipping {}: {}".format(s, e))
                 metadata['VariantsNotRead'] += 1
                 continue
 
@@ -160,21 +160,21 @@ class Gwas:
             try:
                 b = float(s[effect_field])
             except Exception as e:
-                logging.warning("Skipping {}: {}".format(s, e))
+                logging.debug("Skipping {}: {}".format(s, e))
                 metadata['VariantsNotRead'] += 1
                 continue
 
             try:
                 se = float(s[se_field])
             except Exception as e:
-                logging.warning("Skipping {}: {}".format(s, e))
+                logging.debug("Skipping {}: {}".format(s, e))
                 metadata['VariantsNotRead'] += 1
                 continue
 
             try:
                 pval = float(s[pval_field])
             except Exception as e:
-                logging.warning("Skipping line {}, {}".format(s, e))
+                logging.debug("Skipping line {}, {}".format(s, e))
                 metadata['VariantsNotRead'] += 1
                 continue
 
@@ -248,7 +248,7 @@ class Gwas:
             try:
                 result.check_alleles_iupac()
             except AssertionError as e:
-                logging.warning("Skipping {}: {}".format(s, e))
+                logging.debug("Skipping {}: {}".format(s, e))
                 metadata['VariantsNotRead'] += 1
                 continue
 
@@ -261,7 +261,7 @@ class Gwas:
                     result.check_reference_allele(fasta)
                     metadata['SwitchedAlleles'] += 1
                 except AssertionError as e:
-                    logging.warning("Could not harmonise {}: {}".format(s, e))
+                    logging.debug("Could not harmonise {}: {}".format(s, e))
                     metadata['VariantsNotHarmonised'] += 1
                     continue
             metadata['HarmonisedVariants'] += 1
