@@ -2,6 +2,16 @@
 
 Tool to map GWAS summary statistics to VCF/BCF with on the fly harmonisation to a supplied reference FASTA.
 
+## Quick start
+
+Run on our server
+
+```
+Visit 64.227.44.193:8400
+```
+
+## Run locally
+
 ### Install
 
 ```
@@ -37,7 +47,7 @@ wget https://storage.googleapis.com/genomics-public-data/resources/broad/hg38/v0
 wget https://storage.googleapis.com/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta.fai
 ```
 
-## Running the tests
+### Running the tests
 
 Unit tests:
 
@@ -46,7 +56,7 @@ cd gwas2vcf
 python -m pytest -v test
 ```
 
-## Usage
+### Usage
 
 ```
 usage: main.py [-h] [-v] [--out OUT] [--data DATA] --ref REF --json JSON [--id ID] [--cohort_controls COHORT_CONTROLS]
@@ -75,11 +85,11 @@ optional arguments:
 
 See `param.py` for JSON specification
 
-## Example
+### Example
 
 See [gwas-vcf-performance](https://github.com/MRCIEU/gwas-vcf-performance/blob/master/workflow.Rmd) for a full implementation 
 
-## Combine multiallelics
+### Combine multiallelics
 
 Merge variants at single genetic position on to a single row. This step is **highly** recommended to avoid duplicate RSIDs. 
 
@@ -91,7 +101,7 @@ bcftools norm \
 -o norm.vcf.gz
 ```
 
-## Validate VCF file
+### Validate VCF file
 
 Check the file format is valid but ignore genotypes since these are missing
 
@@ -103,7 +113,7 @@ gatk ValidateVariants \
 --validation-type-to-exclude ALLELES
 ```
 
-## Add variant frequency and dbSNP identifiers
+### Add variant frequency and dbSNP identifiers
 
 Add variant frequency from 1000 genomes (or similar)
 
@@ -116,7 +126,7 @@ bcftools annotate \
 harmonised.vcf.gz
 ```
 
-## Extract genome-wide significant variants to text file
+### Extract genome-wide significant variants to text file
 
 ```
 bcftools query \
@@ -126,7 +136,7 @@ bcftools query \
 file.vcf.gz
 ```
 
-## Merge multiple GWAS summary stats into a single file
+### Merge multiple GWAS summary stats into a single file
 
 ```
 bcftools merge \
