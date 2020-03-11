@@ -7,7 +7,7 @@ Tool to map GWAS summary statistics to VCF/BCF with on the fly harmonisation to 
 Run on our server
 
 ```
-Visit 64.227.44.193:8400
+Visit [gwas2vcfweb](64.227.44.193:8400)
 ```
 
 ## Run locally
