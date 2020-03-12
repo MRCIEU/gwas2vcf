@@ -4,7 +4,7 @@ Tool to map GWAS summary statistics to VCF/BCF with on the fly harmonisation to 
 
 ## Quick start
 
-Visit [gwas2vcfweb](http://64.227.44.193:8400)
+Visit [gwas2vcfweb](http://www.gwas2vcf.tools/)
 
 ## Run locally
 
