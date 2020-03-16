@@ -28,15 +28,11 @@ source ./venv/bin/activate
 
 #### Docker
 
-Pull existing image from DockerHub
+Pull existing image from DockerHub or build
 
 ```sh
 docker pull mcgml/gwas2vcf
-```
-
-Build image
-
-```sh
+# OR
 docker build -t gwas2vcf .
 ```
 
