@@ -10,18 +10,24 @@ Use web interface [gwas2vcfweb](https://github.com/mrcieu/gwas2vcfweb)
 
 ### Install
 
-```
+```sh
 # src
 git clone git@github.com:MRCIEU/gwas2vcf.git
 cd gwas2vcf
+```
 
-# VirtualEnv
+#### Native
+
+```sh
 virtualenv venv
 source ./venv/bin/activate
 ./venv/bin/pip install -r requirements.txt
 ./venv/bin/python main.py -h
+```
 
-# Docker
+#### Docker
+
+```sh
 docker build -t gwas2vcf .
 docker create -v /data:/data -name gwas2vcf gwas2vcf
 docker run -it gwas2vcf:latest python main.py -h
@@ -29,7 +35,7 @@ docker run -it gwas2vcf:latest python main.py -h
 
 ### Reference FASTA
 
-```
+```sh
 # GRCh36/hg18/b36
 wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/b36/human_b36_both.fasta.gz
 wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/b36/human_b36_both.fasta.fai.gz
@@ -47,14 +53,14 @@ wget https://storage.googleapis.com/genomics-public-data/resources/broad/hg38/v0
 
 Unit tests:
 
-```
+```sh
 cd gwas2vcf
 python -m pytest -v test
 ```
 
 ### Usage
 
-```
+```sh
 usage: main.py [-h] [-v] [--out OUT] [--data DATA] --ref REF --json JSON [--id ID] [--cohort_controls COHORT_CONTROLS]
                [--cohort_cases COHORT_CASES] [--rm_chr_prefix] [--csi] [--log {DEBUG,INFO,WARNING,ERROR,CRITICAL}]
 
@@ -89,7 +95,7 @@ See [gwas-vcf-performance](https://github.com/MRCIEU/gwas-vcf-performance/blob/m
 
 Merge variants at single genetic position on to a single row. This step is **highly** recommended to avoid duplicate RSIDs. 
 
-```
+```sh
 bcftools norm \
 -f ref.fasta \
 -m +any \
@@ -101,7 +107,7 @@ bcftools norm \
 
 Check the file format is valid but ignore genotypes since these are missing
 
-```
+```sh
 gatk ValidateVariants \
 -V harmonised.vcf \
 -R ref.fasta \
@@ -113,7 +119,7 @@ gatk ValidateVariants \
 
 Add variant frequency from 1000 genomes (or similar)
 
-```
+```sh
 bcftools annotate \
 -a 1kg.vcf.gz \
 -c ID,AF \
@@ -124,7 +130,7 @@ harmonised.vcf.gz
 
 ### Extract genome-wide significant variants to text file
 
-```
+```sh
 bcftools query \
 -i 'FORMAT/LP > 7.3' \
 -f '%CHROM\t%POS\t%ID\t%REF\t%ALT[\t%ES\t%SE\t%LP]\n' \
@@ -134,7 +140,7 @@ file.vcf.gz
 
 ### Merge multiple GWAS summary stats into a single file
 
-```
+```sh
 bcftools merge \
 -O z \
 -o merged.vcf.gz \
