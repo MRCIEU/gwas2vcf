@@ -1,6 +1,6 @@
 # GWAS to VCF harmonisation tool
 
-Tool to map GWAS summary statistics to VCF/BCF with on the fly harmonisation to a supplied reference FASTA.
+Tool to map GWAS summary statistics to VCF/BCF with on-the-fly harmonisation to a supplied reference FASTA
 
 ## Quick start
 
@@ -8,10 +8,11 @@ Use web interface [gwas2vcfweb](https://github.com/mrcieu/gwas2vcfweb)
 
 ## Run locally
 
-### Install
+Either run directly on a UNIX host or using Docker containerisation (recommended)
+
+### Download
 
 ```sh
-# src
 git clone git@github.com:MRCIEU/gwas2vcf.git
 cd gwas2vcf
 ```
@@ -27,10 +28,26 @@ source ./venv/bin/activate
 
 #### Docker
 
+Pull existing image from DockerHub
+
+```sh
+docker pull mcgml/gwas2vcf
+```
+
+Build image
+
 ```sh
 docker build -t gwas2vcf .
-docker create -v /data:/data -name gwas2vcf gwas2vcf
-docker run -it gwas2vcf:latest python main.py -h
+```
+
+Run
+
+```sh
+docker run \
+-v /path/to/fasta:/path/to/fasta \
+-name gwas2vcf \
+-it gwas2vcf:latest \
+python main.py -h
 ```
 
 ### Reference FASTA
@@ -93,7 +110,7 @@ See [gwas-vcf-performance](https://github.com/MRCIEU/gwas-vcf-performance/blob/m
 
 ### Combine multiallelics
 
-Merge variants at single genetic position on to a single row. This step is **highly** recommended to avoid duplicate RSIDs. 
+Merge variants at single genetic position on to a single row. This step is **highly** recommended to avoid duplicate RSIDs which is not supported by VCF
 
 ```sh
 bcftools norm \
@@ -105,7 +122,7 @@ bcftools norm \
 
 ### Validate VCF file
 
-Check the file format is valid but ignore genotypes since these are missing
+Check the file format is valid but ignore genotypes since there are none
 
 ```sh
 gatk ValidateVariants \
@@ -146,7 +163,3 @@ bcftools merge \
 -o merged.vcf.gz \
 *.vcf.gz
 ```
-
-## Known issues
-
-VCF v4.2 cannot accommodate double precision floats. Decimals smaller than 1.1754944e-38 are rounded to 0. P values are encoded as -log10.
