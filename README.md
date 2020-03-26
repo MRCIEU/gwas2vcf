@@ -98,7 +98,26 @@ optional arguments:
                         Set the logging level
 ```
 
-See `param.py` for JSON specification
+Additional parameters are passed through a [JSON](https://www.w3schools.com/js/js_json_objects.asp) parameters file, see `param.py` for full details or example below.
+
+```json
+{
+  "chr_col": 0,
+  "pos_col": 1,
+  "ea_col": 2,
+  "oa_col": 3,
+  "beta_col": 4,
+  "se_col": 5,
+  "pval_col": 6,
+  "snp_col": 7,
+  "eaf_col": 8,
+  "imp_info_col": 9,
+  "ncontrol_col": 10,
+  "delimiter": "\t",
+  "header": true,
+  "build": "GRCh37"
+}
+```
 
 ### Example
 
