@@ -98,7 +98,7 @@ optional arguments:
                         Set the logging level
 ```
 
-Additional parameters are passed through a [JSON](https://www.w3schools.com/js/js_json_objects.asp) parameters file, see `param.py` for full details or example below.
+Additional parameters are passed through a [JSON](https://www.w3schools.com/js/js_json_objects.asp) parameters file using ```--json <param.json>```, see `param.py` for full details and below example. Not that field columns start at 0.
 
 ```json
 {
