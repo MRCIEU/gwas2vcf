@@ -123,18 +123,6 @@ Additional parameters are passed through a [JSON](https://www.w3schools.com/js/j
 
 See [gwas-vcf-performance](https://github.com/MRCIEU/gwas-vcf-performance/blob/master/workflow.Rmd) for a full implementation 
 
-### Combine multiallelics
-
-Merge variants at single genetic position on to a single row. This step is **highly** recommended to avoid duplicate RSIDs which is not supported by VCF
-
-```sh
-bcftools norm \
--f ref.fasta \
--m +any \
--O z \
--o norm.vcf.gz
-```
-
 ### Validate VCF file
 
 Check the file format is valid but ignore genotypes since there are none
