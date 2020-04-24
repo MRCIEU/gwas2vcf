@@ -51,6 +51,30 @@ class Gwas:
             ))
         ).upper()
 
+    def normalise(self, fasta):
+        # implementation of: A. Tan, G. R. alo Abecasis, and H. Min Kang, “Unified representation of genetic variants,” Bioinformatics, 2015.
+
+        # Left align and truncate alleles with the same sequence on the right
+        truncate_allele = True
+        while truncate_allele:
+            truncate_allele = False
+            if len(self.ref) > 0 and len(self.alt) > 0 and self.ref[-1] == self.alt[-1]:
+                self.ref = self.ref[:-1]
+                self.alt = self.alt[:-1]
+                truncate_allele = True
+            if len(self.ref) == 0 or len(self.alt) == 0:
+                left_nucleotide = fasta.fetch(self.chrom, self.pos - 2, self.pos - 1)
+                self.ref = left_nucleotide + self.ref
+                self.alt = left_nucleotide + self.alt
+                self.pos = self.pos - 1
+                truncate_allele = True
+
+        # truncate shared left sequence
+        while len(self.ref) > 1 and len(self.alt) > 1 and self.ref[0] == self.alt[0]:
+            self.ref = self.ref[1:]
+            self.alt = self.alt[1:]
+            self.pos = self.pos + 1
+
     def check_alleles_iupac(self):
         for bp in self.alt:
             assert bp in {"A", "T", "G", "C"}
@@ -156,6 +180,11 @@ class Gwas:
 
             ref = s[nea_field].upper()
             alt = s[ea_field].upper()
+
+            if ref == alt:
+                logging.debug("Skipping: ref={} is the same as alt={}".format(ref, alt))
+                metadata['VariantsNotRead'] += 1
+                continue
 
             try:
                 b = float(s[effect_field])
@@ -265,6 +294,10 @@ class Gwas:
                     metadata['VariantsNotHarmonised'] += 1
                     continue
             metadata['HarmonisedVariants'] += 1
+
+            # left align and trim variants
+            if len(ref) > 1 and len(alt) > 1:
+                result.normalise(fasta)
 
             # keep file position sorted by chromosome position for recall later
             if result.chrom not in file_idx:
