@@ -28,6 +28,8 @@ class Gwas:
         self.imp_z = imp_z
         self.vcf_filter = vcf_filter
 
+    # TODO should also affect position if indel
+    # TODO test
     def reverse_sign(self):
         r = self.ref
         a = self.alt
@@ -43,6 +45,7 @@ class Gwas:
         except TypeError:
             self.alt_freq = None
 
+    # TODO test
     def check_reference_allele(self, fasta):
         assert self.ref == str(
             fasta.fetch(region="{}:{}-{}".format(
@@ -52,6 +55,7 @@ class Gwas:
             ))
         ).upper()
 
+    # TODO limit FASTA call
     def normalise(self, fasta):
         seq = fasta.fetch(self.chrom).upper()
         start, stop, alleles = norm.normalize_alleles(
@@ -280,6 +284,7 @@ class Gwas:
                 continue
 
             # harmonise alleles
+            # TODO limit to one FASTA call
             try:
                 result.check_reference_allele(fasta)
             except AssertionError:
