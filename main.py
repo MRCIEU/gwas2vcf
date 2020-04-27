@@ -108,7 +108,7 @@ def main():
         sys.exit()
 
     # read in data
-    # harmonise on-the-fly and write to pickle format
+    # harmonise, left align and trim on-the-fly and write to pickle format
     # keep file index for each record and chromosome position to write out karyotypically sorted records later
     with pysam.FastaFile(args.ref) as fasta:
         gwas, idx, sample_metadata = Gwas.read_from_file(
