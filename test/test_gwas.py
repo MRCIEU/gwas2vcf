@@ -2,6 +2,7 @@ from gwas import Gwas
 import pytest
 from vgraph import norm
 import pysam
+import os
 
 
 def test_are_alleles_iupac():
@@ -24,7 +25,7 @@ def test_reverse_sign():
 
 
 def test_update_dbsnp():
-    with pysam.VariantFile("dbsnp.vcf.gz") as dbsnp:
+    with pysam.VariantFile(os.path.join(os.path.dirname(__file__), "dbsnp.vcf.gz")) as dbsnp:
         g = Gwas('test', 1, 'A', 'T', 1, None, None, None, None, None, None, None, None)
         assert g.dbsnpid is None
         g.update_dbsnp(dbsnp)
@@ -36,7 +37,7 @@ def test_update_dbsnp():
 
 
 def test_check_reference_allele():
-    with pysam.FastaFile("test.fasta") as fasta:
+    with pysam.FastaFile(os.path.join(os.path.dirname(__file__), "test.fasta")) as fasta:
         g = Gwas('test', 1, 'A', 'T', 1, None, None, None, None, None, None, None, None)
         g.check_reference_allele(fasta)
 
@@ -46,7 +47,7 @@ def test_check_reference_allele():
 
 
 def test_normalise():
-    with pysam.FastaFile("test.fasta") as fasta:
+    with pysam.FastaFile(os.path.join(os.path.dirname(__file__), "test.fasta")) as fasta:
         # SNV
         g = Gwas('test', 1, 'A', 'T', None, None, None, None, None, None, None, None, None)
         g.check_reference_allele(fasta)
@@ -97,7 +98,7 @@ def test_bioinformed_vgraph_normalise():
     """ Cython logic from bioinformed/vgraph """
 
     # get a reference sequence
-    with pysam.FastaFile("test.fasta") as fasta:
+    with pysam.FastaFile(os.path.join(os.path.dirname(__file__), "test.fasta")) as fasta:
         seq = fasta.fetch("test").upper()
 
         # SNV
