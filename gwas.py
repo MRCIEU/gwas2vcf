@@ -5,6 +5,7 @@ import tempfile
 import pickle
 import re
 from heapq import heappush
+from vgraph import norm
 
 
 class Gwas:
@@ -14,8 +15,8 @@ class Gwas:
 
         self.chrom = chrom
         self.pos = pos
-        self.ref = str(ref).strip().upper()
-        self.alt = str(alt).strip().upper()
+        self.ref = ref
+        self.alt = alt
         self.b = b
         self.se = se
         self.pval = pval
@@ -43,39 +44,54 @@ class Gwas:
             self.alt_freq = None
 
     def check_reference_allele(self, fasta):
-        assert self.ref == str(
-            fasta.fetch(region="{}:{}-{}".format(
-                self.chrom,
-                self.pos,
-                self.pos + len(self.ref) - 1
-            ))
+        assert self.ref == fasta.fetch(
+            reference=self.chrom,
+            start=self.pos - 1,
+            end=self.pos + len(self.ref) - 1
         ).upper()
 
-    def normalise(self, fasta):
-        # implementation of: A. Tan, G. R. alo Abecasis, and H. Min Kang, “Unified representation of genetic variants,” Bioinformatics, 2015.
+    def normalise(self, fasta, padding=100):
+        # TODO handle padding edge cases
+        # skip SNVs which do not need trimming
+        if len(self.ref) < 2 and len(self.alt) < 2:
+            return
 
-        # Left align and truncate alleles with the same sequence on the right
-        truncate_allele = True
-        while truncate_allele:
-            truncate_allele = False
-            if len(self.ref) > 0 and len(self.alt) > 0 and self.ref[-1] == self.alt[-1]:
-                self.ref = self.ref[:-1]
-                self.alt = self.alt[:-1]
-                truncate_allele = True
-            if len(self.ref) == 0 or len(self.alt) == 0:
-                left_nucleotide = fasta.fetch(self.chrom, self.pos - 2, self.pos - 1)
-                self.ref = left_nucleotide + self.ref
-                self.alt = left_nucleotide + self.alt
-                self.pos = self.pos - 1
-                truncate_allele = True
+        # zero based indexing
+        pos0 = self.pos - 1
+        # get reference sequence
+        seq = fasta.fetch(reference=self.chrom, start=pos0 - padding, end=pos0 + padding).upper()
+        # left-align and trim alleles
+        start, stop, alleles = norm.normalize_alleles(
+            seq,
+            padding,
+            padding + len(self.ref),
+            (self.ref, self.alt)
+        )
+        # set trimmed alleles and new position
+        self.ref = alleles[0]
+        self.alt = alleles[1]
+        self.pos = (pos0 - padding) + start + 1
 
-        # truncate shared left sequence
-        while len(self.ref) > 1 and len(self.alt) > 1 and self.ref[0] == self.alt[0]:
-            self.ref = self.ref[1:]
-            self.alt = self.alt[1:]
-            self.pos = self.pos + 1
+        # add start base if lost during trimming
+        if len(self.ref) == 0 or len(self.alt) == 0:
+            # get distance from old and new positions
+            dist = (self.pos - 1) - pos0
+            # extract base from seq
+            left_nucleotide = seq[(padding + dist) - 1: (padding + dist)]
+            # set alleles and pos
+            self.ref = left_nucleotide + self.ref
+            self.alt = left_nucleotide + self.alt
+            self.pos = self.pos - 1
 
-    def check_alleles_iupac(self):
+    def update_dbsnp(self, dbsnp):
+        if dbsnp is None:
+            raise IOError("Could not read dbsnp file")
+        self.dbsnpid = None
+        for rec in dbsnp.fetch(contig=self.chrom, start=self.pos - 1, stop=self.pos):
+            self.dbsnpid = rec.id
+            break
+
+    def check_alleles_are_vaild(self):
         for bp in self.alt:
             assert bp in {"A", "T", "G", "C"}
         for bp in self.ref:
@@ -106,7 +122,8 @@ class Gwas:
             imp_z_field=None,
             imp_info_field=None,
             ncontrol_field=None,
-            rm_chr_prefix=False
+            rm_chr_prefix=False,
+            dbsnp=None
     ):
 
         rsid_pattern = re.compile("^rs[0-9]*$")
@@ -130,12 +147,14 @@ class Gwas:
         logging.debug("IMP INFO Field: {}".format(imp_info_field))
         logging.debug("N Control Field: {}".format(ncontrol_field))
 
+        # TODO use namedtuple
         metadata = {
             'TotalVariants': 0,
             'VariantsNotRead': 0,
             'HarmonisedVariants': 0,
             'VariantsNotHarmonised': 0,
-            'SwitchedAlleles': 0
+            'SwitchedAlleles': 0,
+            'NormalisedVariants': 0
         }
         file_idx = dict()
         filename, file_extension = os.path.splitext(path)
@@ -178,8 +197,8 @@ class Gwas:
                 metadata['VariantsNotRead'] += 1
                 continue
 
-            ref = s[nea_field].upper()
-            alt = s[ea_field].upper()
+            ref = str(s[nea_field]).strip().upper()
+            alt = str(s[ea_field]).strip().upper()
 
             if ref == alt:
                 logging.debug("Skipping: ref={} is the same as alt={}".format(ref, alt))
@@ -275,7 +294,7 @@ class Gwas:
 
             # check alleles
             try:
-                result.check_alleles_iupac()
+                result.check_alleles_are_vaild()
             except AssertionError as e:
                 logging.debug("Skipping {}: {}".format(s, e))
                 metadata['VariantsNotRead'] += 1
@@ -298,6 +317,11 @@ class Gwas:
             # left align and trim variants
             if len(ref) > 1 and len(alt) > 1:
                 result.normalise(fasta)
+                metadata['NormalisedVariants'] += 1
+
+            # add or update dbSNP identifier
+            if dbsnp is not None:
+                result.update_dbsnp(dbsnp)
 
             # keep file position sorted by chromosome position for recall later
             if result.chrom not in file_idx:
@@ -312,6 +336,7 @@ class Gwas:
         logging.info("Variants harmonised: {}".format(metadata['HarmonisedVariants']))
         logging.info("Variants discarded during harmonisation: {}".format(metadata['VariantsNotHarmonised']))
         logging.info("Alleles switched: {}".format(metadata['SwitchedAlleles']))
+        logging.info("Normalised variants: {}".format(metadata['NormalisedVariants']))
         logging.info("Skipped {} of {}".format(
             metadata['VariantsNotRead'] + metadata['VariantsNotHarmonised'], metadata['TotalVariants'])
         )
