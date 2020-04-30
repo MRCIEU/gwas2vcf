@@ -5,12 +5,32 @@ import pysam
 
 
 def test_are_alleles_iupac():
-    g = Gwas('1', 1, 'A', 'T', None, None, None, None, None, None, None, None, None)
+    g = Gwas('test', 1, 'A', 'T', None, None, None, None, None, None, None, None, None)
     g.check_alleles_iupac()
 
     with pytest.raises(AssertionError):
-        g = Gwas('1', 1, 'A', 'wdeT', None, None, None, None, None, None, None, None, None)
+        g = Gwas('test', 1, 'A', 'wdeT', None, None, None, None, None, None, None, None, None)
         g.check_alleles_iupac()
+
+
+def test_reverse_sign():
+    g = Gwas('test', 1, 'A', 'T', 1, None, None, None, None, None, None, None, None)
+    g.reverse_sign()
+    assert g.chrom == "test"
+    assert g.pos == 1
+    assert g.ref == "T"
+    assert g.alt == "A"
+    assert g.b == -1
+
+
+def test_check_reference_allele():
+    with pysam.FastaFile("test.fasta") as fasta:
+        g = Gwas('test', 1, 'A', 'T', 1, None, None, None, None, None, None, None, None)
+        g.check_reference_allele(fasta)
+
+        with pytest.raises(AssertionError):
+            g = Gwas('test', 1, 'T', 'A', 1, None, None, None, None, None, None, None, None)
+            g.check_reference_allele(fasta)
 
 
 def test_normalise():

@@ -9,6 +9,7 @@ from vgraph import norm
 
 
 class Gwas:
+    PAD = 5
 
     def __init__(self, chrom, pos, ref, alt, b, se, pval, n, alt_freq, dbsnpid, ncase, imp_info, imp_z,
                  vcf_filter="PASS"):
@@ -28,8 +29,6 @@ class Gwas:
         self.imp_z = imp_z
         self.vcf_filter = vcf_filter
 
-    # TODO should also affect position if indel
-    # TODO test
     def reverse_sign(self):
         r = self.ref
         a = self.alt
@@ -45,32 +44,39 @@ class Gwas:
         except TypeError:
             self.alt_freq = None
 
-    # TODO test
     def check_reference_allele(self, fasta):
-        assert self.ref == str(
-            fasta.fetch(region="{}:{}-{}".format(
-                self.chrom,
-                self.pos,
-                self.pos + len(self.ref) - 1
-            ))
+        assert self.ref == fasta.fetch(
+            reference=self.chrom,
+            start=self.pos - 1,
+            end=self.pos + len(self.ref) - 1
         ).upper()
 
-    # TODO limit FASTA call
     def normalise(self, fasta):
-        seq = fasta.fetch(self.chrom).upper()
+        # skip SNVs which do not need trimming
+        if len(self.ref) < 2 and len(self.alt) < 2:
+            return
+
+        # zero based indexing
+        pos0 = self.pos - 1
+        # get reference sequence
+        seq = fasta.fetch(reference=self.chrom, start=pos0 - Gwas.PAD, end=pos0 + Gwas.PAD).upper()
+        # left-align and trim alleles
         start, stop, alleles = norm.normalize_alleles(
             seq,
-            self.pos - 1,
-            self.pos + (len(self.ref) - 1),
+            Gwas.PAD,
+            Gwas.PAD + len(self.ref),
             (self.ref, self.alt)
         )
+        # set trimmed alleles and new position
         self.ref = alleles[0]
         self.alt = alleles[1]
-        self.pos = start + 1
+        self.pos = (pos0 - Gwas.PAD) + start + 1
 
-        # add start base if trimmed off
+        # add start base if lost during trimming
         if len(self.ref) == 0 or len(self.alt) == 0:
+            # TODO use FASTA call from above
             left_nucleotide = str(fasta.fetch(region="{}:{}-{}".format(self.chrom, self.pos - 1, self.pos - 1))).upper()
+            # set alleles and pos
             self.ref = left_nucleotide + self.ref
             self.alt = left_nucleotide + self.alt
             self.pos = self.pos - 1
@@ -284,7 +290,6 @@ class Gwas:
                 continue
 
             # harmonise alleles
-            # TODO limit to one FASTA call
             try:
                 result.check_reference_allele(fasta)
             except AssertionError:
