@@ -3,4 +3,5 @@ biopython==1.72
 pysam==0.15.2
 marshmallow==2.18.1
 numpy==1.15.4
-vgraph==1.4.0
+git+git://github.com/bioinformed/vgraph@releases/tag/v1.4.0
+Cython==0.29.17
