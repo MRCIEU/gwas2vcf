@@ -4,7 +4,7 @@ Tool to map GWAS summary statistics to VCF/BCF with on-the-fly harmonisation to 
 
 ## Quick start
 
-Use web interface [gwas2vcfweb](https://github.com/mrcieu/gwas2vcfweb)
+Use web interface <http://vcf.mrcieu.ac.uk>
 
 ## Run locally
 
@@ -20,10 +20,11 @@ cd gwas2vcf
 #### Native
 
 ```sh
-virtualenv venv
-source ./venv/bin/activate
-./venv/bin/pip install -r requirements.txt
-./venv/bin/python main.py -h
+python3 -m venv env
+source env/bin/activate
+pip install -r requirements.txt
+pip install git+git://github.com/bioinformed/vgraph@v1.4.0#egg=vgraph
+python main.py -h
 ```
 
 #### Docker
