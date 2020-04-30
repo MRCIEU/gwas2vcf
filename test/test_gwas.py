@@ -6,11 +6,11 @@ import pysam
 
 def test_are_alleles_iupac():
     g = Gwas('test', 1, 'A', 'T', None, None, None, None, None, None, None, None, None)
-    g.check_alleles_iupac()
+    g.check_alleles_are_vaild()
 
     with pytest.raises(AssertionError):
         g = Gwas('test', 1, 'A', 'wdeT', None, None, None, None, None, None, None, None, None)
-        g.check_alleles_iupac()
+        g.check_alleles_are_vaild()
 
 
 def test_reverse_sign():
@@ -21,6 +21,18 @@ def test_reverse_sign():
     assert g.ref == "T"
     assert g.alt == "A"
     assert g.b == -1
+
+
+def test_update_dbsnp():
+    with pysam.VariantFile("dbsnp.vcf.gz") as dbsnp:
+        g = Gwas('test', 1, 'A', 'T', 1, None, None, None, None, None, None, None, None)
+        assert g.dbsnpid is None
+        g.update_dbsnp(dbsnp)
+        assert g.dbsnpid == "rs1234"
+        g = Gwas('test', 2, 'A', 'T', 1, None, None, None, None, None, None, None, None)
+        assert g.dbsnpid is None
+        g.update_dbsnp(dbsnp)
+        assert g.dbsnpid is None
 
 
 def test_check_reference_allele():
@@ -38,7 +50,7 @@ def test_normalise():
         # SNV
         g = Gwas('test', 1, 'A', 'T', None, None, None, None, None, None, None, None, None)
         g.check_reference_allele(fasta)
-        g.normalise(fasta)
+        g.normalise(fasta, padding=5)
         assert g.chrom == "test"
         assert g.pos == 1
         assert g.ref == "A"
@@ -47,7 +59,7 @@ def test_normalise():
         # left pad SNV
         g = Gwas('test', 10, 'ACACA', 'ACACT', None, None, None, None, None, None, None, None, None)
         g.check_reference_allele(fasta)
-        g.normalise(fasta)
+        g.normalise(fasta, padding=5)
         assert g.chrom == "test"
         assert g.pos == 14
         assert g.ref == "A"
@@ -56,7 +68,7 @@ def test_normalise():
         # right pad SNV
         g = Gwas('test', 10, 'ACACA', 'TCACA', None, None, None, None, None, None, None, None, None)
         g.check_reference_allele(fasta)
-        g.normalise(fasta)
+        g.normalise(fasta, padding=5)
         assert g.chrom == "test"
         assert g.pos == 10
         assert g.ref == "A"
@@ -65,7 +77,7 @@ def test_normalise():
         # left pad ins
         g = Gwas('test', 10, 'ACA', 'ACAGT', None, None, None, None, None, None, None, None, None)
         g.check_reference_allele(fasta)
-        g.normalise(fasta)
+        g.normalise(fasta, padding=5)
         assert g.chrom == "test"
         assert g.pos == 12
         assert g.ref == "A"
@@ -74,7 +86,7 @@ def test_normalise():
         # left-align pad del
         g = Gwas('test', 10, 'ACACA', 'ACA', None, None, None, None, None, None, None, None, None)
         g.check_reference_allele(fasta)
-        g.normalise(fasta)
+        g.normalise(fasta, padding=5)
         assert g.chrom == "test"
         assert g.pos == 9
         assert g.ref == "TAC"

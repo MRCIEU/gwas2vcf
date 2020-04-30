@@ -9,7 +9,6 @@ from vgraph import norm
 
 
 class Gwas:
-    PAD = 5
 
     def __init__(self, chrom, pos, ref, alt, b, se, pval, n, alt_freq, dbsnpid, ncase, imp_info, imp_z,
                  vcf_filter="PASS"):
@@ -51,7 +50,8 @@ class Gwas:
             end=self.pos + len(self.ref) - 1
         ).upper()
 
-    def normalise(self, fasta):
+    def normalise(self, fasta, padding=100):
+        # TODO handle padding edge cases
         # skip SNVs which do not need trimming
         if len(self.ref) < 2 and len(self.alt) < 2:
             return
@@ -59,29 +59,39 @@ class Gwas:
         # zero based indexing
         pos0 = self.pos - 1
         # get reference sequence
-        seq = fasta.fetch(reference=self.chrom, start=pos0 - Gwas.PAD, end=pos0 + Gwas.PAD).upper()
+        seq = fasta.fetch(reference=self.chrom, start=pos0 - padding, end=pos0 + padding).upper()
         # left-align and trim alleles
         start, stop, alleles = norm.normalize_alleles(
             seq,
-            Gwas.PAD,
-            Gwas.PAD + len(self.ref),
+            padding,
+            padding + len(self.ref),
             (self.ref, self.alt)
         )
         # set trimmed alleles and new position
         self.ref = alleles[0]
         self.alt = alleles[1]
-        self.pos = (pos0 - Gwas.PAD) + start + 1
+        self.pos = (pos0 - padding) + start + 1
 
         # add start base if lost during trimming
         if len(self.ref) == 0 or len(self.alt) == 0:
-            # TODO use FASTA call from above
-            left_nucleotide = str(fasta.fetch(region="{}:{}-{}".format(self.chrom, self.pos - 1, self.pos - 1))).upper()
+            # get distance from old and new positions
+            dist = (self.pos - 1) - pos0
+            # extract base from seq
+            left_nucleotide = seq[(padding + dist) - 1: (padding + dist)]
             # set alleles and pos
             self.ref = left_nucleotide + self.ref
             self.alt = left_nucleotide + self.alt
             self.pos = self.pos - 1
 
-    def check_alleles_iupac(self):
+    def update_dbsnp(self, dbsnp):
+        if dbsnp is None:
+            raise IOError("Could not read dbsnp file")
+        self.dbsnpid = None
+        for rec in dbsnp.fetch(contig=self.chrom, start=self.pos - 1, stop=self.pos):
+            self.dbsnpid = rec.id
+            break
+
+    def check_alleles_are_vaild(self):
         for bp in self.alt:
             assert bp in {"A", "T", "G", "C"}
         for bp in self.ref:
@@ -112,7 +122,8 @@ class Gwas:
             imp_z_field=None,
             imp_info_field=None,
             ncontrol_field=None,
-            rm_chr_prefix=False
+            rm_chr_prefix=False,
+            dbsnp=None
     ):
 
         rsid_pattern = re.compile("^rs[0-9]*$")
@@ -283,7 +294,7 @@ class Gwas:
 
             # check alleles
             try:
-                result.check_alleles_iupac()
+                result.check_alleles_are_vaild()
             except AssertionError as e:
                 logging.debug("Skipping {}: {}".format(s, e))
                 metadata['VariantsNotRead'] += 1
@@ -307,6 +318,10 @@ class Gwas:
             if len(ref) > 1 and len(alt) > 1:
                 result.normalise(fasta)
                 metadata['NormalisedVariants'] += 1
+
+            # add or update dbSNP identifier
+            if dbsnp is not None:
+                result.update_dbsnp(dbsnp)
 
             # keep file position sorted by chromosome position for recall later
             if result.chrom not in file_idx:

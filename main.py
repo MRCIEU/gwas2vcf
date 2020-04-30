@@ -21,6 +21,7 @@ def main():
     parser.add_argument('--data', dest='data', required=False,
                         help='Path to GWAS summary stats. If not present then must be specified as \'data\' in json file')
     parser.add_argument('--ref', dest='ref', required=True, help='Path to reference FASTA')
+    parser.add_argument('--dbsnp', dest='dbsnp', required=False, help='Path to reference dbSNP VCF')
     parser.add_argument('--json', dest='json', required=True, help='Path to parameters JSON')
     parser.add_argument('--id', dest='id', required=False,
                         help='Study identifier. If not present then must be specified as \'id\' in json file')
@@ -107,6 +108,11 @@ def main():
         logging.error("{} output directory does not exist".format(args.out))
         sys.exit()
 
+    if args.dbsnp is not None:
+        dbsnp = pysam.VariantFile(args.dbsnp)
+    else:
+        dbsnp = None
+
     # read in data
     # harmonise, left align and trim on-the-fly and write to pickle format
     # keep file index for each record and chromosome position to write out karyotypically sorted records later
@@ -130,8 +136,12 @@ def main():
             imp_z_field=j.get('imp_z_col'),
             imp_info_field=j.get('imp_info_col'),
             ncontrol_field=j.get('ncontrol_col'),
-            rm_chr_prefix=args.rm_chr_prefix
+            rm_chr_prefix=args.rm_chr_prefix,
+            dbsnp=dbsnp
         )
+
+    if dbsnp is not None:
+        dbsnp.close()
 
     # metadata
     file_metadata = {
