@@ -1,5 +1,9 @@
 # GWAS to VCF harmonisation tool
 
+<!-- badges: start -->
+[![Build Status](https://travis-ci.org/MRCIEU/gwas2vcf.svg?branch=master)](https://travis-ci.org/MRCIEU/gwas2vcf)
+<!-- badges: end -->
+
 Tool to map GWAS summary statistics to VCF/BCF with on-the-fly harmonisation to a supplied reference FASTA
 
 ## Quick start
