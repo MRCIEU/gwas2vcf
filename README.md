@@ -33,11 +33,9 @@ python main.py -h
 
 #### Docker
 
-Pull existing image from DockerHub or build
+Build docker image
 
 ```sh
-docker pull mcgml/gwas2vcf
-# OR
 docker build -t gwas2vcf .
 ```
 
