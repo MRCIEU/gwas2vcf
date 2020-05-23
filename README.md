@@ -6,6 +6,8 @@
 
 Tool to map GWAS summary statistics to VCF/BCF with on-the-fly harmonisation to a supplied reference FASTA
 
+Produces GWAS-VCF with version 1.0 of the [specification](https://github.com/MRCIEU/gwas-vcf-specification/releases/tag/1.0.0)
+
 ## Quick start
 
 Use web interface <http://vcf.mrcieu.ac.uk>
