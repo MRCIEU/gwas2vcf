@@ -128,6 +128,10 @@ Additional parameters are passed through a [JSON](https://www.w3schools.com/js/j
 
 See [gwas-vcf-performance](https://github.com/MRCIEU/gwas-vcf-performance/blob/master/workflow.Rmd) for a full implementation 
 
+### Parse GWAS-VCF
+
+See [R](https://github.com/mrcieu/gwasvcf) and [Python](https://github.com/mrcieu/pygwasvcf) libraries for reading GWAS summary statistics in GWAS-VCF
+
 ### Validate VCF file
 
 Check the file format is valid but ignore genotypes since there are none
@@ -140,14 +144,14 @@ gatk ValidateVariants \
 --validation-type-to-exclude ALLELES
 ```
 
-### Add variant frequency and dbSNP identifiers
+### Add variant frequency
 
 Add variant frequency from 1000 genomes (or similar)
 
 ```sh
 bcftools annotate \
 -a 1kg.vcf.gz \
--c ID,AF \
+-c AF \
 -O z \
 -o annotated.vcf.gz \
 harmonised.vcf.gz
