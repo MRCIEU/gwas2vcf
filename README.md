@@ -8,6 +8,14 @@ Tool to map GWAS summary statistics to VCF/BCF with on-the-fly harmonisation to 
 
 Produces GWAS-VCF with version 1.0 of the [specification](https://github.com/MRCIEU/gwas-vcf-specification/releases/tag/1.0.0)
 
+## Citation
+
+```
+The variant call format provides efficient and robust storage of GWAS summary statistics
+Matthew S Lyon, Shea J Andrews, Benjamin L Elsworth, Tom R Gaunt, Gibran Hemani, Edoardo Marcora
+bioRxiv 2020.05.29.115824; doi: https://doi.org/10.1101/2020.05.29.115824
+```
+
 ## Quick start
 
 Use web interface <http://vcf.mrcieu.ac.uk>
