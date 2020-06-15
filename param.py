@@ -35,6 +35,7 @@ class Param(Schema):
     cohort_controls = fields.Float(required=False,
                                    description="Total study number of controls (if case/control) or total sample size if continuous")
     jsonmeta = fields.Str(required=False, description="Path to input metadata file file")
+    md5 = fields.Str(required=False, description="md5 checksum for input file")
 
     @validates_schema(pass_original=True)
     def check_unknown_fields(self, data, original_data):
