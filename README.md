@@ -1,4 +1,4 @@
-# GWAS to VCF harmonisation tool
+# Convert GWAS summary statistics to VCF
 
 <!-- badges: start -->
 [![Build Status](https://travis-ci.org/MRCIEU/gwas2vcf.svg?branch=master)](https://travis-ci.org/MRCIEU/gwas2vcf)
@@ -111,7 +111,7 @@ optional arguments:
                         Set the logging level
 ```
 
-Additional parameters are passed through a [JSON](https://www.w3schools.com/js/js_json_objects.asp) parameters file using ```--json <param.json>```, see `param.py` for full details and below example. Not that field columns start at 0.
+Additional parameters are passed through a [JSON](https://www.w3schools.com/js/js_json_objects.asp) parameters file using ```--json <param.json>```, see `param.py` for full details and below example. Note that field columns start at 0.
 
 ```json
 {
@@ -134,13 +134,15 @@ Additional parameters are passed through a [JSON](https://www.w3schools.com/js/j
 
 ### Example
 
-See [gwas-vcf-performance](https://github.com/MRCIEU/gwas-vcf-performance/blob/master/workflow.Rmd) for a full implementation 
+See [gwas-vcf-performance](https://github.com/MRCIEU/gwas-vcf-performance/blob/master/workflow.Rmd) for a full implementation
 
-### Parse GWAS-VCF
+## Working with GWAS-VCF
+
+### Parsing libraries
 
 See [R](https://github.com/mrcieu/gwasvcf) and [Python](https://github.com/mrcieu/pygwasvcf) libraries for reading GWAS summary statistics in GWAS-VCF
 
-### Validate VCF file
+### Validate file
 
 Check the file format is valid but ignore genotypes since there are none
 
@@ -184,7 +186,7 @@ bcftools merge \
 *.vcf.gz
 ```
 
-### Convert GWAS-VCF to NHGRI-EBI GWAS catalog format
+### Convert to NHGRI-EBI GWAS catalog format
 
 ```sh
 # map to GWAS catalog format
@@ -196,4 +198,20 @@ awk 'BEGIN {print "variant_id\tp_value\tchromosome\tbase_pair_location\teffect_a
 
 # validate file using [ss-validate](https://pypi.org/project/ss-validate)
 ss-validate -f gwas.tsv
+```
+
+### Map genomic coordinates to another genome build (liftover)
+
+This procedure requires a chain file which contains the chromosome base-position mapping between two genome builds
+
+**Where the REF/ALT alleles flip between builds these records must be discarded to prevent incorrect effect directionality**
+
+```sh
+ gatk LiftoverVcf \
+--INPUT input.vcf.gz \
+--OUTPUT output.vcf.gz \
+--REJECT rejected.vcf.gz \
+--CHAIN file.chain \
+--REFERENCE_SEQUENCE target.fasta \
+--RECOVER_SWAPPED_REF_ALT false 
 ```
