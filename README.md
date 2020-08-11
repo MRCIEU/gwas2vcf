@@ -153,6 +153,48 @@ The following examples require:
 
 Please cite the relevant tool(s) if you use these examples.
 
+#### Filter
+
+##### Extract genome-wide significant variants
+
+The LP field is -log10(P), 7.3 is approx 5e-8
+
+```sh
+bcftools filter \
+-i 'FORMAT/LP > 7.3' \
+-o output.vcf \
+file.vcf.gz
+```
+
+##### Extract variants by gene
+
+Requires annotation by Ensembl (see below)
+
+```sh
+bcftools filter \
+-i 'INFO/ENSG_ID == "ENSG00000198670"' \
+file.vcf.gz
+```
+
+##### Extract variants by pathway
+
+Requires annotation by Reactome (see below)
+
+```sh
+bcftools filter \
+-i 'INFO/Reactome_ID == "R-HSA-3000171"' \
+file.vcf.gz
+```
+
+##### Select genome region for further analysis
+
+ ```sh
+bcftools filter \
+-r 1:1000000-2000000 \
+-o output.vcf.gz \
+input.vcf.gz
+```
+
 #### Annotate
 
 ##### Add variant frequency
@@ -171,7 +213,7 @@ bcftools annotate \
 input.vcf.gz
 ```
 
-##### Add gene/pathway annotation
+##### Add gene/pathway annotations
 
 Download and merge input files
 
@@ -232,39 +274,6 @@ bcftools annotate \
 -O z \
 -l Reactome_ID:unique \
 input.vcf.gz
-```
-
-#### Filter
-
-##### Select genome region for further analysis
-
- ```sh
-bcftools filter \
--r 1:1000000-2000000 \
--o output.vcf.gz \
-input.vcf.gz
-```
-
-##### Extract genome-wide significant variants to text file
-
-The LP field is -log10(P), 7.3 is approx 5e-8
-
-```sh
-bcftools query \
--i 'FORMAT/LP > 7.3' \
--f '%CHROM\t%POS\t%ID\t%REF\t%ALT[\t%ES\t%SE\t%LP]\n' \
--o data.txt \
-file.vcf.gz
-```
-
-##### Extract by annotation
-
-Select GWAS loci encoding genes in the olfactory signalling pathway (requires annotation by Reactome [see above])
-
-```sh
-bcftools filter \
--i 'INFO/Reactome_ID == "R-HSA-3000171"' \
-file.vcf.gz
 ```
 
 #### Convert
