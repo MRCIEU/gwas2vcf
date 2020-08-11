@@ -1,1 +1,0 @@
-##INFO=<ID=ENSG_ID,Number=.,Type=String,Description="Ensembl gene ID">
