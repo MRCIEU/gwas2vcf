@@ -88,7 +88,7 @@ python -m pytest -v test
 
 ```sh
 usage: main.py [-h] [-v] [--out OUT] [--data DATA] --ref REF --json JSON [--id ID] [--cohort_controls COHORT_CONTROLS]
-               [--cohort_cases COHORT_CASES] [--rm_chr_prefix] [--csi] [--log {DEBUG,INFO,WARNING,ERROR,CRITICAL}]
+               [--cohort_cases COHORT_CASES] [--alias] [--csi] [--log {DEBUG,INFO,WARNING,ERROR,CRITICAL}]
 
 Map GWAS summary statistics to VCF/BCF
 
@@ -105,7 +105,7 @@ optional arguments:
                         present in json file.
   --cohort_cases COHORT_CASES
                         Total study number of cases. Overwrites value if present in json file.
-  --rm_chr_prefix       Remove chr prefix from GWAS chromosome
+  --alias               Chromosome name mapping file in the format <gwas_chr>\t<ref_chr>
   --csi                 Default is to index tbi but use this flag to index csi
   --log {DEBUG,INFO,WARNING,ERROR,CRITICAL}
                         Set the logging level
