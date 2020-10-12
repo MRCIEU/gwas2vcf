@@ -12,7 +12,7 @@ import os
 
 
 def main():
-    version = "1.2.1"
+    version = "1.3.0"
 
     parser = argparse.ArgumentParser(description='Map GWAS summary statistics to VCF/BCF')
     parser.add_argument('-v', '--version', action='version', version='%(prog)s {}'.format(version))
@@ -29,13 +29,14 @@ def main():
                         help='Total study number of controls (if case/control) or total sample size if continuous. Overwrites value if present in json file.')
     parser.add_argument('--cohort_cases', type=int, dest='cohort_cases', required=False, default=None,
                         help='Total study number of cases. Overwrites value if present in json file.')
-    parser.add_argument('--rm_chr_prefix', dest='rm_chr_prefix', action='store_true', default=False, required=False,
-                        help='Remove chr prefix from GWAS chromosome')
     parser.add_argument('--csi', dest='csi', action='store_true', default=False, required=False,
                         help='Default is to index tbi but use this flag to index csi')
     parser.add_argument("--log", dest="log", required=False, default='INFO',
                         choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
                         help="Set the logging level")
+    parser.add_argument('--alias', dest='alias', required=False,
+                        help='Optional chromosome alias file')
+
     args = parser.parse_args()
 
     # set logging level
@@ -113,6 +114,15 @@ def main():
     else:
         dbsnp = None
 
+    if args.alias is not None:
+        alias = {}
+        with open(args.alias) as f:
+            for line in f:
+                (key, val) = line.split("\t")
+                alias[key] = val
+    else:
+        alias = None
+
     # read in data
     # harmonise, left align and trim on-the-fly and write to pickle format
     # keep file index for each record and chromosome position to write out karyotypically sorted records later
@@ -136,7 +146,7 @@ def main():
             imp_z_field=j.get('imp_z_col'),
             imp_info_field=j.get('imp_info_col'),
             ncontrol_field=j.get('ncontrol_col'),
-            rm_chr_prefix=args.rm_chr_prefix,
+            alias=alias,
             dbsnp=dbsnp
         )
 

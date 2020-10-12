@@ -122,7 +122,7 @@ class Gwas:
             imp_z_field=None,
             imp_info_field=None,
             ncontrol_field=None,
-            rm_chr_prefix=False,
+            alias=None,
             dbsnp=None
     ):
 
@@ -180,8 +180,11 @@ class Gwas:
             logging.debug("Input row: {}".format(s))
 
             try:
-                if rm_chr_prefix:
-                    chrom = s[chrom_field].replace("chr", "")
+                if alias is not None:
+                    if s[chrom_field] in alias:
+                        chrom = alias[s[chrom_field]]
+                    else:
+                        chrom = s[chrom_field]
                 else:
                     chrom = s[chrom_field]
             except Exception as e:
