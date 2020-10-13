@@ -118,7 +118,7 @@ def main():
         alias = {}
         with open(args.alias) as f:
             for line in f:
-                (key, val) = line.split("\t")
+                (key, val) = line.strip().split("\t")
                 alias[key] = val
     else:
         alias = None
