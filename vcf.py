@@ -62,12 +62,12 @@ class Vcf:
         header.add_line(
             '##FORMAT=<ID=AF,Number=A,Type=Float,Description="Alternate allele frequency in the association study">')
         header.add_line(
-            '##FORMAT=<ID=SS,Number=A,Type=Float,Description="Sample size used to estimate genetic effect">')
+            '##FORMAT=<ID=SS,Number=A,Type=Integer,Description="Sample size used to estimate genetic effect">')
         header.add_line(
             '##FORMAT=<ID=EZ,Number=A,Type=Float,Description="Z-score provided if it was used to derive the EFFECT and SE fields">')
         header.add_line('##FORMAT=<ID=SI,Number=A,Type=Float,Description="Accuracy score of summary data imputation">')
         header.add_line(
-            '##FORMAT=<ID=NC,Number=A,Type=Float,Description="Number of cases used to estimate genetic effect">')
+            '##FORMAT=<ID=NC,Number=A,Type=Integer,Description="Number of cases used to estimate genetic effect">')
         header.add_line(
             '##FORMAT=<ID=ID,Number=1,Type=String,Description="Study variant identifier">')
 
