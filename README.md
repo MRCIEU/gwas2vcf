@@ -75,6 +75,18 @@ wget https://storage.googleapis.com/genomics-public-data/resources/broad/hg38/v0
 wget https://storage.googleapis.com/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta.fai
 ```
 
+### dbSNP
+
+```sh
+# GRCh37/hg19/b37
+wget http://fileserve.mrcieu.ac.uk/dbsnp/released/2019-09-11/data/dbsnp.v153.b37.vcf.gz .
+wget http://fileserve.mrcieu.ac.uk/dbsnp/released/2019-09-11/data/dbsnp.v153.b37.vcf.gz.tbi .
+
+# GRCh38/hg38/b38
+wget http://fileserve.mrcieu.ac.uk/dbsnp/released/2019-09-11/data/dbsnp.v153.hg38.vcf.gz .
+wget http://fileserve.mrcieu.ac.uk/dbsnp/released/2019-09-11/data/dbsnp.v153.hg38.vcf.gz.tbi .
+```
+
 ### Running the tests
 
 Unit tests:
