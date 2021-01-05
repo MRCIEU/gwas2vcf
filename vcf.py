@@ -146,11 +146,6 @@ class Vcf:
                         "Allele frequency field cannot fit into float32. Expect loss of precision for: {}".format(
                             result.alt_freq)
                     )
-                if Vcf.is_float32_lossy(result.n):
-                    logging.warning(
-                        "Sample size field cannot fit into float32. Expect loss of precision for: {}".format(
-                            result.n)
-                    )
                 if Vcf.is_float32_lossy(result.imp_z):
                     logging.warning(
                         "Imputation Z score field cannot fit into float32. Expect loss of precision for: {}".format(
@@ -183,13 +178,13 @@ class Vcf:
                 if result.alt_freq is not None:
                     record.samples[trait_id]['AF'] = result.alt_freq
                 if result.n is not None:
-                    record.samples[trait_id]['SS'] = result.n
+                    record.samples[trait_id]['SS'] = round(result.n)
                 if result.imp_z is not None:
                     record.samples[trait_id]['EZ'] = result.imp_z
                 if result.imp_info is not None:
                     record.samples[trait_id]['SI'] = result.imp_info
                 if result.ncase is not None:
-                    record.samples[trait_id]['NC'] = result.ncase
+                    record.samples[trait_id]['NC'] = round(result.ncase)
                 if result.dbsnpid is not None:
                     record.samples[trait_id]['ID'] = record.id
 
