@@ -83,8 +83,8 @@ wget http://fileserve.mrcieu.ac.uk/dbsnp/released/2019-09-11/data/dbsnp.v153.b37
 wget http://fileserve.mrcieu.ac.uk/dbsnp/released/2019-09-11/data/dbsnp.v153.b37.vcf.gz.tbi .
 
 # GRCh38/hg38/b38
-wget http://fileserve.mrcieu.ac.uk/dbsnp/released/2019-09-11/data/dbsnp.v153.hg38.vcf.gz .
-wget http://fileserve.mrcieu.ac.uk/dbsnp/released/2019-09-11/data/dbsnp.v153.hg38.vcf.gz.tbi .
+wget http://fileserve.mrcieu.ac.uk/dbsnp/dbsnp.v153.hg38.vcf.gz .
+wget http://fileserve.mrcieu.ac.uk/dbsnp/dbsnp.v153.hg38.vcf.gz.tbi .
 ```
 
 ### Running the tests
