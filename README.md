@@ -33,6 +33,8 @@ cd gwas2vcf
 
 #### Native
 
+Requires Python v3.8
+
 ```sh
 python3 -m venv env
 source env/bin/activate
