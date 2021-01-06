@@ -99,8 +99,8 @@ python -m pytest -v test
 ### Usage
 
 ```sh
-usage: main.py [-h] [-v] [--out OUT] [--data DATA] --ref REF --json JSON [--id ID] [--cohort_controls COHORT_CONTROLS]
-               [--cohort_cases COHORT_CASES] [--alias] [--csi] [--log {DEBUG,INFO,WARNING,ERROR,CRITICAL}]
+usage: main.py [-h] [-v] [--out OUT] [--data DATA] --ref REF [--dbsnp DBSNP] --json JSON [--id ID] [--cohort_controls COHORT_CONTROLS]
+               [--cohort_cases COHORT_CASES] [--csi] [--log {DEBUG,INFO,WARNING,ERROR,CRITICAL}] [--alias ALIAS]
 
 Map GWAS summary statistics to VCF/BCF
 
@@ -110,43 +110,69 @@ optional arguments:
   --out OUT             Path to output VCF/BCF. If not present then must be specified as 'out' in json file
   --data DATA           Path to GWAS summary stats. If not present then must be specified as 'data' in json file
   --ref REF             Path to reference FASTA
+  --dbsnp DBSNP         Path to reference dbSNP VCF
   --json JSON           Path to parameters JSON
   --id ID               Study identifier. If not present then must be specified as 'id' in json file
   --cohort_controls COHORT_CONTROLS
-                        Total study number of controls (if case/control) or total sample size if continuous. Overwrites value if
-                        present in json file.
+                        Total study number of controls (if case/control) or total sample size if continuous. Overwrites value if present in json
+                        file.
   --cohort_cases COHORT_CASES
                         Total study number of cases. Overwrites value if present in json file.
-  --alias               Chromosome name mapping file in the format <gwas_chr>\t<ref_chr>
   --csi                 Default is to index tbi but use this flag to index csi
   --log {DEBUG,INFO,WARNING,ERROR,CRITICAL}
                         Set the logging level
+  --alias ALIAS         Optional chromosome alias file
 ```
 
 Additional parameters are passed through a [JSON](https://www.w3schools.com/js/js_json_objects.asp) parameters file using ```--json <param.json>```, see `param.py` for full details and below example. Note that field columns start at 0.
 
+### Example
+
+Assuming the GWAS summary stats have a hg19/b37 chromosome name & position you can use these files:
+- [RefGenomeFile](https://github.com/MRCIEU/gwas2vcf#reference-fasta)
+- [DbSnpVcfFile](https://github.com/MRCIEU/gwas2vcf#dbsnp)
+- [alias.txt](https://github.com/MRCIEU/gwas2vcf/blob/master/alias.txt)
+
+```sh
+# obtain test gwas summary stats
+wget https://raw.githubusercontent.com/MRCIEU/gwas2vcfweb/master/app/tests/data/example.1k.txt
+```
+
 ```json
+# create json parameters file
 {
   "chr_col": 0,
   "pos_col": 1,
-  "ea_col": 2,
-  "oa_col": 3,
-  "beta_col": 4,
-  "se_col": 5,
-  "pval_col": 6,
-  "snp_col": 7,
-  "eaf_col": 8,
-  "imp_info_col": 9,
-  "ncontrol_col": 10,
+  "snp_col": 2,
+  "ea_col": 3,
+  "oa_col": 4,
+  "beta_col": 5,
+  "se_col": 6,
+  "ncontrol_col": 7,
+  "pval_col": 8,
+  "eaf_col": 9,
   "delimiter": "\t",
   "header": true,
   "build": "GRCh37"
 }
+
+# map to GWAS-VCF
+SumStatsFile=/data/example.1k.txt
+RefGenomeFile=/data/human_g1k_v37.fasta
+ParamFile=/data/params.json
+DbSnpVcfFile=/data/dbsnp.v153.b37.vcf.gz
+VcfFileOutPath=/data/out.vcf
+ID="test"
+
+python /app/main.py \
+--data ${SumStatsFile} \
+--json ${ParamFile} \
+--id ${ID} \
+--ref ${RefGenomeFile} \
+--dbsnp ${DbSnpVcfFile} \
+--out ${VcfFileOutPath} \
+--alias /app/alias.txt
 ```
-
-### Example
-
-See [gwas-vcf-performance](https://github.com/MRCIEU/gwas-vcf-performance/blob/master/workflow.Rmd) for a full implementation
 
 ## Working with GWAS-VCF
 
