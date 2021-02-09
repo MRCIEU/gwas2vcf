@@ -323,7 +323,12 @@ class Gwas:
 
             # left align and trim variants
             if len(ref) > 1 and len(alt) > 1:
-                result.normalise(fasta)
+                try:
+                    result.normalise(fasta)
+                except Exception as e:
+                    logging.debug("Could not normalise {}: {}".format(s, e))
+                    metadata['VariantsNotHarmonised'] += 1
+                    continue
                 metadata['NormalisedVariants'] += 1
 
             # add or update dbSNP identifier
