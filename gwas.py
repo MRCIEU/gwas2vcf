@@ -44,11 +44,15 @@ class Gwas:
             self.alt_freq = None
 
     def check_reference_allele(self, fasta):
-        assert self.ref == fasta.fetch(
-            reference=self.chrom,
-            start=self.pos - 1,
-            end=self.pos + len(self.ref) - 1
-        ).upper()
+        try:
+            x = fasta.fetch(
+                reference=self.chrom,
+                start=self.pos - 1,
+                end=self.pos + len(self.ref) - 1
+            ).upper()
+        except:
+            assert 1 == 2
+        assert self.ref == x
 
     def normalise(self, fasta, padding=100):
         # TODO handle padding edge cases
