@@ -122,7 +122,7 @@ class Vcf:
                 gwas_file.seek(chr_pos[1])
                 result = pickle.load(gwas_file)
 
-                lpval = -np.log10(result.pval)
+                lpval = Vcf.convert_pval_to_neg_log10(result.pval)
 
                 # check floats
                 if Vcf.is_float32_lossy(result.b):

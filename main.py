@@ -12,7 +12,7 @@ import os
 
 
 def main():
-    version = "1.3.1"
+    version = "1.3.2"
 
     parser = argparse.ArgumentParser(description='Map GWAS summary statistics to VCF/BCF')
     parser.add_argument('-v', '--version', action='version', version='%(prog)s {}'.format(version))
@@ -42,7 +42,6 @@ def main():
     # set logging level
     if args.log:
         logging.basicConfig(level=getattr(logging, args.log), format='%(asctime)s %(levelname)s %(message)s')
-
     logging.info("Gwas2VCF {}".format(version))
     logging.info("Arguments: {}".format(vars(args)))
     logging.info("Reading JSON parameters")
