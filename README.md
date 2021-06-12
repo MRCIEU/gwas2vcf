@@ -65,14 +65,17 @@ python main.py -h
 # GRCh36/hg18/b36
 wget http://fileserve.mrcieu.ac.uk/ref/2.8/b36/human_b36_both.fasta
 wget http://fileserve.mrcieu.ac.uk/ref/2.8/b36/human_b36_both.fasta.fai
+wget http://fileserve.mrcieu.ac.uk/ref/2.8/b36/human_b36_both.dict
 
 # GRCh37/hg19/b37
 wget http://fileserve.mrcieu.ac.uk/ref/2.8/b37/human_g1k_v37.fasta
 wget http://fileserve.mrcieu.ac.uk/ref/2.8/b37/human_g1k_v37.fasta.fai
+wget http://fileserve.mrcieu.ac.uk/ref/2.8/b37/human_g1k_v37.dict
 
 # GRCh38/hg38/b38
 wget https://storage.googleapis.com/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta
 wget https://storage.googleapis.com/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta.fai
+wget https://storage.googleapis.com/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.dict
 ```
 
 ### dbSNP
@@ -344,6 +347,7 @@ wget http://fileserve.mrcieu.ac.uk/ref/chains/b37tohg18.chain
 wget http://fileserve.mrcieu.ac.uk/ref/chains/b37tohg19.chain
 wget http://fileserve.mrcieu.ac.uk/ref/chains/hg18tob37.chain
 wget http://fileserve.mrcieu.ac.uk/ref/chains/hg19toHg18.chain
+curl https://hgdownload.soe.ucsc.edu/goldenPath/hg19/liftOver/hg19ToHg38.over.chain.gz | zcat | sed 's/chr//' > b37ToHg38.chain
 ```
 
 ```sh
