@@ -1,8 +1,10 @@
 from gwas import Gwas
 import pytest
+import decimal
 from vgraph import norm
 import pysam
 import os
+from pvalueHandler import PvalueHandler
 
 
 def test_are_alleles_iupac():
@@ -44,6 +46,53 @@ def test_check_reference_allele():
         with pytest.raises(AssertionError):
             g = Gwas('test', 1, 'T', 'A', 1, None, None, None, None, None, None, None, None)
             g.check_reference_allele(fasta)
+
+
+
+def test_pvalues_precision_with_PvalueHandler():
+    p_value_handler = PvalueHandler()
+    p_value_strings = ['0.1','0.00000000005','7.5E-8','8e-1000','0.1E-10000']
+    gwas_list = []
+    for p_value_string in p_value_strings:
+        gwas_list.append ( Gwas('test', 1, 'A', 'T', None, None, p_value_handler.neg_log_of_decimal (p_value_handler.parse_string(p_value_string)),
+                                None, None, None, None, None, None) )
+
+    #show that we get the number we expect when converted to a float
+    assert gwas_list[0].nlog_pval == float(-decimal.Decimal(p_value_strings[0]).log10())
+    assert gwas_list[1].nlog_pval == float(-decimal.Decimal(p_value_strings[1]).log10())
+    assert gwas_list[2].nlog_pval == float(-decimal.Decimal(p_value_strings[2]).log10())
+    assert gwas_list[3].nlog_pval == float(-decimal.Decimal(p_value_strings[3]).log10())
+    assert gwas_list[4].nlog_pval == float(-decimal.Decimal(p_value_strings[4]).log10())
+
+    #show that the show that the resulting flow is at least close to the exact decimal value
+    epsilon = gwas_list[0].nlog_pval/1000000.0
+    assert  gwas_list[0].nlog_pval+ epsilon  >  -decimal.Decimal(p_value_strings[0]).log10() and \
+            gwas_list[0].nlog_pval - epsilon < -decimal.Decimal(p_value_strings[0]).log10()
+    epsilon = gwas_list[1].nlog_pval / 1000000.0
+    assert  gwas_list[1].nlog_pval+ epsilon  >  -decimal.Decimal(p_value_strings[1]).log10() and \
+            gwas_list[1].nlog_pval - epsilon < -decimal.Decimal(p_value_strings[1]).log10()
+    epsilon = gwas_list[2].nlog_pval / 1000000.0
+    assert  gwas_list[2].nlog_pval+ epsilon  >  -decimal.Decimal(p_value_strings[2]).log10() and \
+            gwas_list[2].nlog_pval - epsilon < -decimal.Decimal(p_value_strings[2]).log10()
+    epsilon = gwas_list[3].nlog_pval / 1000000.0
+    assert  gwas_list[3].nlog_pval+ epsilon  >  -decimal.Decimal(p_value_strings[3]).log10() and \
+            gwas_list[3].nlog_pval - epsilon < -decimal.Decimal(p_value_strings[3]).log10()
+    epsilon = gwas_list[4].nlog_pval / 1000000.0
+    assert  gwas_list[4].nlog_pval+ epsilon  >  -decimal.Decimal(p_value_strings[4]).log10() and \
+            gwas_list[4].nlog_pval - epsilon < -decimal.Decimal(p_value_strings[4]).log10()
+
+    # Note:this is the problem we're trying to correct
+    p='7e-1000'
+    pv= float (p)
+    assert pv==0.0
+
+    # so that show that this problem is alleviated
+    with pytest.raises(AssertionError):
+        assert gwas_list[0].nlog_pval == 0.0
+        assert gwas_list[1].nlog_pval == 0.0
+        assert gwas_list[2].nlog_pval == 0.0
+        assert gwas_list[3].nlog_pval == 0.0
+        assert gwas_list[4].nlog_pval == 0.0
 
 
 def test_normalise():

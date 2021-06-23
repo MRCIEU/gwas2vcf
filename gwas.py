@@ -6,11 +6,12 @@ import pickle
 import re
 from heapq import heappush
 from vgraph import norm
+from pvalueHandler import PvalueHandler
 
 
 class Gwas:
 
-    def __init__(self, chrom, pos, ref, alt, b, se, pval, n, alt_freq, dbsnpid, ncase, imp_info, imp_z,
+    def __init__(self, chrom, pos, ref, alt, b, se, nlog_pval, n, alt_freq, dbsnpid, ncase, imp_info, imp_z,
                  vcf_filter="PASS"):
 
         self.chrom = chrom
@@ -19,7 +20,7 @@ class Gwas:
         self.alt = alt
         self.b = b
         self.se = se
-        self.pval = pval
+        self.nlog_pval = nlog_pval
         self.alt_freq = alt_freq
         self.n = n
         self.dbsnpid = dbsnpid
@@ -177,6 +178,8 @@ class Gwas:
         # store results in a serialised temp file to reduce memory usage
         results = tempfile.TemporaryFile()
 
+        p_value_handler = PvalueHandler ()
+
         for l in f:
             metadata['TotalVariants'] += 1
             s = l.strip().split(delimiter)
@@ -227,7 +230,8 @@ class Gwas:
                 continue
 
             try:
-                pval = float(s[pval_field])
+                pval = p_value_handler.parse_string(s[pval_field])
+                nlog_pval = p_value_handler.neg_log_of_decimal(pval)
             except Exception as e:
                 logging.debug("Skipping line {}, {}".format(s, e))
                 metadata['VariantsNotRead'] += 1
@@ -288,7 +292,7 @@ class Gwas:
                 alt,
                 b,
                 se,
-                pval,
+                nlog_pval,
                 n,
                 alt_freq,
                 rsid,

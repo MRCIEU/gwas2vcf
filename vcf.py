@@ -4,18 +4,18 @@ import numpy as np
 import pickle
 from heapq import heappop
 
-
 class Vcf:
 
-    @staticmethod
-    def convert_pval_to_neg_log10(p):
-        # prevent negative 0 output
-        if p == 1:
-            return 0
-        # prevent Inf output
-        if p == 0:
-            return 999
-        return -np.log10(p)
+    # no longer necessary
+    # @staticmethod
+    # def convert_pval_to_neg_log10(p):
+    #     # prevent negative 0 output
+    #     if p == 1:
+    #         return 0
+    #     # prevent Inf output
+    #     if p == 0:
+    #         return 999
+    #     return -np.log10(p)
 
     @staticmethod
     def is_float32_lossy(f):
@@ -122,7 +122,7 @@ class Vcf:
                 gwas_file.seek(chr_pos[1])
                 result = pickle.load(gwas_file)
 
-                lpval = Vcf.convert_pval_to_neg_log10(result.pval)
+                result.nlog_pval = result.nlog_pval
 
                 # check floats
                 if Vcf.is_float32_lossy(result.b):
@@ -136,10 +136,10 @@ class Vcf:
                         "Standard error field cannot fit into float32. Expect loss of precision for: {}".format(
                             result.se)
                     )
-                if Vcf.is_float32_lossy(lpval):
+                if Vcf.is_float32_lossy(result.nlog_pval):
                     logging.warning(
                         "-log10(pval) field cannot fit into float32. Expect loss of precision for: {}".format(
-                            lpval)
+                            result.nlog_pval)
                     )
                 if Vcf.is_float32_lossy(result.alt_freq):
                     logging.warning(
@@ -173,8 +173,8 @@ class Vcf:
                     record.samples[trait_id]['ES'] = result.b
                 if result.se is not None:
                     record.samples[trait_id]['SE'] = result.se
-                if lpval is not None:
-                    record.samples[trait_id]['LP'] = lpval
+                if result.nlog_pval is not None:
+                    record.samples[trait_id]['LP'] = result.nlog_pval
                 if result.alt_freq is not None:
                     record.samples[trait_id]['AF'] = result.alt_freq
                 if result.n is not None:
