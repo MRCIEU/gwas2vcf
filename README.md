@@ -134,7 +134,7 @@ Additional parameters are passed through a [JSON](https://www.w3schools.com/js/j
 Assuming the GWAS summary stats have a hg19/b37 chromosome name & position you can use these files:
 - [RefGenomeFile](https://github.com/MRCIEU/gwas2vcf#reference-fasta)
 - [DbSnpVcfFile](https://github.com/MRCIEU/gwas2vcf#dbsnp)
-- [alias.txt](https://github.com/MRCIEU/gwas2vcf/blob/master/alias.txt)
+- [alias-b37.txt](https://github.com/MRCIEU/gwas2vcf/blob/master/alias-b37.txt)
 
 ```sh
 # obtain test gwas summary stats
@@ -174,8 +174,14 @@ python /app/main.py \
 --ref ${RefGenomeFile} \
 --dbsnp ${DbSnpVcfFile} \
 --out ${VcfFileOutPath} \
---alias /app/alias.txt
+--alias /app/alias-b37.txt
 ```
+
+### Notes on chromosome naming & the alias file
+
+Some genome builds use the chr prefix on chromosome names i.e. ```chr1``` while others just use ```1```. This will cause issuses if your GWAS summary statistics and FASTA you wish to map to have different chromosome names (although they use the same genome build).
+
+One solution is to provide an alias file to map your GWAS summary stats chromosome name to another string. An example alias is provided in the repo ```alias-b37.txt``` and ```alias-hg38.txt```. The format is ```source-chr\tdest-chr``` one row per contig.
 
 ## Working with GWAS-VCF
 
