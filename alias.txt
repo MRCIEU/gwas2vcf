@@ -25,5 +25,4 @@ chrY	Y
 chrMT	MT
 23	X
 24	Y
-25	MT
 26	MT
