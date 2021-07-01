@@ -4,7 +4,7 @@ import decimal
 from vgraph import norm
 import pysam
 import os
-from pvalueHandler import PvalueHandler
+from pvalue_handler import PvalueHandler
 
 
 def test_are_alleles_iupac():
