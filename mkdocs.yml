@@ -1,0 +1,8 @@
+site_name: gwas2vcf
+site_url: https://mrcieu.github.io/gwas2vcf
+nav:
+    - Home: index.md
+    - Install: install.md
+    - Tutorial: tutorial.md
+    - Downstream analyses: downstream.md
+theme: readthedocs
