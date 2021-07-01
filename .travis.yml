@@ -1,8 +1,0 @@
-language: python
-python:
-  - "3.8"
-install:
-  - pip install -r requirements.txt
-  - pip install git+git://github.com/bioinformed/vgraph@v1.4.0#egg=vgraph
-script:
-  - python -m pytest -v test
