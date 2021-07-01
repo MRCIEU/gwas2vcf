@@ -5,7 +5,7 @@ import decimal
 from gwas import Gwas
 import tempfile
 from heapq import heappush, heappop
-from pvalueHandler import PvalueHandler
+from pvalue_handler import PvalueHandler
 
 def test_convert_pval_to_neg_log10():
     p_value_handler = PvalueHandler()
