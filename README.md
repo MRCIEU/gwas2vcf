@@ -63,12 +63,12 @@ python main.py -h
 
 ```sh
 # GRCh36/hg18/b36
-wget http://fileserve.mrcieu.ac.uk/ref/2.8/b36/human_b36_both.fasta
+wget http://fileserve.mrcieu.ac.uk/ref/2.8/b36/human_b36_both.fasta.gz
 wget http://fileserve.mrcieu.ac.uk/ref/2.8/b36/human_b36_both.fasta.fai
 wget http://fileserve.mrcieu.ac.uk/ref/2.8/b36/human_b36_both.dict
 
 # GRCh37/hg19/b37
-wget http://fileserve.mrcieu.ac.uk/ref/2.8/b37/human_g1k_v37.fasta
+wget http://fileserve.mrcieu.ac.uk/ref/2.8/b37/human_g1k_v37.fasta.gz
 wget http://fileserve.mrcieu.ac.uk/ref/2.8/b37/human_g1k_v37.fasta.fai
 wget http://fileserve.mrcieu.ac.uk/ref/2.8/b37/human_g1k_v37.dict
 
