@@ -1,7 +1,7 @@
 # Convert GWAS summary statistics to VCF
 
 <!-- badges: start -->
-[![Build Status](https://travis-ci.org/MRCIEU/gwas2vcf.svg?branch=master)](https://travis-ci.org/MRCIEU/gwas2vcf)
+![Build Status](https://github.com/MRCIEU/gwas2vcf/actions/workflows/test.yml/badge.svg)
 <!-- badges: end -->
 
 Tool to map GWAS summary statistics to VCF/BCF with on-the-fly harmonisation to a supplied reference FASTA
