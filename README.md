@@ -90,7 +90,7 @@ wget http://fileserve.mrcieu.ac.uk/dbsnp/dbsnp.v153.hg38.vcf.gz .
 wget http://fileserve.mrcieu.ac.uk/dbsnp/dbsnp.v153.hg38.vcf.gz.tbi .
 ```
 
-Newer dbSNP builds can be obtained from the NCBI FTP but the VCF files have no standard chromosome names which can be updated accordingly
+Newer dbSNP builds can be obtained from the NCBI FTP but the VCF files have non-standard chromosome names which can be updated accordingly (thanks @darked89)
 
 ```
 # download latest dbSNP VCF
