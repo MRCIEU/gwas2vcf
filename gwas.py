@@ -6,7 +6,7 @@ import pickle
 import re
 from heapq import heappush
 from vgraph import norm
-from pvalueHandler import PvalueHandler
+from pvalue_handler import PvalueHandler
 
 
 class Gwas:
