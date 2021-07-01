@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="canonical" href="https://mrcieu.github.io/gwas2vcf/install/">
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Install - gwas2vcf</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Install";
+    var mkdocs_page_input_path = "install.md";
+    var mkdocs_page_url = "/gwas2vcf/install/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> gwas2vcf</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                    </li>
+                </ul>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Install</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#quick-start">Quick start</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#run-locally">Run locally</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#download">Download</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#native">Native</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#docker">Docker</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#running-the-tests">Running the tests</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#reference-files">Reference files</a>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../tutorial/">Tutorial</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../downstream/">Downstream analyses</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">gwas2vcf</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Install</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="install">Install</h1>
+<h2 id="quick-start">Quick start</h2>
+<p>Use web interface <a href="http://vcf.mrcieu.ac.uk" target="_blank">http://vcf.mrcieu.ac.uk</a></p>
+<h2 id="run-locally">Run locally</h2>
+<p>Either run directly on a UNIX host or using Docker containerisation (recommended)</p>
+<h3 id="download">Download</h3>
+<pre><code class="language-sh">git clone git@github.com:MRCIEU/gwas2vcf.git
+cd gwas2vcf
+</code></pre>
+<h3 id="native">Native</h3>
+<p>Requires Python v3.8</p>
+<pre><code class="language-sh">python3 -m venv env
+source env/bin/activate
+pip install -r requirements.txt
+pip install git+git://github.com/bioinformed/vgraph@v1.4.0#egg=vgraph
+python main.py -h
+</code></pre>
+<h3 id="docker">Docker</h3>
+<p>Build docker image</p>
+<pre><code class="language-sh">docker build -t gwas2vcf .
+</code></pre>
+<p>Run</p>
+<pre><code class="language-sh">docker run \
+-v /path/to/fasta:/path/to/fasta \
+--name gwas2vcf \
+-it gwas2vcf:latest \
+python main.py -h
+</code></pre>
+<h3 id="usage">Usage</h3>
+<pre><code class="language-sh">usage: main.py [-h] [-v] [--out OUT] [--data DATA] --ref REF [--dbsnp DBSNP] --json JSON [--id ID] [--cohort_controls COHORT_CONTROLS]
+               [--cohort_cases COHORT_CASES] [--csi] [--log {DEBUG,INFO,WARNING,ERROR,CRITICAL}] [--alias ALIAS]
+
+Map GWAS summary statistics to VCF/BCF
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -v, --version         show program's version number and exit
+  --out OUT             Path to output VCF/BCF. If not present then must be specified as 'out' in json file
+  --data DATA           Path to GWAS summary stats. If not present then must be specified as 'data' in json file
+  --ref REF             Path to reference FASTA
+  --dbsnp DBSNP         Path to reference dbSNP VCF
+  --json JSON           Path to parameters JSON
+  --id ID               Study identifier. If not present then must be specified as 'id' in json file
+  --cohort_controls COHORT_CONTROLS
+                        Total study number of controls (if case/control) or total sample size if continuous. Overwrites value if present in json
+                        file.
+  --cohort_cases COHORT_CASES
+                        Total study number of cases. Overwrites value if present in json file.
+  --csi                 Default is to index tbi but use this flag to index csi
+  --log {DEBUG,INFO,WARNING,ERROR,CRITICAL}
+                        Set the logging level
+  --alias ALIAS         Optional chromosome alias file
+</code></pre>
+<p>Additional parameters are passed through a <a href="https://www.w3schools.com/js/js_json_objects.asp">JSON</a> parameters file using <code>--json &lt;param.json&gt;</code>, see <code>param.py</code> for full details and below example. Note that field columns start at 0.</p>
+<h3 id="running-the-tests">Running the tests</h3>
+<p>Unit tests:</p>
+<pre><code class="language-sh">cd gwas2vcf
+python -m pytest -v test
+</code></pre>
+<h2 id="reference-files">Reference files</h2>
+<h1 id="fasta">FASTA</h1>
+<pre><code class="language-sh"># GRCh36/hg18/b36
+wget http://fileserve.mrcieu.ac.uk/ref/2.8/b36/human_b36_both.fasta.gz
+wget http://fileserve.mrcieu.ac.uk/ref/2.8/b36/human_b36_both.fasta.fai
+wget http://fileserve.mrcieu.ac.uk/ref/2.8/b36/human_b36_both.dict
+
+# GRCh37/hg19/b37
+wget http://fileserve.mrcieu.ac.uk/ref/2.8/b37/human_g1k_v37.fasta.gz
+wget http://fileserve.mrcieu.ac.uk/ref/2.8/b37/human_g1k_v37.fasta.fai
+wget http://fileserve.mrcieu.ac.uk/ref/2.8/b37/human_g1k_v37.dict
+
+# GRCh38/hg38/b38
+wget https://storage.googleapis.com/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta
+wget https://storage.googleapis.com/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta.fai
+wget https://storage.googleapis.com/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.dict
+</code></pre>
+<h1 id="dbsnp">dbSNP</h1>
+<pre><code class="language-sh"># GRCh37/hg19/b37
+wget http://fileserve.mrcieu.ac.uk/dbsnp/dbsnp.v153.b37.vcf.gz .
+wget http://fileserve.mrcieu.ac.uk/dbsnp/dbsnp.v153.b37.vcf.gz.tbi .
+
+# GRCh38/hg38/b38
+wget http://fileserve.mrcieu.ac.uk/dbsnp/dbsnp.v153.hg38.vcf.gz .
+wget http://fileserve.mrcieu.ac.uk/dbsnp/dbsnp.v153.hg38.vcf.gz.tbi .
+</code></pre>
+<p>Newer dbSNP builds can be obtained from the NCBI FTP but the VCF files have non-standard chromosome names which can be updated accordingly (thanks @darked89)</p>
+<pre><code># download latest dbSNP VCF
+wget https://ftp.ncbi.nih.gov/snp/latest_release/VCF/GCF_000001405.39.gz
+
+# define chromosome name mapping
+echo -n &quot;NC_000001.11    1
+NC_000002.12    2
+NC_000003.12    3
+NC_000004.12    4
+NC_000005.10    5
+NC_000006.12    6
+NC_000007.14    7
+NC_000008.11    8
+NC_000009.12    9
+NC_000010.11    10
+NC_000011.10    11
+NC_000012.12    12
+NC_000013.11    13
+NC_000014.9     14
+NC_000015.10    15
+NC_000016.10    16
+NC_000017.11    17
+NC_000018.10    18
+NC_000019.10    19
+NC_000020.11    20
+NC_000021.9     21
+NC_000022.11    22
+NC_000023.11    X
+NC_000024.10    Y
+NC_012920.1     MT
+&quot; &gt; hg38_rename_chrom_names.tsv
+
+# update chromosome names
+bcftools annotate \
+--rename-chrs hg38_rename_chrom_names.tsv \
+--output-type z \
+--output dbSNP_clean.vcf.gz GCF_000001405.39.gz
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../tutorial/" class="btn btn-neutral float-right" title="Tutorial">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href=".." class="btn btn-neutral" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../tutorial/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
