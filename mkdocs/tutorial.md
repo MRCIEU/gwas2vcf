@@ -55,6 +55,6 @@ python /app/main.py \
 
 ### Alias file
 
-Some genome builds use the chr prefix on chromosome names i.e. ```chr1``` while others just use ```1```. This will cause issuses if your GWAS summary statistics and FASTA you wish to map to have different chromosome names (although they use the same genome build).
+Some genome builds use the chr prefix on chromosome names i.e. ```chr1``` while others just use ```1```. This will cause issues if your GWAS summary statistics and FASTA you wish to map to have different chromosome names (although they use the same genome build).
 
 One solution is to provide an alias file to map your GWAS summary stats chromosome name to another string. An example alias is provided in the repo ```alias-b37.txt``` and ```alias-hg38.txt```. The format is ```source-chr\tdest-chr``` one row per contig.

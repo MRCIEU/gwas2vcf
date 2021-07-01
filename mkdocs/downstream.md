@@ -1,6 +1,6 @@
 # Working with GWAS-VCF
 
-See below examples of working with GWAS-VCF. Let us know if you have other use cases through the issues page!
+See below examples of working with GWAS-VCF. Let us know if you have other use cases through the [issues](https://github.com/MRCIEU/gwasvcf/issues) page!
 
 ## Data
 
