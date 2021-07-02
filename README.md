@@ -1,7 +1,7 @@
 # Convert GWAS summary statistics to VCF
 
 <!-- badges: start -->
-![Build Status](https://github.com/MRCIEU/gwas2vcf/actions/workflows/test.yml/badge.svg)
+[![Build Status](https://github.com/MRCIEU/gwas2vcf/actions/workflows/test.yml/badge.svg)](https://github.com/MRCIEU/gwas2vcf/actions)
 [![DOI](https://img.shields.io/badge/doi-10.1186%2Fs13059--020--02248--0-blue)](https://doi.org/10.1186/s13059-020-02248-0)
 <!-- badges: end -->
 
