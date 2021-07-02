@@ -26,7 +26,7 @@ What can I do with GWAS-VCF?
 - Analysis workflows ([pathway](https://mrcieu.github.io/gwas2vcf/downstream/#extract-variants-by-pathway), [gene](https://mrcieu.github.io/gwas2vcf/downstream/#extract-variants-by-gene), [clumping](https://mrcieu.github.io/gwasglue/articles/finemapping.html), [finemapping](https://mrcieu.github.io/gwasglue/articles/finemapping.html), [LDSC](https://github.com/MRCIEU/gwas_processing), [colocalization](https://mrcieu.github.io/gwasglue/articles/colocalisation.html), [Mendelian randomization](https://mrcieu.github.io/gwasglue/articles/mr.html#using-gwas-vcf-files), [COJO](https://mrcieu.github.io/gwasglue/articles/cojo.html))
 - File parsing ([R](https://github.com/MRCIEU/gwasvcf), [Python3](https://github.com/MRCIEU/pygwasvcf))
 
-Let us know if you have other use cases through the issues page!
+Let us know if you have other use cases through the [issues](https://github.com/MRCIEU/gwas2vcf/issues) page!
 
 ## Citation
 
