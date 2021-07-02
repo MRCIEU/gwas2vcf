@@ -19,9 +19,7 @@ Complete GWAS summary statistics harmonised to GWAS-VCF are available on >14,000
 
 ## Tutorials
 
-Example GWAS-VCF operations: [filter](https://mrcieu.github.io/gwas2vcf/downstream/#filter), [annotate](https://mrcieu.github.io/gwas2vcf/downstream/#annotate), [convert](https://mrcieu.github.io/gwas2vcf/downstream/#convert), [liftover](https://mrcieu.github.io/gwas2vcf/downstream/#liftover), [merge](https://mrcieu.github.io/gwas2vcf/downstream/#merge), [validate](https://mrcieu.github.io/gwas2vcf/downstream/#validate)
-
-Select variants by: [pathway](https://mrcieu.github.io/gwas2vcf/downstream/#extract-variants-by-pathway), [gene](https://mrcieu.github.io/gwas2vcf/downstream/#extract-variants-by-gene)
+Example GWAS-VCF operations: [filter](https://mrcieu.github.io/gwas2vcf/downstream/#filter), [annotate](https://mrcieu.github.io/gwas2vcf/downstream/#annotate), [convert](https://mrcieu.github.io/gwas2vcf/downstream/#convert), [liftover](https://mrcieu.github.io/gwas2vcf/downstream/#liftover), [merge](https://mrcieu.github.io/gwas2vcf/downstream/#merge), [validate](https://mrcieu.github.io/gwas2vcf/downstream/#validate). Select variants by: [pathway](https://mrcieu.github.io/gwas2vcf/downstream/#extract-variants-by-pathway), [gene](https://mrcieu.github.io/gwas2vcf/downstream/#extract-variants-by-gene)
 
 ## Citation
 
