@@ -5,7 +5,7 @@
 [![DOI](https://img.shields.io/badge/doi-10.1186%2Fs13059--020--02248--0-blue)](https://doi.org/10.1186/s13059-020-02248-0)
 <!-- badges: end -->
 
-Tool to map GWAS summary statistics to VCF/BCF with on-the-fly harmonisation to a supplied reference FASTA
+Tool to map GWAS summary statistics to VCF with on-the-fly harmonisation to a supplied reference FASTA
 
 Produces GWAS-VCF with version 1.0 of the [specification](https://github.com/MRCIEU/gwas-vcf-specification/releases/tag/1.0.0)
 
