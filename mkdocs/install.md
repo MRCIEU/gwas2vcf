@@ -29,9 +29,15 @@ python main.py -h
 
 ### Docker
 
-Build docker image
+Pull image from DockerHub OR build image from source
 
 ```sh
+# pull image from DockerHub
+docker pull mrcieu/gwas2vcf
+
+### OR ###
+
+# build docker image from source
 docker build -t gwas2vcf .
 ```
 
