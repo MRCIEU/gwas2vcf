@@ -19,7 +19,12 @@ Complete GWAS summary statistics harmonised to GWAS-VCF are available on >14,000
 
 ## Tutorials
 
-Example GWAS-VCF operations: [filter](https://mrcieu.github.io/gwas2vcf/downstream/#filter), [annotate](https://mrcieu.github.io/gwas2vcf/downstream/#annotate), [convert](https://mrcieu.github.io/gwas2vcf/downstream/#convert), [liftover](https://mrcieu.github.io/gwas2vcf/downstream/#liftover), [merge](https://mrcieu.github.io/gwas2vcf/downstream/#merge), [validate](https://mrcieu.github.io/gwas2vcf/downstream/#validate). Select variants by: [pathway](https://mrcieu.github.io/gwas2vcf/downstream/#extract-variants-by-pathway), [gene](https://mrcieu.github.io/gwas2vcf/downstream/#extract-variants-by-gene)
+What can I do with GWAS-VCF?
+
+- Command-line operations ([filter](https://mrcieu.github.io/gwas2vcf/downstream/#filter), [annotate](https://mrcieu.github.io/gwas2vcf/downstream/#annotate), [convert](https://mrcieu.github.io/gwas2vcf/downstream/#convert), [liftover](https://mrcieu.github.io/gwas2vcf/downstream/#liftover), [merge](https://mrcieu.github.io/gwas2vcf/downstream/#merge), [validate](https://mrcieu.github.io/gwas2vcf/downstream/#validate))
+- Quality control ([QC](https://github.com/MRCIEU/opengwas-reports))
+- Analysis workflows ([pathway](https://mrcieu.github.io/gwas2vcf/downstream/#extract-variants-by-pathway), [gene](https://mrcieu.github.io/gwas2vcf/downstream/#extract-variants-by-gene), [clumping](https://mrcieu.github.io/gwasglue/articles/finemapping.html), [finemapping](https://mrcieu.github.io/gwasglue/articles/finemapping.html), [LDSC](https://github.com/MRCIEU/gwas_processing), [colocalization](https://mrcieu.github.io/gwasglue/articles/colocalisation.html), [Mendelian randomization](https://mrcieu.github.io/gwasglue/articles/mr.html#using-gwas-vcf-files), [COJO](https://mrcieu.github.io/gwasglue/articles/cojo.html))
+- File parsing ([R](https://github.com/MRCIEU/gwasvcf), [Python3](https://github.com/MRCIEU/pygwasvcf))
 
 ## Citation
 
