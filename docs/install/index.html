@@ -133,8 +133,14 @@ pip install git+git://github.com/bioinformed/vgraph@v1.4.0#egg=vgraph
 python main.py -h
 </code></pre>
 <h3 id="docker">Docker</h3>
-<p>Build docker image</p>
-<pre><code class="language-sh">docker build -t gwas2vcf .
+<p>Pull image from DockerHub OR build image from source</p>
+<pre><code class="language-sh"># pull image from DockerHub
+docker pull mrcieu/gwas2vcf
+
+### OR ###
+
+# build docker image from source
+docker build -t gwas2vcf .
 </code></pre>
 <p>Run</p>
 <pre><code class="language-sh">docker run \
