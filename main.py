@@ -108,11 +108,6 @@ def main():
         logging.error("{} output directory does not exist".format(args.out))
         sys.exit()
 
-    if args.dbsnp is not None:
-        dbsnp = pysam.VariantFile(args.dbsnp)
-    else:
-        dbsnp = None
-
     if args.alias is not None:
         alias = {}
         with open(args.alias) as f:
@@ -146,11 +141,8 @@ def main():
             imp_info_field=j.get('imp_info_col'),
             ncontrol_field=j.get('ncontrol_col'),
             alias=alias,
-            dbsnp=dbsnp
+            dbsnp=args.dbsnp
         )
-
-    if dbsnp is not None:
-        dbsnp.close()
 
     # metadata
     file_metadata = {

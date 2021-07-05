@@ -4,6 +4,7 @@ import os
 import tempfile
 import pickle
 import re
+from cyvcf2 import VCF
 from heapq import heappush
 from vgraph import norm
 from pvalue_handler import PvalueHandler
@@ -92,8 +93,11 @@ class Gwas:
         if dbsnp is None:
             raise IOError("Could not read dbsnp file")
         self.dbsnpid = None
-        for rec in dbsnp.fetch(contig=self.chrom, start=self.pos - 1, stop=self.pos):
-            self.dbsnpid = rec.id
+        # for rec in dbsnp.fetch(contig=self.chrom, start=self.pos - 1, stop=self.pos):
+        #    self.dbsnpid = rec.id
+        #    break
+        for v in dbsnp(region='{}:{}-{}'.format(self.chrom, self.pos, self.pos)):
+            self.dbsnpid = v.ID
             break
 
     def check_alleles_are_vaild(self):
@@ -152,6 +156,11 @@ class Gwas:
         logging.debug("IMP INFO Field: {}".format(imp_info_field))
         logging.debug("N Control Field: {}".format(ncontrol_field))
 
+        if dbsnp is not None:
+            dbsnp_vcf = VCF(dbsnp)
+        else:
+            dbsnp_vcf = None
+
         # TODO use namedtuple
         metadata = {
             'TotalVariants': 0,
@@ -178,7 +187,7 @@ class Gwas:
         # store results in a serialised temp file to reduce memory usage
         results = tempfile.TemporaryFile()
 
-        p_value_handler = PvalueHandler ()
+        p_value_handler = PvalueHandler()
 
         for l in f:
             metadata['TotalVariants'] += 1
@@ -337,7 +346,7 @@ class Gwas:
 
             # add or update dbSNP identifier
             if dbsnp is not None:
-                result.update_dbsnp(dbsnp)
+                result.update_dbsnp(dbsnp_vcf)
 
             # keep file position sorted by chromosome position for recall later
             if result.chrom not in file_idx:
@@ -346,6 +355,8 @@ class Gwas:
             pickle.dump(result, results)
 
         f.close()
+        if dbsnp is not None:
+            dbsnp_vcf.close()
 
         logging.info("Total variants: {}".format(metadata['TotalVariants']))
         logging.info("Variants could not be read: {}".format(metadata['VariantsNotRead']))
