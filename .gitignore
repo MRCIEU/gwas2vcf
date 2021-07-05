@@ -6,4 +6,5 @@ __pycache__/
 test/data/
 *.pyc
 .DS_Store
-venv
+venv/
+.pytest_cache/
