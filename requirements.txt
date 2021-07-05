@@ -1,6 +1,8 @@
 pytest==5.3.5
-biopython==1.72
-pysam==0.15.2
+biopython
+pysam==0.15.4
 marshmallow==2.18.1
-numpy==1.15.4
+numpy
 Cython==0.29.17
+cyvcf2
+setuptools

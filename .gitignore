@@ -6,4 +6,4 @@ __pycache__/
 test/data/
 *.pyc
 .DS_Store
-env
+venv

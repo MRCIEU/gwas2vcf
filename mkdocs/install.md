@@ -23,7 +23,9 @@ Requires Python v3.8
 python3 -m venv env
 source env/bin/activate
 pip install -r requirements.txt
-pip install git+git://github.com/bioinformed/vgraph@v1.4.0#egg=vgraph
+# Note if running with clang (macOS) you may need
+# export ARCHFLAGS="-arch x86_64"; CC=clang CXX=clang++ pip install git+git://github.com/bioinformed/vgraph@v1.4.0#egg=vgraph
+pip install git+git://github.com/bioinformed/vgraph@v1.4.0#egg=vgraph 
 python main.py -h
 ```
 
@@ -61,7 +63,7 @@ Map GWAS summary statistics to VCF/BCF
 
 optional arguments:
   -h, --help            show this help message and exit
-  -v, --version         show program's version number and exit
+  -v, --version         show program version number and exit
   --out OUT             Path to output VCF/BCF. If not present then must be specified as 'out' in json file
   --data DATA           Path to GWAS summary stats. If not present then must be specified as 'data' in json file
   --ref REF             Path to reference FASTA
