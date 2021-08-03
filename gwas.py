@@ -343,7 +343,12 @@ class Gwas:
             if result.chrom not in file_idx:
                 file_idx[result.chrom] = []
             heappush(file_idx[result.chrom], (result.pos, results.tell()))
-            pickle.dump(result, results)
+
+            try:
+                pickle.dump(result, results)
+            except Exception as e:
+                logging.error("Could not write to {}:".format(tempfile.gettempdir()), e)
+                raise e
 
         f.close()
 
