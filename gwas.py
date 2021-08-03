@@ -361,5 +361,7 @@ class Gwas:
         logging.info("Skipped {} of {}".format(
             metadata['VariantsNotRead'] + metadata['VariantsNotHarmonised'], metadata['TotalVariants'])
         )
+        if (metadata['VariantsNotRead'] + metadata['VariantsNotHarmonised']) / metadata['TotalVariants'] > .2:
+            logging.warning("More than 20% of variants not read or harmonised. Check your input")
 
         return results, file_idx, metadata
