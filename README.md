@@ -33,4 +33,4 @@ Let us know if you have other use cases through the [issues](https://github.com/
 
 - Elsworth B, Lyon M, Alexander T, Liu Y, Matthews P, Hallett J, Bates P, Palmer T, Haberland V, Davey Smith G, Zheng J, Haycock P, Gaunt TR, Hemani G. The MRC IEU OpenGWAS data infrastructure. bioRxiv, p. 2020.08.10.244293, Aug. 2020. <https://doi.org/10.1101/2020.08.10.244293>
 
-Please also cite the relevant tool(s) if you use GWAS-VCF for downstream analyses.
+Please also cite the relevant tool(s) and data source if you use GWAS-VCF for downstream analyses.
