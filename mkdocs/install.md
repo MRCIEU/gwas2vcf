@@ -61,7 +61,7 @@ Map GWAS summary statistics to VCF/BCF
 
 optional arguments:
   -h, --help            show this help message and exit
-  -v, --version         show program\'s version number and exit
+  -v, --version         show program version number and exit
   --out OUT             Path to output VCF/BCF. If not present then must be specified as 'out' in json file
   --data DATA           Path to GWAS summary stats. If not present then must be specified as 'data' in json file
   --ref REF             Path to reference FASTA
