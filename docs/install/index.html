@@ -121,7 +121,7 @@
 <h2 id="run-locally">Run locally</h2>
 <p>Either run directly on a UNIX host or using Docker containerisation (recommended)</p>
 <h3 id="download">Download</h3>
-<pre><code class="language-sh">git clone git@github.com:MRCIEU/gwas2vcf.git
+<pre><code class="language-sh">git clone https://github.com/MRCIEU/gwas2vcf.git
 cd gwas2vcf
 </code></pre>
 <h3 id="native">Native</h3>
@@ -157,7 +157,7 @@ Map GWAS summary statistics to VCF/BCF
 
 optional arguments:
   -h, --help            show this help message and exit
-  -v, --version         show program's version number and exit
+  -v, --version         show program\'s version number and exit
   --out OUT             Path to output VCF/BCF. If not present then must be specified as 'out' in json file
   --data DATA           Path to GWAS summary stats. If not present then must be specified as 'data' in json file
   --ref REF             Path to reference FASTA
@@ -183,12 +183,12 @@ python -m pytest -v test
 <h2 id="reference-files">Reference files</h2>
 <h1 id="fasta">FASTA</h1>
 <pre><code class="language-sh"># GRCh36/hg18/b36
-wget http://fileserve.mrcieu.ac.uk/ref/2.8/b36/human_b36_both.fasta.gz
+wget http://fileserve.mrcieu.ac.uk/ref/2.8/b36/human_b36_both.fasta.gz; gzip -d human_b36_both.fasta.gz
 wget http://fileserve.mrcieu.ac.uk/ref/2.8/b36/human_b36_both.fasta.fai
 wget http://fileserve.mrcieu.ac.uk/ref/2.8/b36/human_b36_both.dict
 
 # GRCh37/hg19/b37
-wget http://fileserve.mrcieu.ac.uk/ref/2.8/b37/human_g1k_v37.fasta.gz
+wget http://fileserve.mrcieu.ac.uk/ref/2.8/b37/human_g1k_v37.fasta.gz; gzip -d human_g1k_v37.fasta.gz
 wget http://fileserve.mrcieu.ac.uk/ref/2.8/b37/human_g1k_v37.fasta.fai
 wget http://fileserve.mrcieu.ac.uk/ref/2.8/b37/human_g1k_v37.dict
 
@@ -207,7 +207,7 @@ wget http://fileserve.mrcieu.ac.uk/dbsnp/dbsnp.v153.hg38.vcf.gz .
 wget http://fileserve.mrcieu.ac.uk/dbsnp/dbsnp.v153.hg38.vcf.gz.tbi .
 </code></pre>
 <p>Newer dbSNP builds can be obtained from the NCBI FTP but the VCF files have non-standard chromosome names which can be updated accordingly (thanks @darked89)</p>
-<pre><code># download latest dbSNP VCF
+<pre><code># download latest dbSNP VCF for hg38
 wget https://ftp.ncbi.nih.gov/snp/latest_release/VCF/GCF_000001405.39.gz
 
 # define chromosome name mapping
@@ -243,6 +243,9 @@ bcftools annotate \
 --rename-chrs hg38_rename_chrom_names.tsv \
 --output-type z \
 --output dbSNP_clean.vcf.gz GCF_000001405.39.gz
+
+# index modified file
+bcftools index dbSNP_clean.vcf.gz
 </code></pre>
               
             </div>
