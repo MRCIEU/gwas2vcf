@@ -11,7 +11,7 @@ Either run directly on a UNIX host or using Docker containerisation (recommended
 ### Download
 
 ```sh
-git clone git@github.com:MRCIEU/gwas2vcf.git
+git clone https://github.com/MRCIEU/gwas2vcf.git
 cd gwas2vcf
 ```
 
