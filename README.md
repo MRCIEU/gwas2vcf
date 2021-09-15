@@ -19,7 +19,7 @@ Complete GWAS summary statistics in GWAS-VCF are available on >14,000 datasets f
 
 ## Workflow
 
-![alt text](https://github.com/MRCIEU/gwas2vcf/blob/master/gwas2vcf.pdf?raw=true)
+![alt text](https://github.com/MRCIEU/gwas2vcf/blob/master/gwas2vcf.jpg?raw=true)
 
 ## Tutorials
 
