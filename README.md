@@ -29,7 +29,9 @@ Let us know if you have other use cases through the [issues](https://github.com/
 
 ## Workflow
 
-![alt text](https://github.com/MRCIEU/gwas2vcf/blob/master/gwas2vcf.jpg?raw=true)
+<p align="center">
+  <img src="https://github.com/MRCIEU/gwas2vcf/blob/master/gwas2vcf.jpg">
+</p>
 
 ## Citation
 
