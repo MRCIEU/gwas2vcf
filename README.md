@@ -17,10 +17,6 @@ Full documentation available from <https://mrcieu.github.io/gwas2vcf>
 
 Complete GWAS summary statistics in GWAS-VCF are available on >14,000 datasets from the [OpenGWAS project](https://gwas.mrcieu.ac.uk)
 
-## Workflow
-
-![alt text](https://github.com/MRCIEU/gwas2vcf/blob/master/gwas2vcf.jpg?raw=true)
-
 ## Tutorials
 
 What can I do with GWAS-VCF?
@@ -30,6 +26,10 @@ What can I do with GWAS-VCF?
 - Parse ([R](https://github.com/MRCIEU/gwasvcf), [Python3](https://github.com/MRCIEU/pygwasvcf))
 
 Let us know if you have other use cases through the [issues](https://github.com/MRCIEU/gwas2vcf/issues) page!
+
+## Workflow
+
+![alt text](https://github.com/MRCIEU/gwas2vcf/blob/master/gwas2vcf.jpg?raw=true)
 
 ## Citation
 
