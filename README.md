@@ -17,6 +17,10 @@ Full documentation available from <https://mrcieu.github.io/gwas2vcf>
 
 Complete GWAS summary statistics in GWAS-VCF are available on >14,000 datasets from the [OpenGWAS project](https://gwas.mrcieu.ac.uk)
 
+## Workflow
+
+![alt text](https://github.com/MRCIEU/gwas2vcf/blob/master/gwas2vcf.pdf?raw=true)
+
 ## Tutorials
 
 What can I do with GWAS-VCF?
