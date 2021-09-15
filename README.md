@@ -27,7 +27,7 @@ What can I do with GWAS-VCF?
 
 Let us know if you have other use cases through the [issues](https://github.com/MRCIEU/gwas2vcf/issues) page!
 
-## Harmonisation workflow
+## Harmonisation
 
 <p align="center">
   <img src="https://github.com/MRCIEU/gwas2vcf/blob/master/gwas2vcf.jpg">
