@@ -47,7 +47,7 @@ Run
 docker run \
 -v /path/to/fasta:/path/to/fasta \
 --name gwas2vcf \
--it gwas2vcf:latest \
+-it mrcieu/gwas2vcf:latest \
 python main.py -h
 ```
 
