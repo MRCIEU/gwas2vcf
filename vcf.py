@@ -1,8 +1,10 @@
-import pysam
 import logging
-import numpy as np
 import pickle
 from heapq import heappop
+
+import numpy as np
+import pysam
+
 
 class Vcf:
 
@@ -45,72 +47,107 @@ class Vcf:
     """
 
     @staticmethod
-    def write_to_file(gwas_file, gwas_idx, path, fasta, build, trait_id, sample_metadata=None, file_metadata=None,
-                      csi=False):
-        logging.info("Writing headers to BCF/VCF: {}".format(path))
+    def write_to_file(
+        gwas_file,
+        gwas_idx,
+        path,
+        fasta,
+        build,
+        trait_id,
+        sample_metadata=None,
+        file_metadata=None,
+        csi=False,
+    ):
+        logging.info(f"Writing headers to BCF/VCF: {path}")
 
         header = pysam.VariantHeader()
 
         # INFO
-        header.add_line('##INFO=<ID=AF,Number=A,Type=Float,Description="Allele Frequency">')
+        header.add_line(
+            '##INFO=<ID=AF,Number=A,Type=Float,Description="Allele Frequency">'
+        )
 
         # FORMAT
         header.add_line(
-            '##FORMAT=<ID=ES,Number=A,Type=Float,Description="Effect size estimate relative to the alternative allele">')
-        header.add_line('##FORMAT=<ID=SE,Number=A,Type=Float,Description="Standard error of effect size estimate">')
-        header.add_line('##FORMAT=<ID=LP,Number=A,Type=Float,Description="-log10 p-value for effect estimate">')
+            '##FORMAT=<ID=ES,Number=A,Type=Float,Description="Effect size estimate relative to the alternative allele">'
+        )
         header.add_line(
-            '##FORMAT=<ID=AF,Number=A,Type=Float,Description="Alternate allele frequency in the association study">')
+            '##FORMAT=<ID=SE,Number=A,Type=Float,Description="Standard error of effect size estimate">'
+        )
         header.add_line(
-            '##FORMAT=<ID=SS,Number=A,Type=Integer,Description="Sample size used to estimate genetic effect">')
+            '##FORMAT=<ID=LP,Number=A,Type=Float,Description="-log10 p-value for effect estimate">'
+        )
         header.add_line(
-            '##FORMAT=<ID=EZ,Number=A,Type=Float,Description="Z-score provided if it was used to derive the EFFECT and SE fields">')
-        header.add_line('##FORMAT=<ID=SI,Number=A,Type=Float,Description="Accuracy score of summary data imputation">')
+            '##FORMAT=<ID=AF,Number=A,Type=Float,Description="Alternate allele frequency in the association study">'
+        )
         header.add_line(
-            '##FORMAT=<ID=NC,Number=A,Type=Integer,Description="Number of cases used to estimate genetic effect">')
+            '##FORMAT=<ID=SS,Number=A,Type=Integer,Description="Sample size used to estimate genetic effect">'
+        )
         header.add_line(
-            '##FORMAT=<ID=ID,Number=1,Type=String,Description="Study variant identifier">')
+            '##FORMAT=<ID=EZ,Number=A,Type=Float,Description="Z-score provided if it was used to derive the EFFECT and SE fields">'
+        )
+        header.add_line(
+            '##FORMAT=<ID=SI,Number=A,Type=Float,Description="Accuracy score of summary data imputation">'
+        )
+        header.add_line(
+            '##FORMAT=<ID=NC,Number=A,Type=Integer,Description="Number of cases used to estimate genetic effect">'
+        )
+        header.add_line(
+            '##FORMAT=<ID=ID,Number=1,Type=String,Description="Study variant identifier">'
+        )
 
         # META
         header.add_line(
-            '##META=<ID=TotalVariants,Number=1,Type=Integer,Description="Total number of variants in input">')
+            '##META=<ID=TotalVariants,Number=1,Type=Integer,Description="Total number of variants in input">'
+        )
         header.add_line(
-            '##META=<ID=VariantsNotRead,Number=1,Type=Integer,Description="Number of variants that could not be read">')
+            '##META=<ID=VariantsNotRead,Number=1,Type=Integer,Description="Number of variants that could not be read">'
+        )
         header.add_line(
-            '##META=<ID=HarmonisedVariants,Number=1,Type=Integer,Description="Total number of harmonised variants">')
+            '##META=<ID=HarmonisedVariants,Number=1,Type=Integer,Description="Total number of harmonised variants">'
+        )
         header.add_line(
-            '##META=<ID=VariantsNotHarmonised,Number=1,Type=Integer,Description="Total number of variants that could not be harmonised">')
+            '##META=<ID=VariantsNotHarmonised,Number=1,Type=Integer,Description="Total number of variants that could not be harmonised">'
+        )
         header.add_line(
-            '##META=<ID=SwitchedAlleles,Number=1,Type=Integer,Description="Total number of variants strand switched">')
+            '##META=<ID=SwitchedAlleles,Number=1,Type=Integer,Description="Total number of variants strand switched">'
+        )
         header.add_line(
-            '##META=<ID=TotalControls,Number=1,Type=Integer,Description="Total number of controls in the association study">')
+            '##META=<ID=TotalControls,Number=1,Type=Integer,Description="Total number of controls in the association study">'
+        )
         header.add_line(
-            '##META=<ID=TotalCases,Number=1,Type=Integer,Description="Total number of cases in the association study">')
+            '##META=<ID=TotalCases,Number=1,Type=Integer,Description="Total number of cases in the association study">'
+        )
         header.add_line(
-            '##META=<ID=StudyType,Number=1,Type=String,Description="Type of GWAS study [Continuous or CaseControl]">')
+            '##META=<ID=StudyType,Number=1,Type=String,Description="Type of GWAS study [Continuous or CaseControl]">'
+        )
 
         # SAMPLES
         header.samples.add(trait_id)
         if file_metadata is not None:
             s = ""
             for k in sample_metadata:
-                s += ",{}={}".format(k, sample_metadata[k])
-            header.add_line('##SAMPLE=<ID={}{}>'.format(trait_id, s))
+                s += f",{k}={sample_metadata[k]}"
+            header.add_line(f"##SAMPLE=<ID={trait_id}{s}>")
 
         # CONTIG
         assert len(fasta.references) == len(fasta.lengths)
         for n, contig in enumerate(fasta.references):
-            header.add_line("##contig=<ID={},length={}, assembly={}>".format(contig, fasta.lengths[n], build))
+            header.add_line(
+                "##contig=<ID={},length={}, assembly={}>".format(
+                    contig, fasta.lengths[n], build
+                )
+            )
 
         # add metadata
         if file_metadata is not None:
             for k in file_metadata:
-                header.add_line('##{}={}'.format(k, file_metadata[k]))
+                header.add_line(f"##{k}={file_metadata[k]}")
 
         vcf = pysam.VariantFile(path, "w", header=header)
 
         # recall variant objects in chromosome position order
-        logging.info("Writing variants to BCF/VCF: {}".format(path))
+        logging.info(f"Writing variants to BCF/VCF: {path}")
         for contig in fasta.references:
             if contig not in gwas_idx:
                 continue
@@ -128,33 +165,39 @@ class Vcf:
                 if Vcf.is_float32_lossy(result.b):
                     logging.warning(
                         "Effect field cannot fit into float32. Expect loss of precision for: {}".format(
-                            result.b)
+                            result.b
+                        )
                     )
                 if Vcf.is_float32_lossy(result.se):
                     result.se = np.float64(np.finfo(np.float32).tiny).item()
                     logging.warning(
                         "Standard error field cannot fit into float32. Expect loss of precision for: {}".format(
-                            result.se)
+                            result.se
+                        )
                     )
                 if Vcf.is_float32_lossy(result.nlog_pval):
                     logging.warning(
                         "-log10(pval) field cannot fit into float32. Expect loss of precision for: {}".format(
-                            result.nlog_pval)
+                            result.nlog_pval
+                        )
                     )
                 if Vcf.is_float32_lossy(result.alt_freq):
                     logging.warning(
                         "Allele frequency field cannot fit into float32. Expect loss of precision for: {}".format(
-                            result.alt_freq)
+                            result.alt_freq
+                        )
                     )
                 if Vcf.is_float32_lossy(result.imp_z):
                     logging.warning(
                         "Imputation Z score field cannot fit into float32. Expect loss of precision for: {}".format(
-                            result.imp_z)
+                            result.imp_z
+                        )
                     )
                 if Vcf.is_float32_lossy(result.imp_info):
                     logging.warning(
                         "Imputation INFO field cannot fit into float32. Expect loss of precision for: {}".format(
-                            result.imp_info)
+                            result.imp_info
+                        )
                     )
 
                 record = vcf.new_record()
@@ -167,26 +210,26 @@ class Vcf:
                 record.filter.add(result.vcf_filter)
 
                 if result.alt_freq is not None:
-                    record.info['AF'] = result.alt_freq
+                    record.info["AF"] = result.alt_freq
 
                 if result.b is not None:
-                    record.samples[trait_id]['ES'] = result.b
+                    record.samples[trait_id]["ES"] = result.b
                 if result.se is not None:
-                    record.samples[trait_id]['SE'] = result.se
+                    record.samples[trait_id]["SE"] = result.se
                 if result.nlog_pval is not None:
-                    record.samples[trait_id]['LP'] = result.nlog_pval
+                    record.samples[trait_id]["LP"] = result.nlog_pval
                 if result.alt_freq is not None:
-                    record.samples[trait_id]['AF'] = result.alt_freq
+                    record.samples[trait_id]["AF"] = result.alt_freq
                 if result.n is not None:
-                    record.samples[trait_id]['SS'] = round(result.n)
+                    record.samples[trait_id]["SS"] = round(result.n)
                 if result.imp_z is not None:
-                    record.samples[trait_id]['EZ'] = result.imp_z
+                    record.samples[trait_id]["EZ"] = result.imp_z
                 if result.imp_info is not None:
-                    record.samples[trait_id]['SI'] = result.imp_info
+                    record.samples[trait_id]["SI"] = result.imp_info
                 if result.ncase is not None:
-                    record.samples[trait_id]['NC'] = round(result.ncase)
+                    record.samples[trait_id]["NC"] = round(result.ncase)
                 if result.dbsnpid is not None:
-                    record.samples[trait_id]['ID'] = record.id
+                    record.samples[trait_id]["ID"] = record.id
 
                 # write to file
                 vcf.write(record)
