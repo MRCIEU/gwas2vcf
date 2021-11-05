@@ -367,23 +367,16 @@ class Gwas:
 
         f.close()
 
-        logging.info("Total variants: {}".format(metadata["TotalVariants"]))
+        logging.info(f'Total variants: {metadata["TotalVariants"]}')
+        logging.info(f'Variants could not be read: {metadata["VariantsNotRead"]}')
+        logging.info(f'Variants harmonised: {metadata["HarmonisedVariants"]}')
         logging.info(
-            "Variants could not be read: {}".format(metadata["VariantsNotRead"])
+            f'Variants discarded during harmonisation: {metadata["VariantsNotHarmonised"]}'
         )
-        logging.info("Variants harmonised: {}".format(metadata["HarmonisedVariants"]))
+        logging.info(f'Alleles switched: {metadata["SwitchedAlleles"]}')
+        logging.info(f'Normalised variants: {metadata["NormalisedVariants"]}')
         logging.info(
-            "Variants discarded during harmonisation: {}".format(
-                metadata["VariantsNotHarmonised"]
-            )
-        )
-        logging.info("Alleles switched: {}".format(metadata["SwitchedAlleles"]))
-        logging.info("Normalised variants: {}".format(metadata["NormalisedVariants"]))
-        logging.info(
-            "Skipped {} of {}".format(
-                metadata["VariantsNotRead"] + metadata["VariantsNotHarmonised"],
-                metadata["TotalVariants"],
-            )
+            f'Skipped {metadata["VariantsNotRead"] + metadata["VariantsNotHarmonised"]} of {metadata["TotalVariants"]}'
         )
         if (metadata["VariantsNotRead"] + metadata["VariantsNotHarmonised"]) / metadata[
             "TotalVariants"

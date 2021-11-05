@@ -134,9 +134,7 @@ class Vcf:
         assert len(fasta.references) == len(fasta.lengths)
         for n, contig in enumerate(fasta.references):
             header.add_line(
-                "##contig=<ID={},length={}, assembly={}>".format(
-                    contig, fasta.lengths[n], build
-                )
+                f"##contig=<ID={contig},length={fasta.lengths[n]}, assembly={build}>"
             )
 
         # add metadata
@@ -164,40 +162,29 @@ class Vcf:
                 # check floats
                 if Vcf.is_float32_lossy(result.b):
                     logging.warning(
-                        "Effect field cannot fit into float32. Expect loss of precision for: {}".format(
-                            result.b
-                        )
+                        f"Effect field cannot fit into float32. Expect loss of precision for: {result.b}"
                     )
+
                 if Vcf.is_float32_lossy(result.se):
                     result.se = np.float64(np.finfo(np.float32).tiny).item()
                     logging.warning(
-                        "Standard error field cannot fit into float32. Expect loss of precision for: {}".format(
-                            result.se
-                        )
+                        f"Standard error field cannot fit into float32. Expect loss of precision for: {result.se}"
                     )
                 if Vcf.is_float32_lossy(result.nlog_pval):
                     logging.warning(
-                        "-log10(pval) field cannot fit into float32. Expect loss of precision for: {}".format(
-                            result.nlog_pval
-                        )
+                        f"-log10(pval) field cannot fit into float32. Expect loss of precision for: {result.nlog_pval}"
                     )
                 if Vcf.is_float32_lossy(result.alt_freq):
                     logging.warning(
-                        "Allele frequency field cannot fit into float32. Expect loss of precision for: {}".format(
-                            result.alt_freq
-                        )
+                        f"Allele frequency field cannot fit into float32. Expect loss of precision for: {result.alt_freq}"
                     )
                 if Vcf.is_float32_lossy(result.imp_z):
                     logging.warning(
-                        "Imputation Z score field cannot fit into float32. Expect loss of precision for: {}".format(
-                            result.imp_z
-                        )
+                        f"Imputation Z score field cannot fit into float32. Expect loss of precision for: {result.imp_z}"
                     )
                 if Vcf.is_float32_lossy(result.imp_info):
                     logging.warning(
-                        "Imputation INFO field cannot fit into float32. Expect loss of precision for: {}".format(
-                            result.imp_info
-                        )
+                        f"Imputation INFO field cannot fit into float32. Expect loss of precision for: {result.imp_info}"
                     )
 
                 record = vcf.new_record()
