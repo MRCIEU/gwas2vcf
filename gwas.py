@@ -10,6 +10,7 @@ from vgraph import norm
 
 from pvalue_handler import PvalueHandler
 
+valid_nucleotides = {"A", "T", "G", "C"}
 
 class Gwas:
     def __init__(
@@ -46,10 +47,10 @@ class Gwas:
         self.vcf_filter = vcf_filter
 
     def reverse_sign(self):
-        r = self.ref
-        a = self.alt
-        self.ref = a
-        self.alt = r
+        ref_old = self.ref
+        alt_old = self.alt
+        self.ref = alt_old
+        self.alt = ref_old
         self.b = self.b * -1
 
         if self.imp_z is not None:
@@ -62,14 +63,14 @@ class Gwas:
 
     def check_reference_allele(self, fasta):
         try:
-            x = fasta.fetch(
+            fasta_ref_seq = fasta.fetch(
                 reference=self.chrom,
                 start=self.pos - 1,
                 end=self.pos + len(self.ref) - 1,
             ).upper()
         except:
             assert 1 == 2
-        assert self.ref == x
+        assert self.ref == fasta_ref_seq
 
     def normalise(self, fasta, padding=100):
         # TODO handle padding edge cases
@@ -111,11 +112,11 @@ class Gwas:
             self.dbsnpid = rec.id
             break
 
-    def check_alleles_are_vaild(self):
-        for bp in self.alt:
-            assert bp in {"A", "T", "G", "C"}
-        for bp in self.ref:
-            assert bp in {"A", "T", "G", "C"}
+    def check_alleles_are_valid(self):
+        for nucleotide in self.alt:
+            assert nucleotide in valid_nucleotides
+        for nucleotide in self.ref:
+            assert nucleotide in valid_nucleotides
 
     def __str__(self):
         return str(self.__dict__)
@@ -124,48 +125,48 @@ class Gwas:
 
     @staticmethod
     def read_from_file(
-        path,
+        input_file_path,
         fasta,
-        chrom_field,
-        pos_field,
-        ea_field,
-        nea_field,
-        effect_field,
-        se_field,
-        pval_field,
+        chrom_col_num,
+        pos_col_num,
+        ea_col_num,
+        nea_col_num,
+        effect_col_num,
+        se_col_num,
+        pval_col_num,
         delimiter,
         header,
-        ncase_field=None,
-        rsid_field=None,
-        ea_af_field=None,
-        nea_af_field=None,
-        imp_z_field=None,
-        imp_info_field=None,
-        ncontrol_field=None,
+        ncase_col_num=None,
+        rsid_col_num=None,
+        ea_af_col_num=None,
+        nea_af_col_num=None,
+        imp_z_col_num=None,
+        imp_info_col_num=None,
+        ncontrol_col_num=None,
         alias=None,
         dbsnp=None,
     ):
 
         rsid_pattern = re.compile("^rs[0-9]*$")
 
-        logging.info(f"Reading summary stats and mapping to FASTA: {path}")
-        logging.debug(f"File path: {path}")
-        logging.debug(f"CHR field: {chrom_field}")
-        logging.debug(f"POS field: {pos_field}")
-        logging.debug(f"EA field: {ea_field}")
-        logging.debug(f"NEA field: {nea_field}")
-        logging.debug(f"Effect field: {effect_field}")
-        logging.debug(f"SE field: {se_field}")
-        logging.debug(f"P fields: {pval_field}")
+        logging.info(f"Reading summary stats and mapping to FASTA: {input_file_path}")
+        logging.debug(f"File path: {input_file_path}")
+        logging.debug(f"CHR field: {chrom_col_num}")
+        logging.debug(f"POS field: {pos_col_num}")
+        logging.debug(f"EA field: {ea_col_num}")
+        logging.debug(f"NEA field: {nea_col_num}")
+        logging.debug(f"Effect field: {effect_col_num}")
+        logging.debug(f"SE field: {se_col_num}")
+        logging.debug(f"P fields: {pval_col_num}")
         logging.debug(f"Delimiter: {delimiter}")
         logging.debug(f"Header: {header}")
-        logging.debug(f"ncase Field: {ncase_field}")
-        logging.debug(f"dbsnp Field: {rsid_field}")
-        logging.debug(f"EA AF Field: {ea_af_field}")
-        logging.debug(f"NEA AF Field: {nea_af_field}")
-        logging.debug(f"IMP Z Score Field: {imp_z_field}")
-        logging.debug(f"IMP INFO Field: {imp_info_field}")
-        logging.debug(f"N Control Field: {ncontrol_field}")
+        logging.debug(f"ncase Field: {ncase_col_num}")
+        logging.debug(f"dbsnp Field: {rsid_col_num}")
+        logging.debug(f"EA AF Field: {ea_af_col_num}")
+        logging.debug(f"NEA AF Field: {nea_af_col_num}")
+        logging.debug(f"IMP Z Score Field: {imp_z_col_num}")
+        logging.debug(f"IMP INFO Field: {imp_info_col_num}")
+        logging.debug(f"N Control Field: {ncontrol_col_num}")
 
         # TODO use namedtuple
         metadata = {
@@ -176,54 +177,54 @@ class Gwas:
             "SwitchedAlleles": 0,
             "NormalisedVariants": 0,
         }
-        file_idx = dict()
-        filename, file_extension = os.path.splitext(path)
+        file_idx = {}
+        file_name, file_extension = os.path.splitext(input_file_path)
 
         if file_extension == ".gz":
             logging.info("Reading gzip file")
-            f = gzip.open(path, "rt")
+            f_handle = gzip.open(input_file_path, "rt")
         else:
             logging.info("Reading plain text file")
-            f = open(path)
+            f_handle = open(input_file_path)
 
         # skip header line (if present)
         if header:
-            logging.info(f"Skipping header: {f.readline().strip()}")
+            logging.info(f"Skipping header: {f_handle.readline().strip()}")
 
         # store results in a serialised temp file to reduce memory usage
         results = tempfile.TemporaryFile()
 
         p_value_handler = PvalueHandler()
 
-        for l in f:
+        for line in f_handle:
             metadata["TotalVariants"] += 1
-            s = l.strip().split(delimiter)
+            columns = line.strip().split(delimiter)
 
-            logging.debug(f"Input row: {s}")
+            logging.debug(f"Input row: {columns}")
 
             try:
                 if alias is not None:
-                    if s[chrom_field] in alias:
-                        chrom = alias[s[chrom_field]]
+                    if columns[chrom_col_num] in alias:
+                        chrom = alias[columns[chrom_col_num]]
                     else:
-                        chrom = s[chrom_field]
+                        chrom = columns[chrom_col_num]
                 else:
-                    chrom = s[chrom_field]
-            except Exception as e:
-                logging.debug(f"Skipping {s}: {e}")
+                    chrom = columns[chrom_col_num]
+            except Exception as exception_name:
+                logging.debug(f"Skipping {columns}: {exception_name}")
                 metadata["VariantsNotRead"] += 1
                 continue
 
             try:
-                pos = int(float(s[pos_field]))  # float is for scientific notation
+                pos = int(float(columns[pos_col_num]))  # float is for scientific notation
                 assert pos > 0
-            except Exception as e:
-                logging.debug(f"Skipping {s}: {e}")
+            except Exception as exception_name:
+                logging.debug(f"Skipping {columns}: {exception_name}")
                 metadata["VariantsNotRead"] += 1
                 continue
 
-            ref = str(s[nea_field]).strip().upper()
-            alt = str(s[ea_field]).strip().upper()
+            ref = str(columns[nea_col_num]).strip().upper()
+            alt = str(columns[ea_col_num]).strip().upper()
 
             if ref == alt:
                 logging.debug(f"Skipping: ref={ref} is the same as alt={alt}")
@@ -231,73 +232,73 @@ class Gwas:
                 continue
 
             try:
-                b = float(s[effect_field])
-            except Exception as e:
-                logging.debug(f"Skipping {s}: {e}")
+                b = float(columns[effect_col_num])
+            except Exception as exception_name:
+                logging.debug(f"Skipping {columns}: {exception_name}")
                 metadata["VariantsNotRead"] += 1
                 continue
 
             try:
-                se = float(s[se_field])
-            except Exception as e:
-                logging.debug(f"Skipping {s}: {e}")
+                se = float(columns[se_col_num])
+            except Exception as exception_name:
+                logging.debug(f"Skipping {columns}: {exception_name}")
                 metadata["VariantsNotRead"] += 1
                 continue
 
             try:
-                pval = p_value_handler.parse_string(s[pval_field])
+                pval = p_value_handler.parse_string(columns[pval_col_num])
                 nlog_pval = p_value_handler.neg_log_of_decimal(pval)
-            except Exception as e:
-                logging.debug(f"Skipping line {s}, {e}")
+            except Exception as exception_name:
+                logging.debug(f"Skipping line {columns}, {exception_name}")
                 metadata["VariantsNotRead"] += 1
                 continue
 
             try:
-                if ea_af_field is not None:
-                    alt_freq = float(s[ea_af_field])
-                elif nea_af_field is not None:
-                    alt_freq = 1 - float(s[nea_af_field])
+                if ea_af_col_num is not None:
+                    alt_freq = float(columns[ea_af_col_num])
+                elif nea_af_col_num is not None:
+                    alt_freq = 1 - float(columns[nea_af_col_num])
                 else:
                     alt_freq = None
-            except (IndexError, TypeError, ValueError) as e:
-                logging.debug(f"Could not parse allele frequency: {e}")
+            except (IndexError, TypeError, ValueError) as exception_name:
+                logging.debug(f"Could not parse allele frequency: {exception_name}")
                 alt_freq = None
 
             try:
-                rsid = s[rsid_field]
+                rsid = columns[rsid_col_num]
                 assert rsid_pattern.match(rsid)
-            except (IndexError, TypeError, ValueError, AssertionError) as e:
-                logging.debug(f"Could not parse dbsnp identifier: {e}")
+            except (IndexError, TypeError, ValueError, AssertionError) as exception_name:
+                logging.debug(f"Could not parse dbsnp identifier: {exception_name}")
                 rsid = None
 
             try:
-                ncase = float(s[ncase_field])
-            except (IndexError, TypeError, ValueError) as e:
-                logging.debug(f"Could not parse number of cases: {e}")
+                ncase = float(columns[ncase_col_num])
+            except (IndexError, TypeError, ValueError) as exception_name:
+                logging.debug(f"Could not parse number of cases: {exception_name}")
                 ncase = None
 
             try:
-                ncontrol = float(s[ncontrol_field])
-            except (IndexError, TypeError, ValueError) as e:
-                logging.debug(f"Could not parse number of controls: {e}")
+                ncontrol = float(columns[ncontrol_col_num])
+            except (IndexError, TypeError, ValueError) as exception_name:
+                logging.debug(f"Could not parse number of controls: {exception_name}")
                 ncontrol = None
 
             try:
                 n = ncase + ncontrol
-            except (IndexError, TypeError, ValueError) as e:
-                logging.debug(f"Could not sum cases and controls: {e}")
+            except (IndexError, TypeError, ValueError) as exception_name:
+                logging.debug(f"Could not sum cases and controls: {exception_name}")
                 n = ncontrol
 
             try:
-                imp_info = float(s[imp_info_field])
-            except (IndexError, TypeError, ValueError) as e:
-                logging.debug(f"Could not parse imputation INFO: {e}")
+                imp_info = float(columns[imp_info_col_num])
+            except (IndexError, TypeError, ValueError) as exception_name:
+                logging.debug(f"Could not parse imputation INFO: {exception_name}")
                 imp_info = None
 
             try:
-                imp_z = float(s[imp_z_field])
-            except (IndexError, TypeError, ValueError) as e:
-                logging.debug(f"Could not parse imputation Z score: {e}")
+                imp_z = float(columns[imp_z_col_num])
+            except (IndexError, TypeError, ValueError) as exception_name:
+                logging.debug(f"Could not parse imputation Z score: {exception_name}")
                 imp_z = None
 
             result = Gwas(
@@ -320,9 +321,9 @@ class Gwas:
 
             # check alleles
             try:
-                result.check_alleles_are_vaild()
-            except AssertionError as e:
-                logging.debug(f"Skipping {s}: {e}")
+                result.check_alleles_are_valid()
+            except AssertionError as exception_name:
+                logging.debug(f"Skipping {columns}: {exception_name}")
                 metadata["VariantsNotRead"] += 1
                 continue
 
@@ -334,8 +335,8 @@ class Gwas:
                     result.reverse_sign()
                     result.check_reference_allele(fasta)
                     metadata["SwitchedAlleles"] += 1
-                except AssertionError as e:
-                    logging.debug(f"Could not harmonise {s}: {e}")
+                except AssertionError as exception_name:
+                    logging.debug(f"Could not harmonise {columns}: {exception_name}")
                     metadata["VariantsNotHarmonised"] += 1
                     continue
             metadata["HarmonisedVariants"] += 1
@@ -344,8 +345,8 @@ class Gwas:
             if len(ref) > 1 and len(alt) > 1:
                 try:
                     result.normalise(fasta)
-                except Exception as e:
-                    logging.debug(f"Could not normalise {s}: {e}")
+                except Exception as exception_name:
+                    logging.debug(f"Could not normalise {columns}: {exception_name}")
                     metadata["VariantsNotHarmonised"] += 1
                     continue
                 metadata["NormalisedVariants"] += 1
@@ -361,11 +362,11 @@ class Gwas:
 
             try:
                 pickle.dump(result, results)
-            except Exception as e:
-                logging.error(f"Could not write to {tempfile.gettempdir()}:", e)
-                raise e
+            except Exception as exception_name:
+                logging.error(f"Could not write to {tempfile.gettempdir()}:", exception_name)
+                raise exception_name
 
-        f.close()
+        f_handle.close()
 
         logging.info(f'Total variants: {metadata["TotalVariants"]}')
         logging.info(f'Variants could not be read: {metadata["VariantsNotRead"]}')
