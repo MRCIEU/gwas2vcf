@@ -20,28 +20,31 @@ class Vcf:
     #     return -np.log10(p)
 
     @staticmethod
-    def is_float32_lossy(f):
-        if f == 0 or f == -0 or f is None or f == np.inf or f == -np.inf:
+    def is_float32_lossy(input_float):
+        if (
+            input_float == 0
+            or input_float is None
+            or input_float == np.inf
+            or input_float == -np.inf
+        ):
             return False
 
         # convert val to float32
-        v = np.float32(f)
+        out_float = np.float32(input_float)
 
-        return v == 0 or v == np.inf or v == -0 or v == -np.inf
+        return out_float in [0, np.inf, 0, -np.inf]
 
     @staticmethod
-    def remove_illegal_chars(s):
-        if s is None:
+    def remove_illegal_chars(input_string):
+        if input_string is None:
             return None
-        r = s.strip()
-        r = r.replace(" ", "_")
-        r = r.replace(";", "_")
-        r = r.replace(":", "_")
-        r = r.replace("=", "_")
-        r = r.replace(",", "_")
-        return r
+        illegal_chars = (" ", ";", ":", "=", ",")
+        out_string = input_string.strip()
+        for bad_char in illegal_chars:
+            out_string = out_string.replace(bad_char, "_")
+        return out_string
 
-    """ 
+    """
     Write GWAS file to VCF
     Expects an open file handle to a Pickle file of GWAS results & file index dict(chromosome[(position, offset)]) 
     """
@@ -125,10 +128,8 @@ class Vcf:
         # SAMPLES
         header.samples.add(trait_id)
         if file_metadata is not None:
-            s = ""
-            for k in sample_metadata:
-                s += f",{k}={sample_metadata[k]}"
-            header.add_line(f"##SAMPLE=<ID={trait_id}{s}>")
+            meta_string = "".join(f",{k}={sample_metadata[k]}" for k in sample_metadata)
+            header.add_line(f"##SAMPLE=<ID={trait_id}{meta_string}>")
 
         # CONTIG
         assert len(fasta.references) == len(fasta.lengths)
