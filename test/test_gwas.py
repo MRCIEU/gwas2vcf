@@ -11,13 +11,13 @@ from pvalue_handler import PvalueHandler
 
 def test_are_alleles_iupac():
     g = Gwas("test", 1, "A", "T", None, None, None, None, None, None, None, None, None)
-    g.check_alleles_are_vaild()
+    g.check_alleles_are_valid()
 
     with pytest.raises(AssertionError):
         g = Gwas(
             "test", 1, "A", "wdeT", None, None, None, None, None, None, None, None, None
         )
-        g.check_alleles_are_vaild()
+        g.check_alleles_are_valid()
 
 
 def test_reverse_sign():
