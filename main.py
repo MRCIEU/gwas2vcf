@@ -98,54 +98,52 @@ def main():
     logging.info("Reading JSON parameters")
     try:
         schema = Param(strict=True)
-        with open(args.json) as f:
-            j = schema.load(json.load(f)).data
-            logging.info(f"Parameters: {j}")
-    except json.decoder.JSONDecodeError as e:
-        logging.error(f"Could not read json parameter file: {e}")
+        with open(args.json, encoding='utf8') as json_fh:
+            json_data = schema.load(json.load(json_fh)).data
+            logging.info(f"Parameters: {json_data}")
+    except json.decoder.JSONDecodeError as exception_name:
+        logging.error(f"Could not read json parameter file: {exception_name}")
         sys.exit()
-    except marshmallow.exceptions.ValidationError as e:
-        logging.error(f"Could not validate json parameter file: {e}")
+    except marshmallow.exceptions.ValidationError as exception_name:
+        logging.error(f"Could not validate json parameter file: {exception_name}")
         sys.exit()
 
     logging.info("Checking input arguments")
     if args.data is None:
-        if "data" in j.keys():
-            vars(args)["data"] = j["data"]
+        if "data" in json_data.keys():
+            vars(args)["data"] = json_data["data"]
         else:
             logging.error("'data' filename not provided in arguments or json file")
             sys.exit()
 
     if args.out is None:
-        if "out" in j.keys():
-            vars(args)["out"] = j["out"]
+        if "out" in json_data.keys():
+            vars(args)["out"] = json_data["out"]
         else:
             logging.error("out filename not provided in arguments or json file")
             sys.exit()
 
     if args.id is None:
-        if "id" in j.keys():
-            vars(args)["id"] = j["id"]
+        if "id" in json_data.keys():
+            vars(args)["id"] = json_data["id"]
         else:
             logging.error("id not provided in arguments or json file")
             sys.exit()
 
-    if args.cohort_cases is None and "cohort_cases" in j.keys():
-        vars(args)["cohort_cases"] = j["cohort_cases"]
+    if args.cohort_cases is None and "cohort_cases" in json_data.keys():
+        vars(args)["cohort_cases"] = json_data["cohort_cases"]
 
-    if args.cohort_controls is None and "cohort_controls" in j.keys():
-        vars(args)["cohort_controls"] = j["cohort_controls"]
+    if args.cohort_controls is None and "cohort_controls" in json_data.keys():
+        vars(args)["cohort_controls"] = json_data["cohort_controls"]
 
     # check values are valid
-    if args.cohort_cases is not None:
-        if args.cohort_cases < 1:
-            logging.error("Total study number of cases must be a positive number")
-            sys.exit()
+    if (args.cohort_cases is not None) and (args.cohort_cases < 1):
+        logging.error("Total study number of cases must be a positive number")
+        sys.exit()
 
-    if args.cohort_controls is not None:
-        if args.cohort_controls < 1:
-            logging.error("Total study number of controls must be a positive number")
-            sys.exit()
+    if (args.cohort_controls is not None) and (args.cohort_controls < 1):
+        logging.error("Total study number of controls must be a positive number")
+        sys.exit()
 
     if not os.path.isfile(args.data):
         logging.error(f"{args.data} file does not exist")
@@ -159,15 +157,12 @@ def main():
         logging.error(f"{args.out} output directory does not exist")
         sys.exit()
 
-    if args.dbsnp is not None:
-        dbsnp = pysam.VariantFile(args.dbsnp)
-    else:
-        dbsnp = None
+    dbsnp = pysam.VariantFile(args.dbsnp) if args.dbsnp is not None else None
 
     if args.alias is not None:
         alias = {}
-        with open(args.alias) as f:
-            for line in f:
+        with open(args.alias, encoding='utf8') as alias_fh:
+            for line in alias_fh:
                 (key, val) = line.strip().split("\t")
                 alias[key] = val
     else:
@@ -180,22 +175,22 @@ def main():
         gwas, idx, sample_metadata = Gwas.read_from_file(
             args.data,
             fasta,
-            j["chr_col"],
-            j["pos_col"],
-            j["ea_col"],
-            j["oa_col"],
-            j["beta_col"],
-            j["se_col"],
-            j["pval_col"],
-            j["delimiter"],
-            j["header"],
-            ncase_field=j.get("ncase_col"),
-            rsid_field=j.get("snp_col"),
-            ea_af_field=j.get("eaf_col"),
-            nea_af_field=j.get("oaf_col"),
-            imp_z_field=j.get("imp_z_col"),
-            imp_info_field=j.get("imp_info_col"),
-            ncontrol_field=j.get("ncontrol_col"),
+            json_data["chr_col"],
+            json_data["pos_col"],
+            json_data["ea_col"],
+            json_data["oa_col"],
+            json_data["beta_col"],
+            json_data["se_col"],
+            json_data["pval_col"],
+            json_data["delimiter"],
+            json_data["header"],
+            ncase_col_num=json_data.get("ncase_col"),
+            rsid_col_num=json_data.get("snp_col"),
+            ea_af_col_num=json_data.get("eaf_col"),
+            nea_af_col_num=json_data.get("oaf_col"),
+            imp_z_col_num=json_data.get("imp_z_col"),
+            imp_info_col_num=json_data.get("imp_info_col"),
+            ncontrol_col_num=json_data.get("ncontrol_col"),
             alias=alias,
             dbsnp=dbsnp,
         )
@@ -215,7 +210,7 @@ def main():
     if args.cohort_cases is not None:
         sample_metadata["TotalCases"] = args.cohort_cases
 
-    if "ncase_col" in j or args.cohort_cases is not None:
+    if "ncase_col" in json_data or args.cohort_cases is not None:
         sample_metadata["StudyType"] = "CaseControl"
     else:
         sample_metadata["StudyType"] = "Continuous"
@@ -227,7 +222,7 @@ def main():
         idx,
         args.out,
         fasta,
-        j["build"],
+        json_data["build"],
         args.id,
         sample_metadata,
         file_metadata,
