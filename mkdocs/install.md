@@ -23,7 +23,7 @@ Requires Python v3.8
 python3 -m venv env
 source env/bin/activate
 pip install -r requirements.txt
-pip install git+git://github.com/bioinformed/vgraph@v1.4.0#egg=vgraph
+pip install git+https://github.com/bioinformed/vgraph@v1.4.0#egg=vgraph
 python main.py -h
 ```
 

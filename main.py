@@ -14,7 +14,7 @@ from vcf import Vcf
 
 
 def main():
-    version = "1.4.2"
+    version = "1.4.3"
 
     parser = argparse.ArgumentParser(
         description="Map GWAS summary statistics to VCF/BCF"
