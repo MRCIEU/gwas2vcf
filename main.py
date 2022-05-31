@@ -7,6 +7,7 @@ from datetime import datetime
 
 import marshmallow
 import pysam
+from cyvcf2 import VCF
 import hashlib
 
 from gwas import Gwas
@@ -176,7 +177,10 @@ def main():
         logging.error(f"{args.out} output directory does not exist")
         sys.exit()
 
-    dbsnp = pysam.VariantFile(args.dbsnp) if args.dbsnp is not None else None
+    if args.dbsnp is not None:
+        dbsnp = VCF(args.dbsnp)
+    else:
+        dbsnp = None
 
     if args.alias is not None:
         alias = {}

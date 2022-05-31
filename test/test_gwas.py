@@ -2,6 +2,7 @@ import decimal
 import os
 
 import pysam
+from cyvcf2 import VCF
 import pytest
 from vgraph import norm
 
@@ -31,17 +32,18 @@ def test_reverse_sign():
 
 
 def test_update_dbsnp():
-    with pysam.VariantFile(
-            os.path.join(os.path.dirname(__file__), "dbsnp.vcf.gz")
-    ) as dbsnp:
-        g = Gwas("test", 1, "A", "T", 1, None, None, None, None, None, None, None, None)
-        assert g.dbsnpid is None
-        g.update_dbsnp(dbsnp)
-        assert g.dbsnpid == "rs1234"
-        g = Gwas("test", 2, "A", "T", 1, None, None, None, None, None, None, None, None)
-        assert g.dbsnpid is None
-        g.update_dbsnp(dbsnp)
-        assert g.dbsnpid is None
+    dbsnp = VCF(os.path.join(os.path.dirname(__file__), "dbsnp.vcf.gz"))
+
+    g = Gwas("test", 1, "A", "T", 1, None, None, None, None, None, None, None, None)
+    assert g.dbsnpid is None
+    g.update_dbsnp(dbsnp)
+    assert g.dbsnpid == "rs1234"
+    g = Gwas("test", 2, "A", "T", 1, None, None, None, None, None, None, None, None)
+    assert g.dbsnpid is None
+    g.update_dbsnp(dbsnp)
+    assert g.dbsnpid is None
+
+    dbsnp.close()
 
 
 def test_check_reference_allele():
@@ -68,6 +70,7 @@ def test_check_contig_name():
             # check that fasta has test1 contig as should not
             g = Gwas("test1", 1, "A", "T", 1, None, None, None, None, None, None, None, None)
             g.check_contig_name(fasta)
+
 
 def test_pvalues_precision_with_PvalueHandler():
     p_value_handler = PvalueHandler()

@@ -4,3 +4,4 @@ pysam
 marshmallow
 numpy
 Cython
+cyvcf2
