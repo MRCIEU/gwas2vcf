@@ -7,10 +7,19 @@ from datetime import datetime
 
 import marshmallow
 import pysam
+import hashlib
 
 from gwas import Gwas
 from param import Param
 from vcf import Vcf
+
+
+def md5(f_name):
+    hash_md5 = hashlib.md5()
+    with open(f_name, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
 
 
 def main():
@@ -95,6 +104,16 @@ def main():
         )
     logging.info(f"Gwas2VCF {version}")
     logging.info(f"Arguments: {vars(args)}")
+
+    # calculate MD5 for input files
+    logging.info("Calculating input file MD5")
+    data_md5 = md5(args['data'])
+    logging.info(f"GWAS MD5 is {data_md5}")
+    ref_md5 = md5(args['ref'])
+    logging.info(f"Reference file MD5 is {ref_md5}")
+    json_md5 = md5(args['json'])
+    logging.info(f"JSON MD5 is {json_md5}")
+
     logging.info("Reading JSON parameters")
     try:
         schema = Param(strict=True)
@@ -202,6 +221,9 @@ def main():
     file_metadata = {
         "Gwas2VCF_command": " ".join(sys.argv[1:]) + "; " + version,
         "file_date": datetime.now().isoformat(),
+        "GWAS_MD5": data_md5,
+        "JSON_MD5": json_md5,
+        "FASTA_MD5": ref_md5
     }
 
     if args.cohort_controls is not None:
@@ -226,7 +248,7 @@ def main():
         args.id,
         sample_metadata,
         file_metadata,
-        args.csi,
+        args.csi
     )
 
     # close temp file to release disk space

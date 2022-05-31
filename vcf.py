@@ -22,10 +22,10 @@ class Vcf:
     @staticmethod
     def is_float32_lossy(input_float):
         if (
-            input_float == 0
-            or input_float is None
-            or input_float == np.inf
-            or input_float == -np.inf
+                input_float == 0
+                or input_float is None
+                or input_float == np.inf
+                or input_float == -np.inf
         ):
             return False
 
@@ -51,15 +51,15 @@ class Vcf:
 
     @staticmethod
     def write_to_file(
-        gwas_file,
-        gwas_idx,
-        path,
-        fasta,
-        build,
-        trait_id,
-        sample_metadata=None,
-        file_metadata=None,
-        csi=False,
+            gwas_file,
+            gwas_idx,
+            path,
+            fasta,
+            build,
+            trait_id,
+            sample_metadata=None,
+            file_metadata=None,
+            csi=False
     ):
         logging.info(f"Writing headers to BCF/VCF: {path}")
 
