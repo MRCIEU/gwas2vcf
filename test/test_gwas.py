@@ -32,7 +32,7 @@ def test_reverse_sign():
 
 def test_update_dbsnp():
     with pysam.VariantFile(
-        os.path.join(os.path.dirname(__file__), "dbsnp.vcf.gz")
+            os.path.join(os.path.dirname(__file__), "dbsnp.vcf.gz")
     ) as dbsnp:
         g = Gwas("test", 1, "A", "T", 1, None, None, None, None, None, None, None, None)
         assert g.dbsnpid is None
@@ -46,7 +46,7 @@ def test_update_dbsnp():
 
 def test_check_reference_allele():
     with pysam.FastaFile(
-        os.path.join(os.path.dirname(__file__), "test.fasta")
+            os.path.join(os.path.dirname(__file__), "test.fasta")
     ) as fasta:
         g = Gwas("test", 1, "A", "T", 1, None, None, None, None, None, None, None, None)
         g.check_reference_allele(fasta)
@@ -57,6 +57,17 @@ def test_check_reference_allele():
             )
             g.check_reference_allele(fasta)
 
+
+def test_check_contig_name():
+    with pysam.FastaFile(os.path.join(os.path.dirname(__file__), "test.fasta")) as fasta:
+        # check that fasta has test contig as should
+        g = Gwas("test", 1, "A", "T", 1, None, None, None, None, None, None, None, None)
+        g.check_contig_name(fasta)
+
+        with pytest.raises(AssertionError):
+            # check that fasta has test1 contig as should not
+            g = Gwas("test1", 1, "A", "T", 1, None, None, None, None, None, None, None, None)
+            g.check_contig_name(fasta)
 
 def test_pvalues_precision_with_PvalueHandler():
     p_value_handler = PvalueHandler()
@@ -93,33 +104,33 @@ def test_pvalues_precision_with_PvalueHandler():
     # show that the show that the resulting flow is at least close to the exact decimal value
     epsilon = gwas_list[0].nlog_pval / 1000000.0
     assert (
-        gwas_list[0].nlog_pval + epsilon > -decimal.Decimal(p_value_strings[0]).log10()
-        and gwas_list[0].nlog_pval - epsilon
-        < -decimal.Decimal(p_value_strings[0]).log10()
+            gwas_list[0].nlog_pval + epsilon > -decimal.Decimal(p_value_strings[0]).log10()
+            and gwas_list[0].nlog_pval - epsilon
+            < -decimal.Decimal(p_value_strings[0]).log10()
     )
     epsilon = gwas_list[1].nlog_pval / 1000000.0
     assert (
-        gwas_list[1].nlog_pval + epsilon > -decimal.Decimal(p_value_strings[1]).log10()
-        and gwas_list[1].nlog_pval - epsilon
-        < -decimal.Decimal(p_value_strings[1]).log10()
+            gwas_list[1].nlog_pval + epsilon > -decimal.Decimal(p_value_strings[1]).log10()
+            and gwas_list[1].nlog_pval - epsilon
+            < -decimal.Decimal(p_value_strings[1]).log10()
     )
     epsilon = gwas_list[2].nlog_pval / 1000000.0
     assert (
-        gwas_list[2].nlog_pval + epsilon > -decimal.Decimal(p_value_strings[2]).log10()
-        and gwas_list[2].nlog_pval - epsilon
-        < -decimal.Decimal(p_value_strings[2]).log10()
+            gwas_list[2].nlog_pval + epsilon > -decimal.Decimal(p_value_strings[2]).log10()
+            and gwas_list[2].nlog_pval - epsilon
+            < -decimal.Decimal(p_value_strings[2]).log10()
     )
     epsilon = gwas_list[3].nlog_pval / 1000000.0
     assert (
-        gwas_list[3].nlog_pval + epsilon > -decimal.Decimal(p_value_strings[3]).log10()
-        and gwas_list[3].nlog_pval - epsilon
-        < -decimal.Decimal(p_value_strings[3]).log10()
+            gwas_list[3].nlog_pval + epsilon > -decimal.Decimal(p_value_strings[3]).log10()
+            and gwas_list[3].nlog_pval - epsilon
+            < -decimal.Decimal(p_value_strings[3]).log10()
     )
     epsilon = gwas_list[4].nlog_pval / 1000000.0
     assert (
-        gwas_list[4].nlog_pval + epsilon > -decimal.Decimal(p_value_strings[4]).log10()
-        and gwas_list[4].nlog_pval - epsilon
-        < -decimal.Decimal(p_value_strings[4]).log10()
+            gwas_list[4].nlog_pval + epsilon > -decimal.Decimal(p_value_strings[4]).log10()
+            and gwas_list[4].nlog_pval - epsilon
+            < -decimal.Decimal(p_value_strings[4]).log10()
     )
 
     # Note:this is the problem we're trying to correct
@@ -138,7 +149,7 @@ def test_pvalues_precision_with_PvalueHandler():
 
 def test_normalise():
     with pysam.FastaFile(
-        os.path.join(os.path.dirname(__file__), "test.fasta")
+            os.path.join(os.path.dirname(__file__), "test.fasta")
     ) as fasta:
         # SNV
         g = Gwas(
@@ -249,7 +260,7 @@ def test_bioinformed_vgraph_normalise():
 
     # get a reference sequence
     with pysam.FastaFile(
-        os.path.join(os.path.dirname(__file__), "test.fasta")
+            os.path.join(os.path.dirname(__file__), "test.fasta")
     ) as fasta:
         seq = fasta.fetch("test").upper()
 

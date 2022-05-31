@@ -12,23 +12,24 @@ from pvalue_handler import PvalueHandler
 
 valid_nucleotides = {"A", "T", "G", "C"}
 
+
 class Gwas:
     def __init__(
-        self,
-        chrom,
-        pos,
-        ref,
-        alt,
-        b,
-        se,
-        nlog_pval,
-        n,
-        alt_freq,
-        dbsnpid,
-        ncase,
-        imp_info,
-        imp_z,
-        vcf_filter="PASS",
+            self,
+            chrom,
+            pos,
+            ref,
+            alt,
+            b,
+            se,
+            nlog_pval,
+            n,
+            alt_freq,
+            dbsnpid,
+            ncase,
+            imp_info,
+            imp_z,
+            vcf_filter="PASS",
     ):
 
         self.chrom = chrom
@@ -68,9 +69,12 @@ class Gwas:
                 start=self.pos - 1,
                 end=self.pos + len(self.ref) - 1,
             ).upper()
-        except:
-            assert 1 == 2
+        except Exception:
+            return False
         assert self.ref == fasta_ref_seq
+
+    def check_contig_name(self, fasta):
+        assert self.chrom in fasta.references
 
     def normalise(self, fasta, padding=100):
         # TODO handle padding edge cases
@@ -98,7 +102,7 @@ class Gwas:
             # get distance from old and new positions
             dist = (self.pos - 1) - pos0
             # extract base from seq
-            left_nucleotide = seq[(padding + dist) - 1 : (padding + dist)]
+            left_nucleotide = seq[(padding + dist) - 1: (padding + dist)]
             # set alleles and pos
             self.ref = left_nucleotide + self.ref
             self.alt = left_nucleotide + self.alt
@@ -125,26 +129,26 @@ class Gwas:
 
     @staticmethod
     def read_from_file(
-        input_file_path,
-        fasta,
-        chrom_col_num,
-        pos_col_num,
-        ea_col_num,
-        nea_col_num,
-        effect_col_num,
-        se_col_num,
-        pval_col_num,
-        delimiter,
-        header,
-        ncase_col_num=None,
-        rsid_col_num=None,
-        ea_af_col_num=None,
-        nea_af_col_num=None,
-        imp_z_col_num=None,
-        imp_info_col_num=None,
-        ncontrol_col_num=None,
-        alias=None,
-        dbsnp=None,
+            input_file_path,
+            fasta,
+            chrom_col_num,
+            pos_col_num,
+            ea_col_num,
+            nea_col_num,
+            effect_col_num,
+            se_col_num,
+            pval_col_num,
+            delimiter,
+            header,
+            ncase_col_num=None,
+            rsid_col_num=None,
+            ea_af_col_num=None,
+            nea_af_col_num=None,
+            imp_z_col_num=None,
+            imp_info_col_num=None,
+            ncontrol_col_num=None,
+            alias=None,
+            dbsnp=None,
     ):
 
         rsid_pattern = re.compile("^rs[0-9]*$")
@@ -172,6 +176,7 @@ class Gwas:
         metadata = {
             "TotalVariants": 0,
             "VariantsNotRead": 0,
+            "VariantsNotMatchingContig": 0,
             "HarmonisedVariants": 0,
             "VariantsNotHarmonised": 0,
             "SwitchedAlleles": 0,
@@ -325,6 +330,14 @@ class Gwas:
             except AssertionError as exception_name:
                 logging.debug(f"Skipping {columns}: {exception_name}")
                 metadata["VariantsNotRead"] += 1
+                continue
+
+            # check contig is present in FASTA
+            try:
+                result.check_contig_name(fasta)
+            except AssertionError as exception_name:
+                logging.debug(f"Skipping {columns}: {exception_name}")
+                metadata["VariantsNotMatchingContig"] += 1
                 continue
 
             # harmonise alleles
