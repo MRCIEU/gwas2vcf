@@ -109,8 +109,9 @@ class Gwas:
             raise OSError("Could not read dbsnp file")
         self.dbsnpid = None
         for rec in dbsnp.fetch(contig=self.chrom, start=self.pos - 1, stop=self.pos):
-            self.dbsnpid = rec.id
-            break
+            if rec.pos == self.pos:
+                self.dbsnpid = rec.id
+                break
 
     def check_alleles_are_valid(self):
         for nucleotide in self.alt:
