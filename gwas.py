@@ -1,6 +1,5 @@
 import gzip
 import logging
-import os
 import pickle
 import re
 import tempfile
@@ -11,6 +10,7 @@ from vgraph import norm
 from pvalue_handler import PvalueHandler
 
 valid_nucleotides = {"A", "T", "G", "C"}
+
 
 class Gwas:
     def __init__(
@@ -179,14 +179,15 @@ class Gwas:
             "NormalisedVariants": 0,
         }
         file_idx = {}
-        file_name, file_extension = os.path.splitext(input_file_path)
 
-        if file_extension == ".gz":
-            logging.info("Reading gzip file")
+        try:
             f_handle = gzip.open(input_file_path, "rt")
-        else:
+            f_handle.read(1)
+        except gzip.BadGzipFile:
             logging.info("Reading plain text file")
             f_handle = open(input_file_path)
+        else:
+            logging.info("Reading gzip file")
 
         # skip header line (if present)
         if header:
